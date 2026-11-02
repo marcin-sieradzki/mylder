@@ -4,14 +4,14 @@
 
 _Mylder_ is Danish for a teeming crowd, and it echoes _myldretid_, rush hour.
 
-**Demo:** [marcin-sieradzki.github.io/mylder](https://marcin-sieradzki.github.io/mylder/) runs the whole app on simulated data, with the server's tracker in a Web Worker in your browser.
+**Live:** [mylder-liard.vercel.app](https://mylder-liard.vercel.app) runs on today's timetable. **Demo:** [marcin-sieradzki.github.io/mylder](https://marcin-sieradzki.github.io/mylder/) runs the whole app on simulated data, with the server's tracker in a Web Worker in your browser.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/map-dark.png">
   <img alt="Mylder's map of Copenhagen: every bus, Metro, S-tog, train and light rail vehicle as a dot on its line, with City pulse open in the side sheet" src="docs/images/map-light.png">
 </picture>
 
-> **Status:** every screen of the first public version is built, and runs on the timetable: every vehicle is placed where its timetable says it should be, and the page says so. Next come delays and cancellations from Rejseplanen's SIRI-ET feed, and deploying to Vercel. The Rejseplanen API joins once its key arrives ([ADR 0018](docs/adr/0018-mylder-goes-public-on-the-timetable-and-siri-et-and-adds-the-api-with-the-key.md)). See the [roadmap](#roadmap).
+> **Status:** every screen of the first public version is built, and runs on the timetable: every vehicle is placed where its timetable says it should be, and the page says so. It is live on [Vercel](https://mylder-liard.vercel.app). Next come delays and cancellations from Rejseplanen's SIRI-ET feed, once its listener is deployed. The Rejseplanen API joins once its key arrives ([ADR 0018](docs/adr/0018-mylder-goes-public-on-the-timetable-and-siri-et-and-adds-the-api-with-the-key.md)). See the [roadmap](#roadmap).
 
 ## Why
 
@@ -60,7 +60,8 @@ The free Rejseplanen key allows about one call a minute, so browsers never call 
 - [x] The planes over Copenhagen, live from adsb.lol with adsb.fi as its fallback
 - [x] Every vehicle on its timetable by default, with no invented realtime
 - [ ] Delays and cancellations from Rejseplanen's SIRI-ET feed, through one small always-on listener
-- [ ] Deploy production and previews on Vercel, with the tracker's state in a hosted Redis
+- [x] Production and previews on Vercel, live at [mylder-liard.vercel.app](https://mylder-liard.vercel.app)
+- [ ] The tracker's state in a hosted Redis
 
 **Once the API key arrives:** reported positions and disruption messages from the Rejseplanen API, on top of the timetable and SIRI-ET.
 
@@ -76,7 +77,8 @@ The free Rejseplanen key allows about one call a minute, so browsers never call 
 - [Playwright](https://playwright.dev) for end-to-end tests
 - [oxlint](https://oxc.rs/docs/guide/usage/linter) for linting, [Prettier](https://prettier.io) for formatting
 - Agent skills in `.claude/skills/`: `grill-me`, `grilling`, `wayfinder` (with `domain-modeling`, `prototype` and `research`), `to-spec`, `to-tickets`, `tdd` (with `codebase-design`), `factory-code-review`, `improve-codebase-architecture` and `software-factory` from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), and `vercel-react-best-practices` from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) (MIT); `create-verification-skill` and `maintain-verification-skill` (MIT, licence in each folder); and Mylder's own `factory` and `verify-mylder`
-- Planned: Vercel for deploys and Upstash Redis for the tracker's state
+- [Vercel](https://vercel.com) for production and previews
+- Planned: Upstash Redis for the tracker's state
 
 ## Getting started
 
