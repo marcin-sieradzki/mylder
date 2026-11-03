@@ -133,52 +133,18 @@ describe("the map's legend", () => {
   })
 
   describe('on the timetable source', () => {
-    const onTimetable = saved('timetable-source', '0006.json')
-    const ON_TIMETABLE_EN =
-      "Every vehicle is Timetable only for now: live positions aren't connected yet."
-    const ON_TIMETABLE_DA =
-      'Alle køretøjer er Kun køreplan indtil videre: der er endnu ingen livepositioner.'
+    const NOT_CONNECTED = /live positions aren't connected yet|der er endnu ingen livepositioner/
 
-    it('says once that every vehicle is placed from the timetable for now, in English', () => {
-      show('en', onTimetable)
-      expect(screen.getAllByText(ON_TIMETABLE_EN)).toHaveLength(1)
+    it.each([
+      ['without delays', 'en', saved('timetable-source', '0006.json')],
+      ['without delays', 'da', saved('timetable-source', '0006.json')],
+      ['with SIRI-ET’s delays', 'en', saved('siri-et', '0002.json')],
+      ['with SIRI-ET’s delays', 'da', saved('siri-et', '0002.json')],
+    ] as const)('adds no note on the source %s, in %s', (_, lang, snapshot) => {
+      show(lang, snapshot)
+      expect(screen.queryByText(NOT_CONNECTED)).not.toBeInTheDocument()
       // Its position mode is none, not CALC_REPORT: no call is made at all.
-      expect(screen.queryByText(NO_LIVE_EN)).not.toBeInTheDocument()
-    })
-
-    it('says it in Danish', () => {
-      show('da', onTimetable)
-      expect(screen.getAllByText(ON_TIMETABLE_DA)).toHaveLength(1)
-    })
-
-    it('says nothing of it on any other source', () => {
-      show('en', alternating)
-      expect(screen.queryByText(ON_TIMETABLE_EN)).not.toBeInTheDocument()
-      for (const kind of ['simulated', 'recording', 'rejseplanen'] as const) {
-        act(() => liveSnapshot.update({ snapshot: { ...onTimetable, source: { kind } } }))
-        expect(screen.queryByText(ON_TIMETABLE_EN)).not.toBeInTheDocument()
-      }
-    })
-  })
-
-  describe('on the timetable source with SIRI-ET’s delays', () => {
-    const withDelays = saved('siri-et', '0002.json')
-    const WITH_DELAYS_EN =
-      "For now a vehicle is Estimated, placed from its delay, or Timetable only: live positions aren't connected yet."
-    const WITH_DELAYS_DA =
-      'Indtil videre er et køretøj Beregnet, placeret ud fra sin forsinkelse, eller Kun køreplan: der er endnu ingen livepositioner.'
-    const ON_TIMETABLE_EN =
-      "Every vehicle is Timetable only for now: live positions aren't connected yet."
-
-    it('says once that a vehicle is Estimated from its delay or Timetable only, in English', () => {
-      show('en', withDelays)
-      expect(screen.getAllByText(WITH_DELAYS_EN)).toHaveLength(1)
-      expect(screen.queryByText(ON_TIMETABLE_EN)).not.toBeInTheDocument()
-    })
-
-    it('says it in Danish', () => {
-      show('da', withDelays)
-      expect(screen.getAllByText(WITH_DELAYS_DA)).toHaveLength(1)
+      expect(screen.queryByText(lang === 'en' ? NO_LIVE_EN : NO_LIVE_DA)).not.toBeInTheDocument()
     })
   })
 

@@ -12,10 +12,7 @@ interface SnapshotLike {
   readonly trips: readonly { readonly state: string }[]
 }
 
-test('with MYLDER_SOURCE unset, the map runs on the timetable and says so', async ({
-  page,
-  request,
-}) => {
+test('with MYLDER_SOURCE unset, the map runs on the timetable', async ({ page, request }) => {
   const response = await request.get(`${DEFAULT_URL}/api/snapshot`)
   expect(response.status()).toBe(200)
   const snapshot = (await response.json()) as SnapshotLike
@@ -26,11 +23,10 @@ test('with MYLDER_SOURCE unset, the map runs on the timetable and says so', asyn
   expect(new Set(snapshot.trips.map((trip) => trip.state))).toEqual(new Set(['timetable-only']))
 
   await page.goto(`${DEFAULT_URL}/en`)
-  // The City sheet has statuses of its own; the banner is the one that names the data.
-  const banner = page.getByRole('status').filter({ hasText: /^Timetable only:/ })
-  await expect(banner).toHaveText(
-    "Timetable only: live positions aren't connected yet, so every vehicle is placed where its timetable says it should be.",
-  )
+  // Neither a banner nor the legend names the source; About does.
+  await expect(page.getByRole('list', { name: 'Data states' })).toBeVisible()
+  await expect(page.getByText("live positions aren't connected yet")).toHaveCount(0)
+  await expect(page.getByRole('status').filter({ hasText: /^Timetable only:/ })).toHaveCount(0)
   const map = page.locator('[data-vehicles]')
   await expect
     .poll(async () => Number(await map.getAttribute('data-vehicles')), {
