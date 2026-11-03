@@ -257,9 +257,6 @@ export function AboutDialog() {
           {snapshot?.positionMode === 'CALC_REPORT' ? (
             <Text render={<p />}>{dictionary.legend.noLive}</Text>
           ) : null}
-          {source?.legend ? (
-            <Text render={<p />}>{sourceWords(dictionary, source.legend)}</Text>
-          ) : null}
         </Section>
         <Section title={words.status.title}>
           <PageStatus snapshot={snapshot} />

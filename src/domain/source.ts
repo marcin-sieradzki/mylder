@@ -1,7 +1,6 @@
 // What a rider is told about the source the page runs on (docs/testing-seams.md, "The switch"):
 // whether it asks Rejseplanen, whether it has positions, whether it brings disruption messages,
-// and the words that name and credit it, as keys into the dictionary, with SIRI-ET's delays on
-// (`MYLDER_UPDATES`, spec #146) or off. The domain's rules, the
+// and the words that name and credit it, as keys into the dictionary. The domain's rules, the
 // screens and the tracker's run read this description, never the kind itself: only
 // src/tracker/source.ts tells its sources apart, to build each one. A new source changes this one
 // place. Beside it, `NOT_IN_SIRI_ET`: the modes SIRI-ET's delays never reach, whatever the source,
@@ -13,11 +12,7 @@ export const SOURCE_KINDS = ['timetable', 'simulated', 'recording', 'rejseplanen
 export type SourceKind = (typeof SOURCE_KINDS)[number]
 
 /** The source banner's words, which `{date}` fills with the day a recording was made. */
-export type BannerWords =
-  'notices.simulated' | 'notices.recorded' | 'onTimetable.banner' | 'onTimetable.bannerWithDelays'
-
-/** The legend's note on which states the dots can take, on a source with no positions. */
-export type LegendWords = 'onTimetable.legend' | 'onTimetable.legendWithDelays'
+export type BannerWords = 'notices.simulated' | 'notices.recorded'
 
 /** About's name for the source, which `{name}` fills with the scenario or the recording. */
 export type SourceNameWords =
@@ -30,7 +25,7 @@ export type SourceNameWords =
 export type SourceNoteWords = 'about.status.notReal' | 'onTimetable.note'
 
 /** Every dictionary key a description names. */
-export type SourceWords = BannerWords | LegendWords | SourceNameWords | SourceNoteWords
+export type SourceWords = BannerWords | SourceNameWords | SourceNoteWords
 
 export interface SourceDescription {
   /**
@@ -47,15 +42,11 @@ export interface SourceDescription {
   /** Whether it brings Rejseplanen's disruption messages; without them Disruptions says so. */
   readonly messages: boolean
   /**
-   * The banner that says where the page's data comes from, and whether it names the day the
-   * snapshot was built; none for Rejseplanen's own live data.
+   * The banner that says the page's data isn't real, and whether it names the day the snapshot
+   * was built; none for real data, Rejseplanen's own or the timetable's, whose About and panels
+   * name it.
    */
   readonly banner?: { readonly words: BannerWords; readonly dated: boolean }
-  /**
-   * The legend's note on which states the dots can take, where a source rules some out: without
-   * positions, nothing is Live or Ageing.
-   */
-  readonly legend?: LegendWords
   /** How About's status names the source. */
   readonly named: SourceNameWords
   /** What About notes of the vehicles; none when they are Rejseplanen's live data. */
@@ -67,13 +58,8 @@ export interface SourceDescription {
   readonly credit: 'rejseplanen' | 'timetable'
 }
 
-/** What SIRI-ET's delays change in a source's description, when they are on. */
-export type WithDelays = Partial<Pick<SourceDescription, 'banner' | 'legend'>>
-
-/** A description for each of the kinds `K`, every one required, and what delays change in it. */
-export type SourceDescriptions<K extends string> = {
-  readonly [Kind in K]: SourceDescription & { readonly withDelays?: WithDelays }
-}
+/** A description for each of the kinds `K`, every one required. */
+export type SourceDescriptions<K extends string> = { readonly [Kind in K]: SourceDescription }
 
 /** Rejseplanen's answers, real, simulated or recorded. */
 const ANSWERING = {
@@ -92,16 +78,9 @@ export const SOURCE_DESCRIPTIONS: SourceDescriptions<SourceKind> = {
     callsRejseplanen: false,
     positions: false,
     messages: false,
-    banner: { words: 'onTimetable.banner', dated: false },
-    legend: 'onTimetable.legend',
     named: 'onTimetable.source',
     note: 'onTimetable.note',
     credit: 'timetable',
-    // Vehicles are placed from the timetable and, where Rejseplanen has sent one, their delay.
-    withDelays: {
-      banner: { words: 'onTimetable.bannerWithDelays', dated: false },
-      legend: 'onTimetable.legendWithDelays',
-    },
   },
   simulated: {
     ...ANSWERING,
@@ -118,17 +97,11 @@ export const SOURCE_DESCRIPTIONS: SourceDescriptions<SourceKind> = {
   rejseplanen: { ...ANSWERING, named: 'about.status.rejseplanen' },
 }
 
-/**
- * The description of a source, with SIRI-ET's delays on (`delays`, the snapshot's updates not off)
- * or off. A source whose banner and legend are its own whatever the delays, such as a simulation,
- * reads the same either way.
- */
-export function describeSource(
-  kind: SourceKind,
-  { delays = false }: { readonly delays?: boolean } = {},
-): SourceDescription {
-  const { withDelays, ...description } = SOURCE_DESCRIPTIONS[kind]
-  return delays ? { ...description, ...withDelays } : description
+/** The description of a source; SIRI-ET's delays, on or off, leave it as it is. */
+export function describeSource(kind: SourceKind): SourceDescription {
+  const description: SourceDescription | undefined = SOURCE_DESCRIPTIONS[kind]
+  if (description === undefined) throw new TypeError(`No source is called ${String(kind)}`)
+  return description
 }
 
 /**

@@ -9,10 +9,6 @@ export function sourceWords(dictionary: ClientDictionary, key: SourceWords): str
   const words: Record<SourceWords, string> = {
     'notices.simulated': notices.simulated,
     'notices.recorded': notices.recorded,
-    'onTimetable.banner': onTimetable.banner,
-    'onTimetable.bannerWithDelays': onTimetable.bannerWithDelays,
-    'onTimetable.legend': onTimetable.legend,
-    'onTimetable.legendWithDelays': onTimetable.legendWithDelays,
     'about.status.rejseplanen': about.status.rejseplanen,
     'about.status.simulated': about.status.simulated,
     'about.status.recording': about.status.recording,
