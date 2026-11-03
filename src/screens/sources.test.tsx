@@ -88,7 +88,7 @@ const recorded = (name: string): Record<Lang, Reads> => ({
 const ON_TIMETABLE: Record<Lang, Reads> = {
   en: {
     banner: undefined,
-    legendNote: true,
+    legendNote: false,
     source: "Rejseplanen's timetable, no live positions yet",
     note: "The positions on this page are the timetable's plan, not reports from the vehicles.",
     credit: 'Timetable data: Rejseplanen, under CC BY 4.0.',
@@ -97,7 +97,7 @@ const ON_TIMETABLE: Record<Lang, Reads> = {
   },
   da: {
     banner: undefined,
-    legendNote: true,
+    legendNote: false,
     source: 'Rejseplanens køreplan, endnu ingen livepositioner',
     note: 'Positionerne på denne side er køreplanens plan, ikke meldinger fra køretøjerne.',
     credit: 'Køreplansdata: Rejseplanen, under CC BY 4.0.',

@@ -280,8 +280,6 @@
     "aircraftRecorded": "Planes: recorded adsb.lol data."
   },
   "onTimetable": {
-    "legend": "Every vehicle is Timetable only for now: live positions aren't connected yet.",
-    "legendWithDelays": "For now a vehicle is Estimated, placed from its delay, or Timetable only: live positions aren't connected yet.",
     "source": "Rejseplanen's timetable, no live positions yet",
     "note": "The positions on this page are the timetable's plan, not reports from the vehicles.",
     "transit": "Timetable data: {rejseplanen}, under {licence}. Timetable of {date}.",

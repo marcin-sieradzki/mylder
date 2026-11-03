@@ -12,10 +12,7 @@ interface SnapshotLike {
   readonly trips: readonly { readonly state: string }[]
 }
 
-test('with MYLDER_SOURCE unset, the map runs on the timetable and says so', async ({
-  page,
-  request,
-}) => {
+test('with MYLDER_SOURCE unset, the map runs on the timetable', async ({ page, request }) => {
   const response = await request.get(`${DEFAULT_URL}/api/snapshot`)
   expect(response.status()).toBe(200)
   const snapshot = (await response.json()) as SnapshotLike
@@ -26,10 +23,9 @@ test('with MYLDER_SOURCE unset, the map runs on the timetable and says so', asyn
   expect(new Set(snapshot.trips.map((trip) => trip.state))).toEqual(new Set(['timetable-only']))
 
   await page.goto(`${DEFAULT_URL}/en`)
-  // No banner names the source: the legend's note says every vehicle is placed from the timetable.
-  await expect(
-    page.getByText("Every vehicle is Timetable only for now: live positions aren't connected yet."),
-  ).toBeVisible()
+  // Neither a banner nor the legend names the source; About does.
+  await expect(page.getByRole('list', { name: 'Data states' })).toBeVisible()
+  await expect(page.getByText("live positions aren't connected yet")).toHaveCount(0)
   await expect(page.getByRole('status').filter({ hasText: /^Timetable only:/ })).toHaveCount(0)
   const map = page.locator('[data-vehicles]')
   await expect

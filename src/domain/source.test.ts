@@ -16,7 +16,6 @@ describe('what a rider is told about each source', () => {
         callsRejseplanen: false,
         positions: false,
         messages: false,
-        legend: 'onTimetable.legend',
         named: 'onTimetable.source',
         note: 'onTimetable.note',
         credit: 'timetable',
@@ -59,20 +58,6 @@ describe('what a rider is told about each source', () => {
   ] satisfies [SourceKind, SourceDescription][])('the %s source', (kind, description) => {
     expect(describeSource(kind)).toEqual(description)
   })
-
-  it('says on the timetable source, with SIRI-ET’s delays on, that vehicles are placed from them', () => {
-    expect(describeSource('timetable', { delays: true })).toEqual({
-      ...describeSource('timetable'),
-      legend: 'onTimetable.legendWithDelays',
-    })
-  })
-
-  it.each(['simulated', 'recording', 'rejseplanen'] as const)(
-    'tells of the %s source as before with delays on: its legend is its own',
-    (kind) => {
-      expect(describeSource(kind, { delays: true })).toEqual(describeSource(kind))
-    },
-  )
 
   it('describes every kind the snapshot can name', () => {
     expect(SOURCE_KINDS).toEqual(['timetable', 'simulated', 'recording', 'rejseplanen'])

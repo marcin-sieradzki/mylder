@@ -45,14 +45,11 @@ test('with updates from the SIRI-ET recording, the server draws trips Estimated 
   expect(snapshot.trips.some((trip) => ['live', 'ageing'].includes(trip.state))).toBe(false)
 })
 
-test('the page draws the Estimated dots and says what they are', async ({ page, request }) => {
+test('the page draws the Estimated dots', async ({ page, request }) => {
   await page.goto(`${UPDATES_URL}/en`)
-  await expect(
-    page.getByText(
-      "For now a vehicle is Estimated, placed from its delay, or Timetable only: live positions aren't connected yet.",
-    ),
-  ).toBeVisible()
-  // No banner names the source; the legend's note above says it.
+  await expect(page.getByRole('list', { name: 'Data states' })).toBeVisible()
+  // Neither a banner nor the legend names the source.
+  await expect(page.getByText("live positions aren't connected yet")).toHaveCount(0)
   await expect(page.getByRole('status').filter({ hasText: /^Timetable and delays:/ })).toHaveCount(
     0,
   )

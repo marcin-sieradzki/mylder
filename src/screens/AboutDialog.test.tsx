@@ -299,9 +299,7 @@ describe('the About dialog', () => {
         'href',
         'https://creativecommons.org/licenses/by/4.0/',
       )
-      expect(dialog).toHaveTextContent(
-        "Every vehicle is Timetable only for now: live positions aren't connected yet.",
-      )
+      expect(dialog).not.toHaveTextContent("live positions aren't connected yet")
       expect(fact(dialog, 'Positions')).toBe('No position calls')
       expect(fact(dialog, 'Calls this month')).toBe('0')
     })
@@ -317,9 +315,7 @@ describe('the About dialog', () => {
       expect(dialog).toHaveTextContent(
         'Køreplansdata: Rejseplanen, under CC BY 4.0. Køreplan fra 2. juni.',
       )
-      expect(dialog).toHaveTextContent(
-        'Alle køretøjer er Kun køreplan indtil videre: der er endnu ingen livepositioner.',
-      )
+      expect(dialog).not.toHaveTextContent('der er endnu ingen livepositioner')
     })
   })
 

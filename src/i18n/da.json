@@ -280,8 +280,6 @@
     "aircraftRecorded": "Fly: optagne data fra adsb.lol."
   },
   "onTimetable": {
-    "legend": "Alle køretøjer er Kun køreplan indtil videre: der er endnu ingen livepositioner.",
-    "legendWithDelays": "Indtil videre er et køretøj Beregnet, placeret ud fra sin forsinkelse, eller Kun køreplan: der er endnu ingen livepositioner.",
     "source": "Rejseplanens køreplan, endnu ingen livepositioner",
     "note": "Positionerne på denne side er køreplanens plan, ikke meldinger fra køretøjerne.",
     "transit": "Køreplansdata: {rejseplanen}, under {licence}. Køreplan fra {date}.",
