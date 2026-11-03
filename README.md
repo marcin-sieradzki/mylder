@@ -70,7 +70,7 @@ The free Rejseplanen key allows about one call a minute, so browsers never call 
 ## Stack
 
 - [Next.js 16](https://nextjs.org) with the App Router, [React 19](https://react.dev) and TypeScript
-- [Perron](https://github.com/marcin-sieradzki/perron), Mylder's own design system, for every component and token ([docs](https://marcin-sieradzki.github.io/perron/))
+- [Perron](https://github.com/marcin-sieradzki/perron), Mylder's own design system, for every component and token ([docs](https://perron-pearl.vercel.app))
 - [MapLibre GL](https://maplibre.org) for the basemap and [deck.gl](https://deck.gl) for the vehicles
 - [Effect](https://effect.website) for the server's tracker
 - [Vitest](https://vitest.dev) + Testing Library for unit and component tests, with Vite only as Vitest's compiler
