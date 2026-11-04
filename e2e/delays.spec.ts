@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext } from '@playwright/test'
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
 import { savedUpdatesSnapshot, UPDATES_URL } from './recording'
 
 // SIRI-ET's delays on the map (spec #146): a server on the timetable source with updates from the
@@ -116,4 +116,44 @@ test('an opened delayed bus and its next stop show its expected times and the de
   await expect(stop).toContainText(
     "Countdowns use the timetable, moved by Rejseplanen's delay where a trip has one; the rest use the timetable alone.",
   )
+})
+
+/** Serves the saved minute of 09:22 at its moment, so the pill names its trips. */
+async function onSavedMinute(page: Page) {
+  const saved = savedUpdatesSnapshot('0002.json') as SnapshotLike
+  await page.clock.install({ time: saved.fetched })
+  await page.route('**/api/snapshot', (route) =>
+    route.fulfill({
+      json: saved,
+      headers: { date: new Date(saved.fetched).toUTCString(), 'cache-control': 'no-store' },
+    }),
+  )
+}
+
+test('the Latest now pill names the trip running latest and opens its panel', async ({ page }) => {
+  // At 09:22 the 950R to Hillerød runs 77 min late, between Slotspavillonen St. and Hillerød St.
+  await onSavedMinute(page)
+  await page.goto(`${UPDATES_URL}/en`)
+  const pill = page.getByRole('banner').getByRole('button', {
+    name: 'Biggest delay right now: 950R to Hillerød, 77 min late, between Slotspavillonen St. and Hillerød St.',
+  })
+  await expect(pill).toContainText('Latest now')
+  await expect(pill).toContainText('at Slotspavillonen St.')
+  await pill.click()
+  await expect(page).toHaveURL(/[?&]trip=train\.950R\.bacca19217\.20261031\.0733(&|$)/)
+  await expect(page.getByRole('dialog', { name: /to Hillerød/ })).toContainText('950R')
+})
+
+test('on a phone the pill takes a row of its own under the top bar', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 })
+  await onSavedMinute(page)
+  await page.goto(`${UPDATES_URL}/en`)
+  const pill = page.getByRole('banner').getByRole('button', { name: /^Biggest delay right now:/ })
+  await expect(pill).toBeVisible()
+  const about = await page.getByRole('button', { name: 'About Mylder' }).boundingBox()
+  const box = (await pill.boundingBox())!
+  expect(box.y).toBeGreaterThanOrEqual(about!.y + about!.height)
+  // Never wider than the screen.
+  expect(box.x).toBeGreaterThanOrEqual(0)
+  expect(box.x + box.width).toBeLessThanOrEqual(412)
 })
