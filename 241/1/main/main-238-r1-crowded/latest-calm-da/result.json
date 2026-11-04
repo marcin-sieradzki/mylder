@@ -1,0 +1,9 @@
+{
+  "journey": "latest-calm-da",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByText(/Mest forsinket nu/).first()\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByText(/Mest forsinket nu/).first() with timeout 30000ms\n  - waiting for getByRole('banner').getByText(/Mest forsinket nu/).first()\n",
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4303/da)",
+    "02-failure: failure (http://localhost:4303/da)"
+  ]
+}

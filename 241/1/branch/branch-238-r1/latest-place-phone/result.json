@@ -1,0 +1,8 @@
+{
+  "journey": "latest-place",
+  "pass": true,
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4303/en)",
+    "02-pill-and-the-top-bar: pill and the top bar (http://localhost:4303/en)"
+  ]
+}

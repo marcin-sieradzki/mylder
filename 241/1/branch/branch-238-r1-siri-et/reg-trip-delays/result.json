@@ -1,0 +1,7 @@
+{
+  "journey": "reg-trip-delays",
+  "pass": true,
+  "steps": [
+    "01-delayed-bus-panel-bus-1a-def713f298-20261031-0843: delayed bus panel bus.1A.def713f298.20261031.0843 (http://localhost:4401/en?trip=bus.1A.def713f298.20261031.0843)"
+  ]
+}

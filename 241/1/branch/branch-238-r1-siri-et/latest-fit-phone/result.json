@@ -1,0 +1,10 @@
+{
+  "journey": "latest-fit-phone",
+  "pass": false,
+  "error": "pill words spill outside the pill: words {\"left\":26.125,\"right\":385.875}, pill {\"left\":29,\"right\":383}",
+  "steps": [
+    "01-pill: pill (http://localhost:4401/en)",
+    "02-panel-open: panel open (http://localhost:4401/en?trip=bus.144.bc5239a3e3.20261031.0815)",
+    "03-failure: failure (http://localhost:4401/en?trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

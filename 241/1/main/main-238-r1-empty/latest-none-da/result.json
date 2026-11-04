@@ -1,0 +1,9 @@
+{
+  "journey": "latest-none-da",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByText(/Mest forsinket nu/).first()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByText(/Mest forsinket nu/).first() with timeout 90000ms\n  - waiting for getByRole('banner').getByText(/Mest forsinket nu/).first()\n",
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4401/da)",
+    "02-failure: failure (http://localhost:4401/da)"
+  ]
+}

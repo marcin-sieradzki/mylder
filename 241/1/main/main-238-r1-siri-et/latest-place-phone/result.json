@@ -1,0 +1,9 @@
+{
+  "journey": "latest-place-phone",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })\nExpected: visible\nTimeout: 60000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / }) with timeout 60000ms\n  - waiting for getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })\n",
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4302/en)",
+    "02-failure: failure (http://localhost:4302/en)"
+  ]
+}

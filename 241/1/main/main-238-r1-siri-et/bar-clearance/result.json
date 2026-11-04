@@ -1,0 +1,8 @@
+{
+  "journey": "bar-clearance",
+  "pass": true,
+  "steps": [
+    "01-bar-and-overview: bar and overview (http://localhost:4302/en)",
+    "02-panel-open: panel open (http://localhost:4302/en?trip=s-tog.B.03989a6253.20261031.0820)"
+  ]
+}

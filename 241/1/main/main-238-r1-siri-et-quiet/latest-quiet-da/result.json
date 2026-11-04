@@ -1,0 +1,9 @@
+{
+  "journey": "latest-quiet-da",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByText('Forsinkelser fra Rejseplanen ikke opdateret siden 09:56')\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByText('Forsinkelser fra Rejseplanen ikke opdateret siden 09:56') with timeout 30000ms\n  - waiting for getByRole('banner').getByText('Forsinkelser fra Rejseplanen ikke opdateret siden 09:56')\n",
+  "steps": [
+    "01-map-opened-feed-quiet: map opened, feed quiet (http://localhost:4302/da)",
+    "02-failure: failure (http://localhost:4302/da)"
+  ]
+}

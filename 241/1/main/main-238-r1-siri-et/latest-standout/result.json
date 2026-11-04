@@ -1,0 +1,9 @@
+{
+  "journey": "latest-standout",
+  "pass": false,
+  "error": "locator.ariaSnapshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })\u001b[22m\n\n\nCall Log:\n- Timeout 60000ms exceeded while waiting on the predicate",
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4302/en)",
+    "02-failure: failure (http://localhost:4302/en)"
+  ]
+}
