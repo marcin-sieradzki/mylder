@@ -1,0 +1,8 @@
+{
+  "journey": "quiet-drop",
+  "pass": true,
+  "steps": [
+    "01-pressed-while-delays-come-ring: pressed while delays come: ring (http://localhost:4411/en?trip=train.940R.28262c0a72.20261031.0946&map=15.00/56.12423/12.30250)",
+    "02-quiet-no-ring: quiet: no ring (http://localhost:4411/en?trip=train.940R.28262c0a72.20261031.0946&map=15.00/56.12423/12.30250)"
+  ]
+}

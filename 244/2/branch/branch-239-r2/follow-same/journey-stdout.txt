@@ -1,0 +1,1 @@
+PASS follow-same: 2 steps in .verify/branch-239-r2/follow-same/

@@ -1,0 +1,5 @@
+top {"key":"train.940R.28262c0a72.20261031.0946","line":"940R","headsign":"Helsingør","mins":14}
+spotlight while fresh {"key":"train.940R.28262c0a72.20261031.0946","at":"646 438"}
+after quiet {"key":null,"at":null} trip in address train.940R.28262c0a72.20261031.0946 panel open true
+red ring pixels on the map {"x":646,"y":438,"sectors":0,"band":0,"elsewhere":0,"spots":[]}
+PASS quiet-drop: 2 steps in .verify/branch-239-r2-quiet/quiet-drop/

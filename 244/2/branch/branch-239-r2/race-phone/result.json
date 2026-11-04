@@ -1,0 +1,10 @@
+{
+  "journey": "race-phone",
+  "pass": true,
+  "steps": [
+    "01-try-1-in-the-air: try 1 in the air (http://localhost:4312/en?map=15.00/55.65532/12.35208&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "02-try-1-rested-clear: try 1 rested clear (http://localhost:4312/en?map=15.00/55.65532/12.35208&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "03-try-2-in-the-air: try 2 in the air (http://localhost:4312/en?map=15.00/55.65556/12.35437&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "04-try-2-rested-clear: try 2 rested clear (http://localhost:4312/en?map=15.00/55.65556/12.35437&trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

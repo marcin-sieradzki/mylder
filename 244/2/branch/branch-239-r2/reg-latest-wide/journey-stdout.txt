@@ -1,0 +1,13 @@
+800 en on its row header bottom 158 at Rønnebækhus (Vallensbæk Torvevej)
+900 en on its row header bottom 168 at Rønnebækhus (Vallensbæk Torvevej)
+1000 en on its row header bottom 168 at Rønnebækhus (Vallensbæk Torvevej)
+1100 en on its row header bottom 132 at Rønnebækhus (Vallensbæk Torvevej)
+1280 en on its row header bottom 132 at Rønnebækhus (Vallensbæk Torvevej)
+1440 en in bar header bottom 58 at Rønnebækhus (Vallensbæk Torvevej)
+1920 en in bar header bottom 58 at Rønnebækhus (Vallensbæk Torvevej)
+1440 en on its row header bottom 132 at Rønnebækhus (Vallensbæk Torvevej)
+1000 en on its row header bottom 168 at Rønnebækhus (Vallensbæk Torvevej)
+1440 en on its row header bottom 132 at Rønnebækhus (Vallensbæk Torvevej)
+1280 da on its row header bottom 132 ved Rønnebækhus (Vallensbæk Torvevej)
+1440 da in bar header bottom 58 ved Rønnebækhus (Vallensbæk Torvevej)
+PASS reg-latest-wide: 6 steps in .verify/branch-239-r2/reg-latest-wide/

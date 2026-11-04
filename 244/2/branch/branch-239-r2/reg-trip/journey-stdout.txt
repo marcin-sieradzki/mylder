@@ -1,0 +1,2 @@
+row Vestamager St. (Metro) dialog null
+PASS reg-trip: 7 steps in .verify/branch-239-r2/reg-trip/

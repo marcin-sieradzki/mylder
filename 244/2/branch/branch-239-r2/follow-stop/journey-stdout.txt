@@ -1,0 +1,6 @@
+top {"key":"train.950R.bacca19217.20261031.0733","line":"950R","headsign":"Hillerød","mins":78} bus to follow bus.10.2715c76fe9.20261031.0858 10 Brønshøj Torv
+following the bus: map null -> null
+map picture moving under Follow: true
+after the press: map 15.00/55.94382/12.31092 -> 15.00/55.94382/12.31092 ; ring train.950R.bacca19217.20261031.0733 651 486 -> 664 604
+ring 664 604 header 132 sheet right 388 panel left 904
+PASS follow-stop: 6 steps in .verify/branch-239-r2/follow-stop/

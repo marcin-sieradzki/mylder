@@ -1,0 +1,5 @@
+412 en {"text":"at Rønnebækhus (Vallensbæk Torvevej)","sw":246,"cw":159}
+412 da {"text":"ved Rønnebækhus (Vallensbæk Torvevej)","sw":258,"cw":258}
+360 en {"text":"at Rønnebækhus (Vallensbæk Torvevej)","sw":246,"cw":246}
+360 da {"text":"ved Rønnebækhus (Vallensbæk Torvevej)","sw":258,"cw":258}
+PASS reg-latest-phone: 4 steps in .verify/branch-239-r2/reg-latest-phone/

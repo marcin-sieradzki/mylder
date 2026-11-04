@@ -1,0 +1,11 @@
+camera A 10.00/55.62460/12.38456 B 10.00/55.62460/12.38456 vehicles A 590 B 590 spotlight in A {"key":"bus.144.bc5239a3e3.20261031.0815","at":"640 401"} Updated 09:24:16
+left out [{"left":848,"top":469,"right":892,"bottom":718},{"left":400,"top":730,"right":892,"bottom":788},{"left":420,"top":140,"right":860,"bottom":185.5},{"left":417,"top":646.21875,"right":605.21875,"bottom":701},{"left":400,"top":629.21875,"right":622.21875,"bottom":718},{"left":400,"top":629.21875,"right":622.21875,"bottom":718},{"left":1224,"top":487,"right":1268,"bottom":736},{"left":400,"top":748,"right":1268,"bottom":788},{"left":420,"top":140,"right":860,"bottom":185.5},{"left":417,"top":664.21875,"right":623,"bottom":719},{"left":400,"top":647.21875,"right":640,"bottom":736},{"left":400,"top":647.21875,"right":810.21875,"bottom":736}]
+rect {"left":390,"top":134,"right":902,"bottom":798} ring at 640 401
+A vs B outside the ring {"changed":432,"cells":[["820,700",230],["820,680",202]]} | with the ring {"changed":605,"cells":[["820,700",230],["820,680",202],["620,400",45],["640,400",44],["620,380",43],["640,380",41]]}
+FAIL other-dots: 5 steps in .verify/branch-239-r2/other-dots/
+no map pixel outside the ring differs
+
+expect(received).toBeLessThan(expected)
+
+Expected: < 30
+Received:   432

@@ -1,0 +1,11 @@
+top {"key":"bus.144.bc5239a3e3.20261031.0815","line":"144","headsign":"Vallensbæk St.","mins":24}
+before press {"key":null,"at":null} map null
+top at press {"key":"bus.144.bc5239a3e3.20261031.0815","line":"144","headsign":"Vallensbæk St.","mins":23} Updated 09:11:43
+landed map 15.00/55.65695/12.36138
+spotlight {"key":"bus.144.bc5239a3e3.20261031.0815","at":"726 426"}
+geom {"x":726,"y":426,"headerBottom":58,"panel":{"left":1064,"top":70,"right":1428,"bottom":788},"vp":{"width":1440,"height":800},"notices":[{"text":"Planes: recorded adsb.lol data.","left":500,"top":66,"right":940,"bottom":111.5}],"legend":{"left":417,"top":664.21875,"right":623,"bottom":719},"overview":{"left":12,"top":70,"right":388,"bottom":788}}
+notice Planes: recorded adsb.lol data. clear of ring
+ring pixels {"x":726,"y":426,"sectors":16,"band":107,"elsewhere":0,"spots":[]}
+after 8 s {"key":"bus.144.bc5239a3e3.20261031.0815","at":"726 426"} map 15.00/55.65695/12.36138 {"x":726,"y":426,"sectors":16,"band":102,"elsewhere":0,"spots":[]}
+after close at last ring point {"x":726,"y":426,"sectors":0,"band":0,"elsewhere":0,"spots":[]}
+PASS spotlight-1440: 6 steps in .verify/branch-239-r2/spotlight-1440/

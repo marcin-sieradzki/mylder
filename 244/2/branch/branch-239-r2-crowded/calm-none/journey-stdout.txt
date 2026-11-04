@@ -1,0 +1,2 @@
+calm spotlight attrs [null,null] red ring pixels on the map {"x":640,"y":400,"sectors":0,"band":0,"elsewhere":0,"spots":[]}
+PASS calm-none: 2 steps in .verify/branch-239-r2-crowded/calm-none/

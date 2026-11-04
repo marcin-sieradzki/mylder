@@ -1,0 +1,5 @@
+picked {"key":"bus.144.bc5239a3e3.20261031.0815","line":"144","headsign":"Vallensbæk St.","mins":23} Updated 09:14:51
+next latest {"key":"train.950R.bacca19217.20261031.0733","line":"950R","headsign":"Hillerød","mins":78} after 55 s
+spotlight {"key":"bus.144.bc5239a3e3.20261031.0815","at":"620 461"} camera 15.00/55.64481/12.37163
+ring pixels at the picked trip {"x":620,"y":461,"sectors":16,"band":100,"elsewhere":0,"spots":[]}
+PASS stays-on-pick: 3 steps in .verify/branch-239-r2/stays-on-pick/

@@ -1,0 +1,12 @@
+top {"key":"bus.144.bc5239a3e3.20261031.0815","line":"144","headsign":"Vallensbæk St.","mins":24}
+before press {"key":null,"at":null} map null
+top at press {"key":"bus.144.bc5239a3e3.20261031.0815","line":"144","headsign":"Vallensbæk St.","mins":23} Updated 09:13:47
+landed map 15.00/55.64850/12.37229
+spotlight {"key":"bus.144.bc5239a3e3.20261031.0815","at":"210 410"}
+geom {"x":210,"y":410,"headerBottom":176.296875,"panel":{"left":0,"top":657,"right":412,"bottom":1484},"vp":{"width":412,"height":839},"notices":[{"text":"Planes: recorded adsb.lol data.","left":12,"top":184.296875,"right":400,"bottom":229.796875}],"legend":{"left":29,"top":483.625,"right":165.21875,"bottom":558}}
+legend ring clear of the legend card (above its top)
+notice Planes: recorded adsb.lol data. clear of ring
+ring pixels {"x":212,"y":415,"sectors":16,"band":678,"elsewhere":0,"spots":[]}
+after 8 s {"key":"bus.144.bc5239a3e3.20261031.0815","at":"220 442"} map 15.00/55.64850/12.37229 {"x":220,"y":443.5,"sectors":16,"band":681,"elsewhere":0,"spots":[]}
+after close at last ring point {"x":222,"y":451,"sectors":0,"band":0,"elsewhere":0,"spots":[]}
+PASS spotlight-phone: 6 steps in .verify/branch-239-r2/spotlight-phone/

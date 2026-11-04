@@ -1,0 +1,12 @@
+{
+  "journey": "race2",
+  "pass": true,
+  "steps": [
+    "01-try-1-in-the-air: try 1 in the air (http://localhost:4312/en?map=15.00/55.66585/12.33828&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "02-try-1-rested-clear: try 1 rested clear (http://localhost:4312/en?map=15.00/55.66585/12.33828&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "03-try-2-in-the-air: try 2 in the air (http://localhost:4312/en?map=15.00/55.66524/12.33810&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "04-try-2-rested-clear: try 2 rested clear (http://localhost:4312/en?map=15.00/55.66524/12.33810&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "05-try-3-in-the-air: try 3 in the air (http://localhost:4312/en?map=15.00/55.65675/12.33401&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "06-try-3-rested-clear: try 3 rested clear (http://localhost:4312/en?map=15.00/55.65675/12.33401&trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

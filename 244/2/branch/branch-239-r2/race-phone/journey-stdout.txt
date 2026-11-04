@@ -1,0 +1,27 @@
+try 1: Updated 09:07:31 -> Updated 09:08:35; snapshot answered +1ms after the press (in flight); top before bus.144.bc5239a3e3.20261031.0815@25; pill trip bus.144.bc5239a3e3.20261031.0815; spotlight bus.144.bc5239a3e3.20261031.0815; landed map=15.00/55.65532/12.35208; ring 225,393; header 176; notices [["Planes: recorded adsb.lol data.",12,230,400]]; panel top 657; vp 412x839; ring pixels 16/16 sectors, 0 red px elsewhere; CLEAR
+  +1349ms 204 640 map=11.00/55.67600/12.56800 Updated 09:08:35
+  +2397ms 208 568 map=15.00/55.65897/12.35199 Updated 09:08:35
+  +3268ms 207 396 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +3599ms 208 396 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +3937ms 209 396 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +4274ms 210 396 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +5588ms 212 395 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +5913ms 213 395 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +6586ms 214 395 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +7233ms 215 395 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +7543ms 216 395 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +8203ms 217 395 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +8525ms 217 394 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +8870ms 218 394 map=15.00/55.65532/12.35208 Updated 09:08:35
+  +9202ms 219 394 map=15.00/55.65532/12.35208 Updated 09:08:35
+try 2: Updated 09:08:35 -> Updated 09:09:36; snapshot answered +0ms after the press (in flight); top before bus.144.bc5239a3e3.20261031.0815@23; pill trip bus.144.bc5239a3e3.20261031.0815; spotlight bus.144.bc5239a3e3.20261031.0815; landed map=15.00/55.65556/12.35437; ring 255,386; header 176; notices [["Planes: recorded adsb.lol data.",12,230,400]]; panel top 657; vp 412x839; ring pixels 16/16 sectors, 0 red px elsewhere; CLEAR
+  +1276ms 200 401 map=11.00/55.67600/12.56800 Updated 09:09:36
+  +2174ms 206 396 map=15.00/55.65556/12.35437 Updated 09:09:36
+  +8204ms 209 395 map=15.00/55.65556/12.35437 Updated 09:09:36
+  +8510ms 213 394 map=15.00/55.65556/12.35437 Updated 09:09:36
+  +8859ms 216 394 map=15.00/55.65556/12.35437 Updated 09:09:36
+  +9183ms 220 393 map=15.00/55.65556/12.35437 Updated 09:09:36
+SUMMARY
+try 1: Updated 09:07:31 -> Updated 09:08:35; snapshot answered +1ms after the press (in flight); top before bus.144.bc5239a3e3.20261031.0815@25; pill trip bus.144.bc5239a3e3.20261031.0815; spotlight bus.144.bc5239a3e3.20261031.0815; landed map=15.00/55.65532/12.35208; ring 225,393; header 176; notices [["Planes: recorded adsb.lol data.",12,230,400]]; panel top 657; vp 412x839; ring pixels 16/16 sectors, 0 red px elsewhere; CLEAR
+try 2: Updated 09:08:35 -> Updated 09:09:36; snapshot answered +0ms after the press (in flight); top before bus.144.bc5239a3e3.20261031.0815@23; pill trip bus.144.bc5239a3e3.20261031.0815; spotlight bus.144.bc5239a3e3.20261031.0815; landed map=15.00/55.65556/12.35437; ring 255,386; header 176; notices [["Planes: recorded adsb.lol data.",12,230,400]]; panel top 657; vp 412x839; ring pixels 16/16 sectors, 0 red px elsewhere; CLEAR
+PASS race-phone: 4 steps in .verify/branch-239-r2/race-phone/

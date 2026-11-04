@@ -1,0 +1,1 @@
+PASS reg-latest-open: 4 steps in .verify/branch-239-r2/reg-latest-open/

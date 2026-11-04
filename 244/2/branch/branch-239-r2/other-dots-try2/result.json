@@ -1,0 +1,12 @@
+{
+  "journey": "other-dots",
+  "pass": false,
+  "error": "no map pixel outside the ring differs\n\nexpect(received).toBeLessThan(expected)\n\nExpected: < 30\nReceived:   432",
+  "steps": [
+    "01-paused: paused (http://localhost:4312/en)",
+    "02-pressed-landed: pressed, landed (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.62460/12.38456)",
+    "03-zoomed-out-picked-a-: zoomed out, picked (A) (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815&map=10.00/55.62460/12.38456)",
+    "04-closed-b-: closed (B) (http://localhost:4312/en?map=10.00/55.62460/12.38456)",
+    "05-failure: failure (http://localhost:4312/en?map=10.00/55.62460/12.38456)"
+  ]
+}

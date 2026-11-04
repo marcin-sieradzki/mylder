@@ -1,0 +1,12 @@
+{
+  "journey": "spotlight-phone",
+  "pass": true,
+  "steps": [
+    "01-before-press: before press (http://localhost:4312/en)",
+    "02-pressed: pressed (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.64850/12.37229)",
+    "03-landed: landed (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.64850/12.37229)",
+    "04-ring-8-s-later: ring 8 s later (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.64850/12.37229)",
+    "05-hover-on-ring: hover on ring (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.64850/12.37229)",
+    "06-closed: closed (http://localhost:4312/en?map=15.00/55.64850/12.37229)"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "journey": "reg-latest-open",
+  "pass": true,
+  "steps": [
+    "01-en-pill-names-144: en pill names 144 (http://localhost:4312/en)",
+    "02-en-pressed-panel-open: en pressed: panel open (http://localhost:4312/en?trip=bus.144.bc5239a3e3.20261031.0815)",
+    "03-da-pill-names-144: da pill names 144 (http://localhost:4312/da)",
+    "04-da-pressed-panel-open: da pressed: panel open (http://localhost:4312/da?trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

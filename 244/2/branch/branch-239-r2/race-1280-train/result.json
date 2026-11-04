@@ -1,0 +1,10 @@
+{
+  "journey": "race-1280-train",
+  "pass": true,
+  "steps": [
+    "01-try-1-in-the-air: try 1 in the air (http://localhost:4312/en?map=15.00/55.97742/12.31477&trip=train.950R.bacca19217.20261031.0733)",
+    "02-try-1-rested-clear: try 1 rested clear (http://localhost:4312/en?map=15.00/55.97742/12.31477&trip=train.950R.bacca19217.20261031.0733)",
+    "03-try-2-in-the-air: try 2 in the air (http://localhost:4312/en?map=15.00/55.96840/12.31338&trip=train.950R.bacca19217.20261031.0733)",
+    "04-try-2-rested-clear: try 2 rested clear (http://localhost:4312/en?map=15.00/55.96840/12.31338&trip=train.950R.bacca19217.20261031.0733)"
+  ]
+}
