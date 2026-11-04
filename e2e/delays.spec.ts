@@ -291,6 +291,16 @@ async function expectOneRow(page: Page, words: (typeof WORDS)[keyof typeof WORDS
   expect(apart).toBe(true)
 }
 
+/** Whether the pill sits in the top bar, rather than on its row under it. */
+const inBar = (pill: Locator) => pill.evaluate((element) => element.closest('.pn-TopBar') !== null)
+
+/** Expects `heading` to start at or below the bottom of the page's header, the pill's row too. */
+async function expectBelowHeader(page: Page, heading: Locator) {
+  await expect(heading).toBeVisible()
+  const header = await boxOf(page.getByRole('banner'))
+  expect((await boxOf(heading)).y).toBeGreaterThanOrEqual(header.y + header.height)
+}
+
 /** The page `width` px wide in `lang` with six chips: the modes and, from the weekday's, the planes. */
 async function openWide(page: Page, lang: keyof typeof WORDS, width = 1280) {
   await page.setViewportSize({ width, height: 800 })
@@ -305,19 +315,71 @@ async function openWide(page: Page, lang: keyof typeof WORDS, width = 1280) {
 for (const lang of ['en', 'da'] as const) {
   const words = WORDS[lang]
 
-  for (const width of [1280, 1440, 1920]) {
-    test(`at ${width} px with six chips in ${lang}, the pill names its stop and keeps the bar on one row`, async ({
+  for (const width of [800, 900, 1000, 1100, 1280, 1440, 1920]) {
+    test(`at ${width} px with six chips in ${lang}, the pill fits where it sits and covers no heading`, async ({
       page,
     }) => {
       await onSavedMinute(page, longStopLatest)
       await openWide(page, lang, width)
       const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
       await expect(pill).toBeVisible()
-      await expectOneRow(page, words, pill)
       // In the bar, or on its row where the bar has no room: ten characters of the stop's name.
       await expectPillWhole(pill, words.now, '250S', 10)
+      // Wherever the bar holds the pill, it holds it on one row.
+      if (await inBar(pill)) await expectOneRow(page, words, pill)
+      // The Overview sheet and the trip's panel start below the header, the pill's row included.
+      await expectBelowHeader(
+        page,
+        page.getByRole('dialog', { name: words.overview }).getByRole('heading', {
+          name: words.overview,
+        }),
+      )
+      await pill.click()
+      await expectBelowHeader(
+        page,
+        page.getByRole('dialog', { name: /Dragør Stationsplads/ }).getByRole('heading', {
+          name: /Dragør Stationsplads/,
+        }),
+      )
     })
   }
+
+  test(`at 900 px in ${lang}, the pill takes its row at the start under the bar`, async ({
+    page,
+  }) => {
+    // The bar wraps onto two rows at 900 px without the pill, so the pill has its own row.
+    await onSavedMinute(page, longStopLatest)
+    await openWide(page, lang, 900)
+    const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
+    await expect(pill).toBeVisible()
+    expect(await inBar(pill)).toBe(false)
+    const bar = await boxOf(page.locator('.pn-TopBar'))
+    const box = await boxOf(pill)
+    expect(box.y).toBeGreaterThanOrEqual(bar.y + bar.height)
+    // At the start, its glass level with the bar's, as wide as its words: all of them show.
+    const row = await boxOf(pill.locator('xpath=..'))
+    expect(Math.abs(row.x - bar.x)).toBeLessThan(1)
+    expect(await visibleStopCharacters(pill)).toBe(
+      'Hillerødmotorvejen, Tingbjerg (Hillerødmotorvejen)'.length,
+    )
+  })
+
+  test(`in ${lang}, the pill leaves the bar as the window narrows and comes back as it widens`, async ({
+    page,
+  }) => {
+    await onSavedMinute(page, longStopLatest)
+    await openWide(page, lang, 1440)
+    const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
+    await expect(pill).toBeVisible()
+    await expect.poll(() => inBar(pill)).toBe(true)
+    await page.setViewportSize({ width: 1000, height: 800 })
+    await expect.poll(() => inBar(pill)).toBe(false)
+    await expectPillWhole(pill, words.now, '250S', 10)
+    await page.setViewportSize({ width: 1440, height: 800 })
+    await expect.poll(() => inBar(pill)).toBe(true)
+    await expectOneRow(page, words, pill)
+    await expectPillWhole(pill, words.now, '250S', 10)
+  })
 
   test(`at 1440 px in ${lang}, the pill sits in the bar with its stop cut short`, async ({
     page,
@@ -327,7 +389,7 @@ for (const lang of ['en', 'da'] as const) {
     await openWide(page, lang, 1440)
     const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
     await expect(pill).toBeVisible()
-    expect(await pill.evaluate((element) => element.closest('.pn-TopBar') !== null)).toBe(true)
+    expect(await inBar(pill)).toBe(true)
     const where = pill.locator('[data-latest-where]')
     expect(await where.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
     await expectOneRow(page, words, pill)
