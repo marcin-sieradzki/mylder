@@ -1,0 +1,12 @@
+{
+  "journey": "follow-stop",
+  "pass": false,
+  "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: \"train.910.af953e6f34.20261031.0858\"\nReceived: null",
+  "steps": [
+    "01-following-a-bus: following a bus (http://localhost:4311/en?trip=bus.10.2715c76fe9.20261031.0913)",
+    "02-following-a-bus-8-s-later: following a bus 8 s later (http://localhost:4311/en?trip=bus.10.2715c76fe9.20261031.0913)",
+    "03-pill-pressed-while-following-the-bus: pill pressed while following the bus (http://localhost:4311/en?trip=train.910.af953e6f34.20261031.0858&map=11.20/55.68456/12.49293)",
+    "04-10-s-after-the-press: 10 s after the press (http://localhost:4311/en?trip=train.910.af953e6f34.20261031.0858&map=11.20/55.68456/12.49293)",
+    "05-failure: failure (http://localhost:4311/en?trip=train.910.af953e6f34.20261031.0858&map=11.20/55.68456/12.49293)"
+  ]
+}

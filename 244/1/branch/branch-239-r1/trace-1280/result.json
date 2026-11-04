@@ -1,0 +1,10 @@
+{
+  "journey": "trace-1280",
+  "pass": true,
+  "steps": [
+    "01-before: before (http://localhost:4310/en)",
+    "02-t6: t6 (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.66390/12.33711)",
+    "03-t20: t20 (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.66390/12.33711)",
+    "04-t39: t39 (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.66390/12.33711)"
+  ]
+}

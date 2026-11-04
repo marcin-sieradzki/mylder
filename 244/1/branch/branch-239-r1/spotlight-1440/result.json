@@ -1,0 +1,12 @@
+{
+  "journey": "spotlight-1440",
+  "pass": true,
+  "steps": [
+    "01-before-press: before press (http://localhost:4310/en)",
+    "02-pressed: pressed (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815)",
+    "03-landed: landed (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.65499/12.34345)",
+    "04-ring-8-s-later: ring 8 s later (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.65499/12.34345)",
+    "05-hover-on-ring: hover on ring (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.65499/12.34345)",
+    "06-closed: closed (http://localhost:4310/en?map=15.00/55.65499/12.34345)"
+  ]
+}

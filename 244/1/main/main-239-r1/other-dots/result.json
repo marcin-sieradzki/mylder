@@ -1,0 +1,9 @@
+{
+  "journey": "other-dots",
+  "pass": false,
+  "error": "camera never came to rest in 20000 ms (last map=null)",
+  "steps": [
+    "01-paused: paused (http://localhost:4311/en)",
+    "02-failure: failure (http://localhost:4311/en?trip=train.910.af953e6f34.20261031.0858)"
+  ]
+}

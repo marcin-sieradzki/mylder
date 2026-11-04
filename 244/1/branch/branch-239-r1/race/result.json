@@ -1,0 +1,14 @@
+{
+  "journey": "race",
+  "pass": true,
+  "steps": [
+    "01-try-1-pressed-as-the-snapshot-is-fetched: try 1 pressed as the snapshot is fetched (http://localhost:4310/en?trip=train.950R.c5cdbdee89.20261031.0915)",
+    "02-try-1-landed-clear: try 1 landed clear (http://localhost:4310/en?trip=train.950R.c5cdbdee89.20261031.0915&map=15.00/55.99540/12.28943)",
+    "03-try-2-pressed-as-the-snapshot-is-fetched: try 2 pressed as the snapshot is fetched (http://localhost:4310/en?map=15.00/56.00387/12.28789&trip=train.950R.c5cdbdee89.20261031.0915)",
+    "04-try-2-landed-clear: try 2 landed clear (http://localhost:4310/en?map=15.00/56.00387/12.28789&trip=train.950R.c5cdbdee89.20261031.0915)",
+    "05-try-3-pressed-as-the-snapshot-is-fetched: try 3 pressed as the snapshot is fetched (http://localhost:4310/en?map=15.00/56.00591/12.29426&trip=train.950R.c5cdbdee89.20261031.0915)",
+    "06-try-3-landed-clear: try 3 landed clear (http://localhost:4310/en?map=15.00/56.00591/12.29426&trip=train.950R.c5cdbdee89.20261031.0915)",
+    "07-try-4-pressed-as-the-snapshot-is-fetched: try 4 pressed as the snapshot is fetched (http://localhost:4310/en?map=15.00/56.00971/12.30826&trip=train.950R.c5cdbdee89.20261031.0915)",
+    "08-try-4-landed-clear: try 4 landed clear (http://localhost:4310/en?map=15.00/56.00971/12.30826&trip=train.950R.c5cdbdee89.20261031.0915)"
+  ]
+}

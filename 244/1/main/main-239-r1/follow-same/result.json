@@ -1,0 +1,10 @@
+{
+  "journey": "follow-same",
+  "pass": false,
+  "error": "expect(locator).toHaveAttribute(expected) failed\n\nLocator:  getByRole('dialog', { name: /to Gilleleje/ }).getByRole('button', { name: 'Follow' })\nExpected: \"false\"\nReceived: \"true\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toHaveAttribute\" getByRole('dialog', { name: /to Gilleleje/ }).getByRole('button', { name: 'Follow' }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: /to Gilleleje/ }).getByRole('button', { name: 'Follow' })\n    12 × locator resolved to <button type=\"button\" tabindex=\"-1\" data-selected=\"\" data-size=\"small\" class=\"pn-Button\" data-tabindex=\"0\" aria-pressed=\"true\" data-color=\"neutral\" data-variant=\"outline\">…</button>\n       - unexpected value \"true\"\n",
+  "steps": [
+    "01-following-the-pill-trip: following the pill trip (http://localhost:4311/en?trip=train.950R.c5cdbdee89.20261031.0915)",
+    "02-pill-pressed-again: pill pressed again (http://localhost:4311/en?trip=train.950R.c5cdbdee89.20261031.0915)",
+    "03-failure: failure (http://localhost:4311/en?trip=train.950R.c5cdbdee89.20261031.0915)"
+  ]
+}

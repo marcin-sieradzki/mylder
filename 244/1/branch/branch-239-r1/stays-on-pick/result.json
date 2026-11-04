@@ -1,0 +1,8 @@
+{
+  "journey": "stays-on-pick",
+  "pass": true,
+  "steps": [
+    "01-picked-144: picked 144 (http://localhost:4310/en?trip=bus.144.8ae8189715.20261031.0918&map=15.00/55.62495/12.37934)",
+    "02-pill-names-950r: pill names 950R (http://localhost:4310/en?trip=bus.144.8ae8189715.20261031.0918&map=15.00/55.62495/12.37934)"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "journey": "follow-same",
+  "pass": true,
+  "steps": [
+    "01-following-the-pill-trip: following the pill trip (http://localhost:4310/en?trip=train.950R.c5cdbdee89.20261031.0915&map=15.00/55.96412/12.31025)",
+    "02-pill-pressed-again: pill pressed again (http://localhost:4310/en?trip=train.950R.c5cdbdee89.20261031.0915&map=15.00/55.96551/12.31111)"
+  ]
+}

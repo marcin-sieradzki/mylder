@@ -1,0 +1,8 @@
+{
+  "journey": "quiet-drop",
+  "pass": false,
+  "error": "camera never came to rest in 20000 ms (last map=null)",
+  "steps": [
+    "01-failure: failure (http://localhost:4410/en?trip=train.940R.28262c0a72.20261031.0946)"
+  ]
+}

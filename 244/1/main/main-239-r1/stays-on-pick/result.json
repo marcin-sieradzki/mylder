@@ -1,0 +1,8 @@
+{
+  "journey": "stays-on-pick",
+  "pass": false,
+  "error": "camera never came to rest in 20000 ms (last map=null)",
+  "steps": [
+    "01-failure: failure (http://localhost:4311/en?trip=train.950R.c5cdbdee89.20261031.0915)"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "journey": "calm-none",
+  "pass": true,
+  "steps": [
+    "01-calm-pill: calm pill (http://localhost:4410/en)",
+    "02-calm-a-trip-open-no-ring: calm: a trip open, no ring (http://localhost:4410/en?tab=vehicles&trip=s-tog.A.0bc307e3eb.20260616.0651)"
+  ]
+}

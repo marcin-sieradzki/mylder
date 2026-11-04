@@ -1,0 +1,10 @@
+{
+  "journey": "reg-latest-phone",
+  "pass": true,
+  "steps": [
+    "01-412-en: 412 en (http://localhost:4310/en)",
+    "02-412-da: 412 da (http://localhost:4310/da)",
+    "03-360-en: 360 en (http://localhost:4310/en)",
+    "04-360-da: 360 da (http://localhost:4310/da)"
+  ]
+}

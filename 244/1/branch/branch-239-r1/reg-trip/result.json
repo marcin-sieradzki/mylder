@@ -1,0 +1,13 @@
+{
+  "journey": "reg-trip",
+  "pass": true,
+  "steps": [
+    "01-vehicles-list: vehicles list (http://localhost:4310/en?tab=vehicles)",
+    "02-trip-open-from-the-list: trip open from the list (http://localhost:4310/en?tab=vehicles&trip=metro.M1.7f21f99145.20261031.0903)",
+    "03-follow-on: follow on (http://localhost:4310/en?tab=vehicles&trip=metro.M1.7f21f99145.20261031.0903)",
+    "04-whole-line: whole line (http://localhost:4310/en?tab=vehicles&trip=metro.M1.7f21f99145.20261031.0903&map=10.65/55.66039/12.53976)",
+    "05-closed: closed (http://localhost:4310/en?tab=vehicles&map=10.65/55.66039/12.53976)",
+    "06-missing: missing (http://localhost:4310/en?trip=nothing)",
+    "07-siri-et-bus: siri-et bus (http://localhost:4310/en?trip=bus.1A.def713f298.20261031.0843)"
+  ]
+}

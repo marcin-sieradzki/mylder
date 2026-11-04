@@ -1,0 +1,12 @@
+{
+  "journey": "reg-latest-wide",
+  "pass": true,
+  "steps": [
+    "01-800-en-row: 800 en row (http://localhost:4310/en)",
+    "02-1280-en-row: 1280 en row (http://localhost:4310/en?map=11.20/55.68000/12.56500)",
+    "03-1440-en-in-bar: 1440 en in bar (http://localhost:4310/en?map=11.20/55.68000/12.56500)",
+    "04-1280-pressed: 1280 pressed (http://localhost:4310/en?map=15.00/55.62442/12.37970&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "05-1280-da-row: 1280 da row (http://localhost:4310/da)",
+    "06-1440-da-in-bar: 1440 da in bar (http://localhost:4310/da?map=11.20/55.68000/12.56500)"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "journey": "race",
+  "pass": true,
+  "steps": [
+    "01-try-1-pressed-as-the-snapshot-is-fetched: try 1 pressed as the snapshot is fetched (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815)",
+    "02-try-1-landed-clear: try 1 landed clear (http://localhost:4310/en?trip=bus.144.bc5239a3e3.20261031.0815&map=15.00/55.65682/12.35895)",
+    "03-try-2-pressed-as-the-snapshot-is-fetched: try 2 pressed as the snapshot is fetched (http://localhost:4310/en?map=15.00/55.65693/12.36000&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "04-try-2-landed-clear: try 2 landed clear (http://localhost:4310/en?map=15.00/55.65693/12.36000&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "05-try-3-pressed-as-the-snapshot-is-fetched: try 3 pressed as the snapshot is fetched (http://localhost:4310/en?map=15.00/55.65581/12.36555&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "06-try-3-landed-clear: try 3 landed clear (http://localhost:4310/en?map=15.00/55.65581/12.36555&trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

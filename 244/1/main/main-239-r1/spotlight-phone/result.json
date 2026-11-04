@@ -1,0 +1,10 @@
+{
+  "journey": "spotlight-phone",
+  "pass": false,
+  "error": "camera never came to rest in 20000 ms (last map=null)",
+  "steps": [
+    "01-before-press: before press (http://localhost:4311/en)",
+    "02-pressed: pressed (http://localhost:4311/en?trip=train.IC.4b951d7b67.20261031.0740)",
+    "03-failure: failure (http://localhost:4311/en?trip=train.IC.4b951d7b67.20261031.0740)"
+  ]
+}

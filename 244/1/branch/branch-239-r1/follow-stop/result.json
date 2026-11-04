@@ -1,0 +1,12 @@
+{
+  "journey": "follow-stop",
+  "pass": true,
+  "steps": [
+    "01-following-a-bus: following a bus (http://localhost:4310/en?trip=bus.10.2715c76fe9.20261031.0858)",
+    "02-following-a-bus-8-s-later: following a bus 8 s later (http://localhost:4310/en?trip=bus.10.2715c76fe9.20261031.0858)",
+    "03-pill-pressed-while-following-the-bus: pill pressed while following the bus (http://localhost:4310/en?trip=train.950R.bacca19217.20261031.0733&map=11.20/55.69289/12.50667)",
+    "04-10-s-after-the-press: 10 s after the press (http://localhost:4310/en?trip=train.950R.bacca19217.20261031.0733&map=15.00/55.93632/12.31368)",
+    "05-following-the-latest-trip: following the latest trip (http://localhost:4310/en?trip=train.950R.bacca19217.20261031.0733&map=15.00/55.93632/12.31368)",
+    "06-pill-pressed-while-following-it-follow-off: pill pressed while following it: Follow off (http://localhost:4310/en?trip=train.950R.bacca19217.20261031.0733&map=15.00/55.93411/12.31330)"
+  ]
+}

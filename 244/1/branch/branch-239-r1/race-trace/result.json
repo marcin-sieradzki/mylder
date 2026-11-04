@@ -1,0 +1,10 @@
+{
+  "journey": "race-trace",
+  "pass": true,
+  "steps": [
+    "01-try-1-t10: try 1 t10 (http://localhost:4310/en?trip=train.950R.c5cdbdee89.20261031.0915&map=15.00/56.01460/12.32085)",
+    "02-try-1-end: try 1 end (http://localhost:4310/en?trip=train.950R.c5cdbdee89.20261031.0915&map=15.00/56.01460/12.32085)",
+    "03-try-2-t10: try 2 t10 (http://localhost:4310/en?map=15.00/56.02174/12.32512&trip=train.950R.c5cdbdee89.20261031.0915)",
+    "04-try-2-end: try 2 end (http://localhost:4310/en?map=15.00/56.02174/12.32512&trip=train.950R.c5cdbdee89.20261031.0915)"
+  ]
+}

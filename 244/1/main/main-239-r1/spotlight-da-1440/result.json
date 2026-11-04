@@ -1,0 +1,10 @@
+{
+  "journey": "spotlight-da-1440",
+  "pass": false,
+  "error": "camera never came to rest in 20000 ms (last map=null)",
+  "steps": [
+    "01-before-press: before press (http://localhost:4311/da)",
+    "02-pressed: pressed (http://localhost:4311/da?trip=bus.144.8ae8189715.20261031.0918)",
+    "03-failure: failure (http://localhost:4311/da?trip=bus.144.8ae8189715.20261031.0918)"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "journey": "other-dots",
+  "pass": true,
+  "steps": [
+    "01-paused: paused (http://localhost:4310/en)",
+    "02-pressed-landed: pressed, landed (http://localhost:4310/en?trip=train.IC.4b951d7b67.20261031.0740&map=15.00/55.38345/10.49946)",
+    "03-zoomed-out-picked-a-: zoomed out, picked (A) (http://localhost:4310/en?trip=train.IC.4b951d7b67.20261031.0740&map=10.00/55.38345/10.49946)",
+    "04-closed-b-: closed (B) (http://localhost:4310/en?map=10.00/55.38345/10.49946)"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "journey": "calm-none",
+  "pass": true,
+  "steps": [
+    "01-none-pill: none pill (http://localhost:4410/en)",
+    "02-none-a-trip-open-no-ring: none: a trip open, no ring (http://localhost:4410/en?tab=vehicles&trip=metro.M1.7f21f99145.20260616.0703)"
+  ]
+}

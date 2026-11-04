@@ -1,0 +1,10 @@
+{
+  "journey": "reg-latest-open",
+  "pass": true,
+  "steps": [
+    "01-en-pill-names-950r: en pill names 950R (http://localhost:4310/en)",
+    "02-en-pressed-panel-open: en pressed: panel open (http://localhost:4310/en?trip=train.950R.bacca19217.20261031.0733)",
+    "03-da-pill-names-950r: da pill names 950R (http://localhost:4310/da)",
+    "04-da-pressed-panel-open: da pressed: panel open (http://localhost:4310/da?trip=train.950R.bacca19217.20261031.0733)"
+  ]
+}
