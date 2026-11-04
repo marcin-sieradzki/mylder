@@ -16,6 +16,7 @@ import { useI18n } from '../i18n/useI18n'
 import { followedVehicle } from '../map/follow'
 import { useClockOffset, useSnapshot, useSource } from '../map/live'
 import type { PanelStateOf } from '../map/panels'
+import { vehicleSpotlight } from '../map/spotlight'
 import { useDataState } from '../map/states'
 import { openPanel, useHiddenModes } from '../map/view'
 import { onMap } from '../map/vehicles'
@@ -57,7 +58,7 @@ export interface VehiclePanelProps {
  * Its header names the trip from the snapshot while the answer is on its way. The header's action
  * row holds Follow and Show whole line. The panel keeps to the vehicle the viewer opened: when a
  * snapshot files its journey under another trip, as the run does once a trip's detail has
- * corrected the join, the address and Follow move to that trip.
+ * corrected the join, the address, Follow and the spotlight move to that trip.
  */
 export function VehiclePanel({ state, frame }: VehiclePanelProps) {
   const { dictionary, lang } = useI18n()
@@ -120,9 +121,10 @@ export function VehiclePanel({ state, frame }: VehiclePanelProps) {
 
 /**
  * Keeps the open panel on the vehicle the viewer opened, by its journey: when a snapshot no longer
- * files that journey under the panel's trip but under another, the address, and Follow if it was
- * on, move to that trip. Only a journey with a number (`ZI@DA`, not `@DA`) is kept to, since only
- * that one tells its vehicle from the rest of its day, as the server's corrections of the join do.
+ * files that journey under the panel's trip but under another, the address, and Follow and the
+ * spotlight if they were on, move to that trip. Only a journey with a number (`ZI@DA`, not `@DA`)
+ * is kept to, since only that one tells its vehicle from the rest of its day, as the server's
+ * corrections of the join do.
  */
 function useKeptVehicle(tripKey: string, snapshot: Snapshot | undefined) {
   const opened = useRef<{ readonly tripKey: string; readonly journey: string }>(undefined)
@@ -138,8 +140,10 @@ function useKeptVehicle(tripKey: string, snapshot: Snapshot | undefined) {
     if (kept !== undefined && moved) {
       opened.current = { tripKey: moved.key, journey: kept }
       const following = followedVehicle.get() === tripKey
+      const ringed = vehicleSpotlight.get() === tripKey
       openPanel({ kind: 'trip', id: moved.key })
       if (following) followedVehicle.start(moved.key)
+      if (ringed) vehicleSpotlight.ring(moved.key)
     } else if (journey !== undefined) opened.current = { tripKey, journey }
   }, [tripKey, snapshot])
 }

@@ -1,8 +1,9 @@
 // Follow, from vehicle detail (docs/screens.md, "Vehicle detail"): the camera stays on one trip's
 // dot, moved there as Follow starts and from the animation loop each frame it draws, outside
 // React, so the page renders again only when Follow starts or ends. It ends when the trip reaches
-// its last stop or leaves the map, when the viewer pans, and when the trip's panel closes. A zoom
-// keeps it: the camera zooms on the dot.
+// its last stop or leaves the map, when the viewer pans, when the trip's panel closes, and when
+// the Latest now pill flies the map to a trip (spotlight.ts). A zoom keeps it: the camera zooms on
+// the dot.
 import 'client-only'
 import type { Map as MapLibreMap, MapLibreEvent } from 'maplibre-gl'
 import { useSyncExternalStore } from 'react'

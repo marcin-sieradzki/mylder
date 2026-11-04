@@ -183,17 +183,24 @@ export interface Floating {
  * left and the detail panel at the right; on a phone the top bar's two rows, the chip and the
  * bottom sheet's peek, an open stop sheet's own where it measured one. Where the screen has
  * measured them, it keeps clear of the page notices that push the chip down and, on a desktop, of
- * the legend. A window too small for that pads less, at the bottom first, so the highlight keeps
- * room.
+ * the legend; with `foot`, as a flight to one dot asks, of the legend on a phone too, where the
+ * legend, the controls and the credit stand on the peek and a lone dot would land beside them. A
+ * window too small for that pads less, at the bottom first, so the highlight keeps room.
  */
-export function fitPadding(width: number, height: number, floating: Floating = {}): Padding {
+export function fitPadding(
+  width: number,
+  height: number,
+  floating: Floating = {},
+  { foot = false }: { readonly foot?: boolean } = {},
+): Padding {
   const gap = 12 // size.panel-gap, and space.300 from the edge
   const chip = 34 + 8 // size.control, and its gap under the top bar (MapHighlight.module.css)
   const desktop = width >= PHONE
   // The chip sits under the notices, however many there are. On a phone the legend stands on the
-  // sheet's peek at the left only, so the peek's padding is enough there.
+  // sheet's peek at the left only, so the peek's padding is enough there for a highlight, which
+  // spreads across the map.
   const below = floating.top === undefined ? 0 : floating.top + chip + MARGIN
-  const above = !desktop || floating.bottom === undefined ? 0 : floating.bottom + MARGIN
+  const above = (!desktop && !foot) || floating.bottom === undefined ? 0 : floating.bottom + MARGIN
   const padding: Padding = desktop
     ? {
         top: Math.max(gap + 68 + chip + MARGIN, below), // the top bar's glass group
@@ -204,7 +211,7 @@ export function fitPadding(width: number, height: number, floating: Floating = {
     : {
         top: Math.max(gap + 114 + chip + MARGIN, below), // the top bar's group, filters below
         right: MARGIN,
-        bottom: (floating.peek ?? 182) + gap + MARGIN, // size.sheet-peek
+        bottom: Math.max((floating.peek ?? 182) + gap + MARGIN, above), // size.sheet-peek
         left: MARGIN,
       }
   const across = Math.min(1, Math.max(0, width - ROOM) / (padding.left + padding.right))
@@ -220,7 +227,7 @@ export function fitPadding(width: number, height: number, floating: Floating = {
 }
 
 /** The closest a fit comes, so a lone stop shows its streets. */
-const FIT_ZOOM = 15
+export const FIT_ZOOM = 15
 
 /** A camera's place over the ground: the longitude and latitude at the map's middle, and its zoom. */
 export interface Place {
@@ -326,6 +333,54 @@ function hullOf(points: [number, number][]): [number, number][] {
   return hull.length > 0 ? hull : [sorted[0]]
 }
 
+/** The room `padding` leaves on a map `area` wide and high, and its middle, in px. */
+function roomOf(area: { readonly width: number; readonly height: number }, padding: Padding) {
+  const room = {
+    width: Math.max(1, area.width - padding.left - padding.right),
+    height: Math.max(1, area.height - padding.top - padding.bottom),
+  }
+  return { room, middle: { x: padding.left + room.width / 2, y: padding.top + room.height / 2 } }
+}
+
+/**
+ * The place at `zoom` from which `points`, as longitude and latitude, are drawn in the middle of
+ * the room `padding` leaves on a map `area` wide and high, stepped to from `from`, and how much of
+ * the room they fill there, their larger share across or down: 1 or less fits. Where the steps
+ * don't settle, nothing fits.
+ */
+function centred(
+  points: readonly [number, number][],
+  from: Place,
+  zoom: number,
+  area: { readonly width: number; readonly height: number },
+  padding: Padding,
+  lensAt: (place: Place) => Lens,
+): { place: Place; fill: number } {
+  const { room, middle } = roomOf(area, padding)
+  let place: Place = { centre: from.centre, zoom }
+  for (let step = 0; step < 50; step++) {
+    const lens = lensAt(place)
+    let [left, right, top, bottom] = [Infinity, -Infinity, Infinity, -Infinity]
+    for (const point of points) {
+      const { x, y } = lens.project(point)
+      left = Math.min(left, x)
+      right = Math.max(right, x)
+      top = Math.min(top, y)
+      bottom = Math.max(bottom, y)
+    }
+    const off = { x: (left + right) / 2 - middle.x, y: (top + bottom) / 2 - middle.y }
+    if (!Number.isFinite(off.x + off.y)) break
+    if (Math.hypot(off.x, off.y) < 0.05) {
+      return { place, fill: Math.max((right - left) / room.width, (bottom - top) / room.height) }
+    }
+    place = {
+      centre: lens.unproject({ x: area.width / 2 + off.x, y: area.height / 2 + off.y }),
+      zoom,
+    }
+  }
+  return { place, fill: Infinity }
+}
+
 /**
  * Where the camera goes to fit `highlight` on a map `area` wide and high, clear of `padding`, at
  * the tilt and heading `lensAt` draws with, which it keeps: the place from which every line and
@@ -346,11 +401,7 @@ export function fitPlace(
     ...highlight.stops.map((stop) => stop.point),
   ].map(([lat, lon]) => mercator([lon, lat]))
   if (world.length === 0) return undefined
-  const room = {
-    width: Math.max(1, area.width - padding.left - padding.right),
-    height: Math.max(1, area.height - padding.top - padding.bottom),
-  }
-  const middle = { x: padding.left + room.width / 2, y: padding.top + room.height / 2 }
+  const { room } = roomOf(area, padding)
   // The camera draws the Mercator world's flat ground in perspective, which keeps the outermost
   // points outermost, so those are all the fit measures.
   const points = hullOf(world).map(fromMercator)
@@ -370,55 +421,44 @@ export function fitPlace(
     centre: fromMercator([(west + east) / 2, (north + south) / 2]),
     zoom: Math.min(FIT_ZOOM, flatZoom),
   }
-  /**
-   * The place at `zoom` from which what is drawn sits in the room's middle, stepped to from
-   * `from`, and how much of the room it fills there, its larger share across or down: 1 or less
-   * fits. Where the steps don't settle, nothing fits.
-   */
-  const centred = (from: Place, zoom: number) => {
-    let place: Place = { centre: from.centre, zoom }
-    for (let step = 0; step < 50; step++) {
-      const lens = lensAt(place)
-      let [left, right, top, bottom] = [Infinity, -Infinity, Infinity, -Infinity]
-      for (const point of points) {
-        const { x, y } = lens.project(point)
-        left = Math.min(left, x)
-        right = Math.max(right, x)
-        top = Math.min(top, y)
-        bottom = Math.max(bottom, y)
-      }
-      const off = { x: (left + right) / 2 - middle.x, y: (top + bottom) / 2 - middle.y }
-      if (!Number.isFinite(off.x + off.y)) break
-      if (Math.hypot(off.x, off.y) < 0.05) {
-        return { place, fill: Math.max((right - left) / room.width, (bottom - top) / room.height) }
-      }
-      place = {
-        centre: lens.unproject({ x: area.width / 2 + off.x, y: area.height / 2 + off.y }),
-        zoom,
-      }
-    }
-    return { place, fill: Infinity }
-  }
+  const centredAt = (from: Place, zoom: number) =>
+    centred(points, from, zoom, area, padding, lensAt)
   const fits = (tried: { fill: number }) => tried.fill <= 1 + 1e-4
   // Then the closest zoom that fits, found by halving between one that fits and one that doesn't:
   // tilted, the ground near the foot of the canvas grows faster than the zoom does.
-  let fitting = centred(flat, flat.zoom)
+  let fitting = centredAt(flat, flat.zoom)
   let [low, high] = [flat.zoom, FIT_ZOOM]
   for (let out = 1; !fits(fitting); out++) {
     if (out > 8) return flat
     ;[low, high] = [flat.zoom - out, flat.zoom - out + 1]
-    fitting = centred(fitting.place, low)
+    fitting = centredAt(fitting.place, low)
   }
-  const closest = high > low ? centred(fitting.place, high) : undefined
+  const closest = high > low ? centredAt(fitting.place, high) : undefined
   if (closest && fits(closest)) return closest.place
   // Flat and north-up, the flat fit already fills the room.
   while (fitting.fill < 0.999 && high - low > 1e-4) {
     const zoom = (low + high) / 2
-    const tried = centred(fitting.place, zoom)
+    const tried = centredAt(fitting.place, zoom)
     if (fits(tried)) [fitting, low] = [tried, zoom]
     else high = zoom
   }
   return fitting.place
+}
+
+/**
+ * Where the camera goes to show one `point`, a longitude and latitude, at `zoom` on a map `area`
+ * wide and high: the place from which it is drawn in the middle of the room `padding` leaves, at
+ * the tilt and heading `lensAt` draws with, stepped to from `from`.
+ */
+export function placeOn(
+  point: [number, number],
+  from: Place,
+  zoom: number,
+  area: { readonly width: number; readonly height: number },
+  padding: Padding,
+  lensAt: (place: Place) => Lens,
+): Place {
+  return centred([point], from, zoom, area, padding, lensAt).place
 }
 
 export interface HighlightStore {
