@@ -77,7 +77,7 @@ The free Rejseplanen key allows about one call a minute, so browsers never call 
 - [Playwright](https://playwright.dev) for end-to-end tests
 - [oxlint](https://oxc.rs/docs/guide/usage/linter) for linting, [Prettier](https://prettier.io) for formatting
 - Agent skills in `.claude/skills/`: `grill-me`, `grilling`, `wayfinder` (with `domain-modeling`, `prototype` and `research`), `to-spec`, `to-tickets`, `tdd` (with `codebase-design`), `factory-code-review`, `improve-codebase-architecture` and `software-factory` from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), and `vercel-react-best-practices` from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) (MIT); `create-verification-skill` and `maintain-verification-skill` (MIT, licence in each folder); and Mylder's own `factory` and `verify-mylder`
-- [Vercel](https://vercel.com) for production and previews
+- [Vercel](https://vercel.com) for production and previews, and its Web Analytics for cookie-free visit counts on production (not the Pages demo)
 - Planned: Upstash Redis for the tracker's state
 
 ## Getting started

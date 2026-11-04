@@ -1,5 +1,6 @@
 import '@mylder/perron/perron.css'
 import './globals.css'
+import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -13,6 +14,9 @@ interface LangProps {
 
 /** The path the pages sit under: the repository's in the GitHub Pages demo (ADR 0013), else none. */
 const BASE_PATH = process.env.NEXT_PUBLIC_MYLDER_BASE_PATH ?? ''
+
+/** Vercel Web Analytics counts visits only where Vercel serves the app, not on the Pages demo. */
+const ON_VERCEL = process.env.VERCEL === '1'
 
 // Only /en and /da exist; any other first segment is a 404.
 export const dynamicParams = false
@@ -51,6 +55,7 @@ export default async function LangLayout({
         <Providers lang={lang} dictionary={dictionary}>
           {children}
         </Providers>
+        {ON_VERCEL ? <Analytics /> : null}
       </body>
     </html>
   )
