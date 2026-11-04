@@ -91,17 +91,22 @@ test('an opened delayed bus and its next stop show its expected times and the de
   page,
   request,
 }) => {
-  const { trips } = await snapshotNow(request)
   // A bus whose update has some call 2 min or more off its timetable. Its `delay` is the one at its
   // next call, which in the recording's first minute is under 2 min for every bus with an update.
-  const bus = trips.find(
-    (trip) =>
-      trip.mode === 'bus' &&
-      trip.state === 'estimated' &&
-      !trip.cancelled &&
-      (trip.steps ?? []).some(([, delay]) => Math.abs(delay) >= 120) &&
-      trip.next.length > 0,
-  )!
+  // The server's clock starts at its first request, and its table fills as the messages come, so
+  // a test that asks first waits for one, up to the next minute's run.
+  test.setTimeout(150_000)
+  const delayedBus = async () =>
+    (await snapshotNow(request)).trips.find(
+      (trip) =>
+        trip.mode === 'bus' &&
+        trip.state === 'estimated' &&
+        !trip.cancelled &&
+        (trip.steps ?? []).some(([, delay]) => Math.abs(delay) >= 120) &&
+        trip.next.length > 0,
+    )
+  await expect.poll(delayedBus, { timeout: 90_000 }).toBeDefined()
+  const bus = (await delayedBus())!
   const source = /Timetable and Rejseplanen's delays\s·\supdated\s\d\d:\d\d:\d\d/
   await page.goto(`${UPDATES_URL}/en?trip=${encodeURIComponent(bus.key)}`)
   const vehicle = page.getByRole('dialog', { name: `to ${bus.headsign}` })
