@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { wallClock } from '../timetable/time'
 import { MONTHLY_CALLS, monthOf, pacing, SPENT_AT } from './budget'
 
 const zone = 'Europe/Copenhagen'
@@ -11,8 +10,9 @@ const line = (share: number) => pacing({ calls: 0, now: at(share), timezone: zon
 
 describe('monthOf', () => {
   it('runs from midnight on the 1st to midnight on the next 1st, in the zone', () => {
-    expect(october.start).toBe(wallClock('2026-10-01', 0, zone))
-    expect(october.end).toBe(wallClock('2026-11-01', 0, zone))
+    // Summer time at the 1st, winter time by the next: the month is an hour longer than 31 days.
+    expect(october.start).toBe(Date.UTC(2026, 8, 30, 22))
+    expect(october.end).toBe(Date.UTC(2026, 9, 31, 23))
     expect(october.next).toBe('2026-11-01')
   })
 })

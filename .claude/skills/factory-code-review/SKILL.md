@@ -36,7 +36,7 @@ Look for the originating spec, in this order:
 Search the repo for every file that documents how code should be written. `CLAUDE.md` is always on the list. Then add each one the diff touches:
 
 - React code: the `vercel-react-best-practices` skill;
-- tests: `docs/testing-seams.md`;
+- tests: `docs/testing-seams.md`, and the `tdd` skill's Anti-patterns, where a tautological test (an assertion that cannot go red) is a hard violation;
 - data states, live data, the timetable or screens: `docs/data-states.md`, `docs/live-data.md`, `docs/timetable.md`, `docs/screens.md`;
 - domain words: `GLOSSARY.md`;
 - the ADRs in `docs/adr/` that cover the area.

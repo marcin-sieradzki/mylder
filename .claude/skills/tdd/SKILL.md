@@ -32,7 +32,13 @@ When the shape of that interface is itself in question (how deep the module is, 
 ## Anti-patterns
 
 - **Implementation-coupled**: mocks internal collaborators, tests private methods, or verifies through a side channel (querying the database instead of using the interface). The tell: the test breaks when you refactor but behavior hasn't changed.
-- **Tautological**: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth: a known-good literal, a worked example, the spec.
+- **Tautological**: an assertion that cannot go _red_, so it passes by construction and can never disagree with the code. It takes one of three shapes:
+  - the expected value is worked out the way the code works it out: by calling the code under test or a helper it calls, or by repeating its logic (`expect(add(a, b)).toBe(a + b)`; `expect(count()).toBe(items().length)` where `count` returns `items().length`; a snapshot derived by hand the same way);
+  - the test asserts nothing, or only what it wrote itself: a literal (`expect(true).toBe(true)`), a constant against itself, a fixture that never went through the code;
+  - every assertion is on a mock the test set up and then called itself, so the code under test never runs.
+
+  Expected values come from an independent source of truth: a known-good literal, a worked example, the spec, or a second source that agrees for a reason of its own (a changelog's top version against `package.json`'s). Before keeping an assertion, name the wrong code that would turn it red; when nothing can, give it an independent expected value, or delete it.
+
 - **Horizontal slicing**: writing all tests first, then all implementation. Bulk tests verify _imagined_ behavior: you test the _shape_ of things rather than user-facing behavior, the tests go insensitive to real changes, and you commit to test structure before understanding the implementation. Work in **vertical slices** instead: one test → one implementation → repeat, each test a **tracer bullet** that responds to what the last cycle taught you.
 
 ## Rules of the loop

@@ -56,7 +56,9 @@ describe('the tickets to open', () => {
 
   it('opens one ticket for a closed Perron issue, naming every place its stand-in sits', () => {
     const tickets = ticketsToOpen(standIns, [closed(190), open(191)], [])
-    expect(tickets.map(({ title }) => title)).toEqual([ticketTitle(190)])
+    expect(tickets.map(({ title }) => title)).toEqual([
+      'Replace the Perron stand-in for perron#190',
+    ])
     const [{ body }] = tickets
     expect(body).toContain('marcin-sieradzki/perron#190')
     expect(body).toContain('perron-stand-in: perron#190')
