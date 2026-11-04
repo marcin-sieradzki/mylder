@@ -105,8 +105,9 @@ test('an opened delayed bus and its next stop show its expected times and the de
         (trip.steps ?? []).some(([, delay]) => Math.abs(delay) >= 120) &&
         trip.next.length > 0,
     )
-  await expect.poll(delayedBus, { timeout: 90_000 }).toBeDefined()
-  const bus = (await delayedBus())!
+  let bus: Trip | undefined
+  await expect.poll(async () => (bus = await delayedBus()), { timeout: 90_000 }).toBeDefined()
+  if (!bus) throw new Error('No bus 2 min off its timetable')
   const source = /Timetable and Rejseplanen's delays\s·\supdated\s\d\d:\d\d:\d\d/
   await page.goto(`${UPDATES_URL}/en?trip=${encodeURIComponent(bus.key)}`)
   const vehicle = page.getByRole('dialog', { name: `to ${bus.headsign}` })
@@ -171,6 +172,49 @@ test('the Latest now pill names the trip running latest and opens its panel', as
   await expect(page.getByRole('dialog', { name: /to Hillerød/ })).toContainText('950R')
 })
 
+/**
+ * How many characters of the pill's stop name show before the ellipsis: those whose glyphs end
+ * inside the stop's visible box, short of the ellipsis's room; all of them when none is cut.
+ */
+const visibleStopCharacters = (pill: Locator) =>
+  pill.locator('[data-latest-where]').evaluate((where) => {
+    const stop = where.querySelector('[data-latest-stop]')!.firstChild!
+    const length = stop.textContent!.length
+    if (where.scrollWidth <= where.clientWidth) return length
+    const range = document.createRange()
+    const right = where.getBoundingClientRect().left + where.clientWidth
+    // The ellipsis takes about a character's room at the end.
+    range.setStart(stop, 0)
+    range.setEnd(stop, 1)
+    const ellipsis = range.getBoundingClientRect().width
+    let shown = 0
+    for (let end = 1; end <= length; end++) {
+      range.setEnd(stop, end)
+      if (range.getBoundingClientRect().right > right - ellipsis) break
+      shown = end
+    }
+    return shown
+  })
+
+/**
+ * Expects the pill's words whole inside it: its first words, the line badge and the delay, and at
+ * least the start of the stop's name, `kept` characters, before any ellipsis.
+ */
+async function expectPillWhole(pill: Locator, now: string, line: string, kept: number) {
+  const box = await boxOf(pill)
+  expect(await pill.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+  for (const part of [
+    pill.getByText(now, { exact: true }),
+    pill.getByText(line, { exact: true }),
+    pill.locator('.pn-Delay'),
+  ]) {
+    const inside = await boxOf(part)
+    expect(inside.x).toBeGreaterThanOrEqual(box.x)
+    expect(inside.x + inside.width).toBeLessThanOrEqual(box.x + box.width)
+  }
+  expect(await visibleStopCharacters(pill)).toBeGreaterThanOrEqual(kept)
+}
+
 for (const width of [412, 360]) {
   test(`on a ${width} px phone the pill takes a row of its own and fits it, the stop cut short`, async ({
     page,
@@ -188,73 +232,133 @@ for (const width of [412, 360]) {
     expect(box.y).toBeGreaterThanOrEqual(about.y + about.height)
     expect(box.x).toBeGreaterThanOrEqual(0)
     expect(box.x + box.width).toBeLessThanOrEqual(width)
-    // Its words never spill out of it.
-    expect(await pill.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
-    // "Latest now", the badge and the delay whole inside it; the stop's name cut by an ellipsis.
-    for (const part of [
-      pill.getByText('Latest now'),
-      pill.getByText('250S'),
-      pill.locator('.pn-Delay'),
-    ]) {
-      const inside = await boxOf(part)
-      expect(inside.x).toBeGreaterThanOrEqual(box.x)
-      expect(inside.x + inside.width).toBeLessThanOrEqual(box.x + box.width)
-    }
-    const stop = pill.getByText(/^at Hillerødmotorvejen, Tingbjerg/)
-    expect(await stop.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
-    expect(await stop.evaluate((element) => getComputedStyle(element).textOverflow)).toBe(
+    // A phone's row is as wide as the screen allows: the start of the stop's name still shows.
+    await expectPillWhole(pill, 'Latest now', '250S', 5)
+    // The stop's name is cut by an ellipsis.
+    const where = pill.locator('[data-latest-where]')
+    await expect(where).toHaveText(/^at Hillerødmotorvejen, Tingbjerg/)
+    expect(await where.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
+    expect(await where.evaluate((element) => getComputedStyle(element).textOverflow)).toBe(
       'ellipsis',
     )
-    const inside = await boxOf(stop)
-    expect(inside.x + inside.width).toBeLessThanOrEqual(box.x + box.width)
   })
 }
 
+const WORDS = {
+  en: {
+    filters: 'Filters',
+    about: 'About Mylder',
+    overview: 'Overview',
+    now: 'Latest now',
+    pill: /^Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, /,
+    outOfDate: /^Updated \d\d:\d\d:\d\d, may be out of date$/,
+    quiet: 'Delays from Rejseplanen not updated since 09:21',
+  },
+  da: {
+    filters: 'Filtre',
+    about: 'Om Mylder',
+    overview: 'Overblik',
+    now: 'Mest forsinket nu',
+    pill: /^Største forsinkelse lige nu: 250S mod Dragør Stationsplads, 100 min forsinket, /,
+    outOfDate: /^Opdateret \d\d:\d\d:\d\d, /,
+    quiet: 'Forsinkelser fra Rejseplanen ikke opdateret siden 09:21',
+  },
+} as const
+
 /**
- * Expects the top bar on one row, as without the pill, and the Overview sheet's heading clear of
- * it: the tools on the brand's row, the bar no taller than its one row of 58 px.
+ * Expects the top bar on one row, as without the pill, and clear of the Overview sheet's heading:
+ * the About button level with the brand, the bar no taller than one row of 58 px, the heading
+ * under it; and the pill, in the bar or on its row under it, clear of the heading too.
  */
-async function expectOneRow(page: Page) {
-  const bar = page.locator('.pn-TopBar')
+async function expectOneRow(page: Page, words: (typeof WORDS)[keyof typeof WORDS], pill: Locator) {
+  const bar = await boxOf(page.locator('.pn-TopBar'))
   const brand = await boxOf(page.getByRole('link', { name: 'Mylder' }))
-  const about = await boxOf(page.getByRole('button', { name: 'About Mylder' }))
+  const about = await boxOf(page.getByRole('button', { name: words.about }))
   expect(Math.abs(about.y + about.height / 2 - (brand.y + brand.height / 2))).toBeLessThan(4)
-  const { y, height } = await boxOf(bar)
-  expect(height).toBeLessThanOrEqual(58)
-  const sheet = await boxOf(
-    page.getByRole('dialog', { name: 'Overview' }).getByRole('heading', { name: 'Overview' }),
+  expect(bar.height).toBeLessThanOrEqual(58)
+  const heading = await boxOf(
+    page
+      .getByRole('dialog', { name: words.overview })
+      .getByRole('heading', { name: words.overview }),
   )
-  expect(sheet.y).toBeGreaterThanOrEqual(y + height)
+  expect(heading.y).toBeGreaterThanOrEqual(bar.y + bar.height)
+  const box = await boxOf(pill)
+  const apart =
+    box.x >= heading.x + heading.width ||
+    box.x + box.width <= heading.x ||
+    box.y >= heading.y + heading.height ||
+    box.y + box.height <= heading.y
+  expect(apart).toBe(true)
 }
 
-test('at 1280 px with six chips the pill keeps the top bar on one row', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 })
+/** The page `width` px wide in `lang` with six chips: the modes and, from the weekday's, the planes. */
+async function openWide(page: Page, lang: keyof typeof WORDS, width = 1280) {
+  await page.setViewportSize({ width, height: 800 })
   await serveAircraft(page, 0)
-  await onSavedMinute(page, longStopLatest)
-  await page.goto(`${UPDATES_URL}/en`)
+  await page.goto(`${UPDATES_URL}/${lang}`)
   // Bus, Metro, S-tog, Train, Light rail and Planes.
-  await expect(page.getByRole('group', { name: 'Filters' }).getByRole('button')).toHaveCount(6)
-  const pill = page.getByRole('banner').getByRole('button', { name: /^Biggest delay right now:/ })
-  await expect(pill).toBeVisible()
-  await expectOneRow(page)
-  // In the bar's tools, beside the About button.
-  const about = await boxOf(page.getByRole('button', { name: 'About Mylder' }))
-  const box = await boxOf(pill)
-  expect(Math.abs(box.y + box.height / 2 - (about.y + about.height / 2))).toBeLessThan(4)
-  expect(await pill.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
-})
-
-test('at 1280 px with six chips the quiet pill keeps the top bar on one row', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 })
-  await serveAircraft(page, 0)
-  // A snapshot of 09:28, six minutes past the delays' last message, at 09:21:52: the feed is
-  // quiet, while the positions are as fresh as the server's runs keep them.
-  const later = 6 * 60_000
-  await onSavedMinute(page, (saved) => ({ ...saved, fetched: saved.fetched + later }), later)
-  await page.goto(`${UPDATES_URL}/en`)
-  await expect(page.getByRole('group', { name: 'Filters' }).getByRole('button')).toHaveCount(6)
   await expect(
-    page.getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:21'),
-  ).toBeVisible()
-  await expectOneRow(page)
-})
+    page.getByRole('group', { name: WORDS[lang].filters }).getByRole('button'),
+  ).toHaveCount(6)
+}
+
+for (const lang of ['en', 'da'] as const) {
+  const words = WORDS[lang]
+
+  for (const width of [1280, 1440, 1920]) {
+    test(`at ${width} px with six chips in ${lang}, the pill names its stop and keeps the bar on one row`, async ({
+      page,
+    }) => {
+      await onSavedMinute(page, longStopLatest)
+      await openWide(page, lang, width)
+      const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
+      await expect(pill).toBeVisible()
+      await expectOneRow(page, words, pill)
+      // In the bar, or on its row where the bar has no room: ten characters of the stop's name.
+      await expectPillWhole(pill, words.now, '250S', 10)
+    })
+  }
+
+  test(`at 1440 px in ${lang}, the pill sits in the bar with its stop cut short`, async ({
+    page,
+  }) => {
+    // The chips leave the bar room for the pill less the end of its stop's long name.
+    await onSavedMinute(page, longStopLatest)
+    await openWide(page, lang, 1440)
+    const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
+    await expect(pill).toBeVisible()
+    expect(await pill.evaluate((element) => element.closest('.pn-TopBar') !== null)).toBe(true)
+    const where = pill.locator('[data-latest-where]')
+    expect(await where.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
+    await expectOneRow(page, words, pill)
+    await expectPillWhole(pill, words.now, '250S', 10)
+  })
+
+  test(`at 1280 px with six chips in ${lang} and a long Updated line, the pill still fits`, async ({
+    page,
+  }) => {
+    // 90 s past the minute, its snapshot may be out of date, and the Updated line says so.
+    await onSavedMinute(page, longStopLatest, 90_000)
+    await openWide(page, lang)
+    await expect(page.getByRole('banner').getByText(words.outOfDate)).toBeVisible()
+    const pill = page.getByRole('banner').getByRole('button', { name: words.pill })
+    await expect(pill).toBeVisible()
+    await expectOneRow(page, words, pill)
+    // In the bar, or on its row where the bar has no room: ten characters of the stop's name.
+    await expectPillWhole(pill, words.now, '250S', 10)
+  })
+
+  test(`at 1280 px with six chips in ${lang}, the quiet pill keeps the bar on one row`, async ({
+    page,
+  }) => {
+    // A snapshot of 09:28, six minutes past the delays' last message, at 09:21:52: the feed is
+    // quiet, while the positions are as fresh as the server's runs keep them.
+    const later = 6 * 60_000
+    await onSavedMinute(page, (saved) => ({ ...saved, fetched: saved.fetched + later }), later)
+    await openWide(page, lang)
+    const quiet = page.getByRole('banner').getByText(words.quiet)
+    await expect(quiet).toBeVisible()
+    expect(await quiet.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+    await expectOneRow(page, words, quiet)
+  })
+}
