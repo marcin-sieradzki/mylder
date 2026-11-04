@@ -7,7 +7,9 @@
 // every dot's size where the zoom puts it, and each one where the camera draws it however the
 // map is turned or tilted. A hover picks a dot of either kind (picking.ts), a tap on one opens its
 // panel, and a tap that finds no dot opens the stop under it, if any.
-// Each frame drawn moves the camera onto the followed dot (follow.ts). It polls the snapshot while
+// Each frame drawn moves the camera onto the followed dot (follow.ts), and draws the spotlight's
+// ring round the rung trip's dot just above the vehicles (spotlight.ts), its trip and its point on
+// the canvas on the map's container as `data-spotlight` and `data-spotlight-at`, for tests. It polls the snapshot while
 // the map is open, and the aircraft while the Planes filter shows them too. The numbers of
 // vehicles and aircraft drawn are on the map's container as `data-vehicles` and `data-aircraft`,
 // for tests.
