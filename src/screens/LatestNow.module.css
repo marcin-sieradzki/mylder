@@ -10,7 +10,7 @@
 /* Perron's Button sizes to its label and never lets the label shrink below its words, so a tight
    Button spills them past its edges. Let the label shrink with the Button, so the pill's words cut
    the stop's name instead. A stand-in for a Button whose label can be cut short in a tight row:
-   goes when Perron's Button has it. perron-stand-in: perron#TBD */
+   goes when Perron's Button has it. perron-stand-in: perron#198 */
 .pill :global(.pn-Button-label) {
   min-inline-size: 0;
 }
