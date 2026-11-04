@@ -1,15 +1,15 @@
 'use client'
 // The map's canvas: MapLibre with the basemap style, repainted when the theme changes, when the
-// timetable's network has loaded and when the highlight changes, and the live vehicles in
-// deck.gl's canvas over it (docs/screens.md, "The moving map"; ADR 0003). It opens on the view
-// the address names and keeps where it was left in the address (`view.ts`), except while Follow
-// moves it each frame. A new highlight ends Follow and fits the camera to it, clear of the top bar,
-// the notices and the legend the screen hands it, moving only the centre and zoom, so a tilted,
-// turned map keeps its tilt and heading, as it does under Follow; a flight to a trip from the
-// Latest now pill lands its dot clear of the same (spotlight.ts). The map lives outside React:
-// React only names the canvas, and the screen's controls move it through the camera (camera.ts).
-// The address keeps its heading and tilt too, so a link opens in 3D. Its tilt and heading at rest are on its
-// container as `data-tilt` and `data-heading`, for tests.
+// timetable's network has loaded and when the highlight changes, and the live vehicles in deck.gl's
+// canvas over it (docs/screens.md, "The moving map"; ADR 0003). It opens on the view the address
+// names and keeps where it was left in the address (`view.ts`), except while Follow moves it each
+// frame. A new highlight ends Follow and fits the camera to it, clear of the top bar, the notices
+// and the legend the screen hands it, moving only the centre and zoom, so a tilted, turned map
+// keeps its tilt and heading, as it does under Follow; a flight to a trip from the Latest now pill
+// lands its dot clear of the same (spotlight.ts). The map lives outside React: React only names the
+// canvas, and the screen's controls move it through the camera (camera.ts). The address keeps its
+// heading and tilt too, so a link opens in 3D. Its tilt and heading at rest are on its container as
+// `data-tilt` and `data-heading`, for tests.
 import 'client-only'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Map as MapLibreMap, setWorkerUrl } from 'maplibre-gl'

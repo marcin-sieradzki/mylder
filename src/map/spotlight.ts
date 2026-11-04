@@ -100,9 +100,10 @@ export type FlightMap = Pick<
  * Flies `map`, `area` wide and high, to `point`, a dot's longitude and latitude, landing it in the
  * middle of the room clear of what floats over the map, as a highlight's fit keeps clear of it
  * (`fitPadding`): the header, the pill's row included, the Overview sheet and the open panel on a
- * desktop, the header, the panel's peek and the map's foot standing on it on a phone. It comes in to zoom 15, the streets in
- * view, or keeps a closer zoom, keeps the rider's tilt and heading, and ends Follow, whose camera
- * would hold it on another dot. Under reduced motion MapLibre jumps rather than flies.
+ * desktop, the header, the panel's peek and the map's foot standing on it on a phone. It comes in
+ * to zoom 15, the streets in view, or keeps a closer zoom, keeps the rider's tilt and heading, and
+ * ends Follow, whose camera would hold it on another dot. Under reduced motion MapLibre jumps
+ * rather than flies.
  */
 export function flyOnto(
   map: FlightMap,

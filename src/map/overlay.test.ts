@@ -494,12 +494,25 @@ describe('the spotlight on the map', () => {
 
   it('changes no other dot', async () => {
     await drawnStill()
-    const before = layerOf('vehicles')!.props
+    // Every attribute of the vehicles' dots and halos, copied, since the layers keep the same
+    // arrays from frame to frame: a write into them would show on both sides of a comparison.
+    const copied = () =>
+      ['vehicle-halos', 'vehicles'].map((id) => {
+        const attributes = layerOf(id)!.props.data.attributes as unknown as Record<
+          string,
+          { value: ArrayLike<number> }
+        >
+        return Object.fromEntries(
+          Object.entries(attributes).map(([name, { value }]) => [name, Array.from(value)]),
+        )
+      })
+    const before = copied()
+    const radiusScale = layerOf('vehicles')!.props.radiusScale
     ringOn(minute6.trips[0].key)
     await new Promise((resolve) => requestAnimationFrame(resolve))
-    const after = layerOf('vehicles')!.props
-    expect(after.data).toEqual(before.data)
-    expect(after.radiusScale).toBe(before.radiusScale)
+    expect(rendered.ids).toContain('spotlight')
+    expect(copied()).toEqual(before)
+    expect(layerOf('vehicles')!.props.radiusScale).toBe(radiusScale)
   })
 
   it('takes the ring off when its panel closes', async () => {

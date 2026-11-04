@@ -9,10 +9,10 @@
 // panel, and a tap that finds no dot opens the stop under it, if any.
 // Each frame drawn moves the camera onto the followed dot (follow.ts), and draws the spotlight's
 // ring round the rung trip's dot just above the vehicles (spotlight.ts), its trip and its point on
-// the canvas on the map's container as `data-spotlight` and `data-spotlight-at`, for tests. It polls the snapshot while
-// the map is open, and the aircraft while the Planes filter shows them too. The numbers of
-// vehicles and aircraft drawn are on the map's container as `data-vehicles` and `data-aircraft`,
-// for tests.
+// the canvas on the map's container as `data-spotlight` and `data-spotlight-at`, for tests. It
+// polls the snapshot while the map is open, and the aircraft while the Planes filter shows them
+// too. The numbers of vehicles and aircraft drawn are on the map's container as `data-vehicles` and
+// `data-aircraft`, for tests.
 import 'client-only'
 import { MapLibreOverlay } from '@deck.gl/maplibre'
 import type { Map as MapLibreMap } from 'maplibre-gl'

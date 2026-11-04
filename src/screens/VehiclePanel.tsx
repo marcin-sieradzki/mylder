@@ -122,8 +122,9 @@ export function VehiclePanel({ state, frame }: VehiclePanelProps) {
 /**
  * Keeps the open panel on the vehicle the viewer opened, by its journey: when a snapshot no longer
  * files that journey under the panel's trip but under another, the address, and Follow and the
- * spotlight if they were on, move to that trip. Only a journey with a number (`ZI@DA`, not `@DA`) is kept to, since only
- * that one tells its vehicle from the rest of its day, as the server's corrections of the join do.
+ * spotlight if they were on, move to that trip. Only a journey with a number (`ZI@DA`, not `@DA`)
+ * is kept to, since only that one tells its vehicle from the rest of its day, as the server's
+ * corrections of the join do.
  */
 function useKeptVehicle(tripKey: string, snapshot: Snapshot | undefined) {
   const opened = useRef<{ readonly tripKey: string; readonly journey: string }>(undefined)
