@@ -1,0 +1,12 @@
+{
+  "journey": "reg-trip-list-facts",
+  "pass": true,
+  "steps": [
+    "01-vehicles-list: vehicles list (http://localhost:4402/en?tab=vehicles)",
+    "02-panel-facts-vestamager-st-metro-: panel facts Vestamager St. (Metro) (http://localhost:4402/en?tab=vehicles&trip=metro.M1.7f21f99145.20261031.0851)",
+    "03-following: following (http://localhost:4402/en?tab=vehicles&trip=metro.M1.7f21f99145.20261031.0851)",
+    "04-whole-line: whole line (http://localhost:4402/en?tab=vehicles&trip=metro.M1.7f21f99145.20261031.0851&map=10.66/55.66009/12.53978)",
+    "05-closed: closed (http://localhost:4402/en?tab=vehicles&map=10.66/55.66009/12.53978)",
+    "06-missing: missing (http://localhost:4402/en?trip=nothing)"
+  ]
+}

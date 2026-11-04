@@ -1,0 +1,12 @@
+FAIL latest-open: 2 steps in .verify/main-238-r2-siri-et/latest-open/
+expect(locator).toBeVisible() failed
+
+Locator: getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })
+Expected: visible
+Timeout: 30000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / }) with timeout 30000ms
+  - waiting for getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })
+

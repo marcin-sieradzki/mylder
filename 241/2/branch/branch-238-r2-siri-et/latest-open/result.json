@@ -1,0 +1,9 @@
+{
+  "journey": "latest-open",
+  "pass": true,
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4402/en)",
+    "02-pill-before-press: pill before press (http://localhost:4402/en)",
+    "03-vehicle-panel-of-the-named-trip: vehicle panel of the named trip (http://localhost:4402/en?trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

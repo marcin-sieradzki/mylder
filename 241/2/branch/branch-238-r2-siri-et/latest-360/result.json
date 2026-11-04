@@ -1,0 +1,9 @@
+{
+  "journey": "latest-360",
+  "pass": true,
+  "steps": [
+    "01-en-360px-pill-on-its-row: en 360px pill on its row (http://localhost:4402/en)",
+    "02-en-360px-trip-panel-and-whole-line: en 360px trip panel and whole line (http://localhost:4402/en?trip=bus.144.bc5239a3e3.20261031.0815&map=10.00/55.69288/12.34783)",
+    "03-en-360px-stop-panel: en 360px stop panel (http://localhost:4402/en?stop=6584)"
+  ]
+}

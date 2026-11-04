@@ -1,0 +1,8 @@
+{
+  "journey": "notice-panel",
+  "pass": true,
+  "steps": [
+    "01-1000px-trip-panel-and-notice: 1000px trip panel and notice (http://localhost:4304/en?trip=bus.1A.48c080f3c1.20261031.0855)",
+    "02-1280px-trip-panel-and-notice: 1280px trip panel and notice (http://localhost:4304/en?trip=bus.1A.48c080f3c1.20261031.0855)"
+  ]
+}

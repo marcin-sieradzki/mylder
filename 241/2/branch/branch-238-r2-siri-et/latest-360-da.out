@@ -1,0 +1,3 @@
+ROWS [{"tag":"da 360px","inBar":false,"barH":90,"headerB":174,"pill":[29,127,302],"toolsTop":19,"brandTop":17,"vis":4,"name":"Albertslund St. (Hedemarksvej)","truncated":true}]
+FAIL latest-360-da: 4 steps in .verify/branch-238-r2-siri-et/latest-360-da/
+da 360px: only 4 characters of "Albertslund St. (Hedemarksvej)" show before the ellipsis

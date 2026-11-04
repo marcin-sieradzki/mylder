@@ -1,0 +1,12 @@
+FAIL latest-calm: 2 steps in .verify/main-238-r2-crowded/latest-calm/
+expect(locator).toBeVisible() failed
+
+Locator: getByRole('banner').getByText(/Latest now/).first()
+Expected: visible
+Timeout: 30000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('banner').getByText(/Latest now/).first() with timeout 30000ms
+  - waiting for getByRole('banner').getByText(/Latest now/).first()
+

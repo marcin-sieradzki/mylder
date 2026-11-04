@@ -1,0 +1,12 @@
+FAIL reg-map-tilt-keys: 1 steps in .verify/branch-238-r2/reg-map-tilt-keys/
+expect(locator).not.toHaveAttribute(expected) failed
+
+Locator: locator('[data-vehicles]')
+Expected: not "0"
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "not toHaveAttribute" locator('[data-vehicles]') with timeout 5000ms
+  - waiting for locator('[data-vehicles]')
+

@@ -1,0 +1,12 @@
+FAIL latest-quiet-da: 2 steps in .verify/main-238-r2-siri-et-quiet/latest-quiet-da/
+expect(locator).toBeVisible() failed
+
+Locator: getByRole('banner').getByText('Forsinkelser fra Rejseplanen ikke opdateret siden 09:56')
+Expected: visible
+Timeout: 30000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('banner').getByText('Forsinkelser fra Rejseplanen ikke opdateret siden 09:56') with timeout 30000ms
+  - waiting for getByRole('banner').getByText('Forsinkelser fra Rejseplanen ikke opdateret siden 09:56')
+

@@ -1,0 +1,12 @@
+FAIL latest-none: 2 steps in .verify/main-238-r2-empty/latest-none/
+expect(locator).toBeVisible() failed
+
+Locator: getByRole('banner').getByText(/Latest now/).first()
+Expected: visible
+Timeout: 90000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('banner').getByText(/Latest now/).first() with timeout 90000ms
+  - waiting for getByRole('banner').getByText(/Latest now/).first()
+

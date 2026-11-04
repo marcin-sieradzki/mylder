@@ -1,0 +1,15 @@
+{
+  "journey": "bar-before",
+  "pass": true,
+  "steps": [
+    "01-en-360px: en 360px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "02-en-412px: en 412px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "03-en-800px: en 800px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "04-en-900px: en 900px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "05-en-1000px: en 1000px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "06-en-1100px: en 1100px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "07-en-1280px: en 1280px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "08-en-1440px: en 1440px (http://localhost:4402/en?map=11.20/55.68000/12.56500)",
+    "09-en-1920px: en 1920px (http://localhost:4402/en?map=11.20/55.68000/12.56500)"
+  ]
+}

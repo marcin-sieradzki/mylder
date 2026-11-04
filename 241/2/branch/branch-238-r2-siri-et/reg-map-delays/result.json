@@ -1,0 +1,7 @@
+{
+  "journey": "reg-map-delays",
+  "pass": true,
+  "steps": [
+    "01-map-with-delays: map with delays (http://localhost:4402/en)"
+  ]
+}

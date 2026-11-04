@@ -1,0 +1,8 @@
+{
+  "journey": "latest-layout-da",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByRole('button', { name: /^Største forsinkelse lige nu: / })\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByRole('button', { name: /^Største forsinkelse lige nu: / }) with timeout 90000ms\n  - waiting for getByRole('banner').getByRole('button', { name: /^Største forsinkelse lige nu: / })\n",
+  "steps": [
+    "01-failure: failure (http://localhost:4304/da)"
+  ]
+}

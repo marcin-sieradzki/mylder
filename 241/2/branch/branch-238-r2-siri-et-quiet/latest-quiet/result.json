@@ -1,0 +1,8 @@
+{
+  "journey": "latest-quiet",
+  "pass": true,
+  "steps": [
+    "01-map-opened-feed-quiet: map opened, feed quiet (http://localhost:4402/en)",
+    "02-pill-says-the-feed-is-quiet: pill says the feed is quiet (http://localhost:4402/en)"
+  ]
+}

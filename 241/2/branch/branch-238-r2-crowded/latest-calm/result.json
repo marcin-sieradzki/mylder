@@ -1,0 +1,8 @@
+{
+  "journey": "latest-calm",
+  "pass": true,
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4402/en)",
+    "02-pill-is-calm: pill is calm (http://localhost:4402/en)"
+  ]
+}

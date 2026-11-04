@@ -1,0 +1,8 @@
+{
+  "journey": "latest-quiet-layout",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:56')\nExpected: visible\nTimeout: 480000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:56') with timeout 480000ms\n  - waiting for getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:56')\n",
+  "steps": [
+    "01-failure: failure (http://localhost:4304/en)"
+  ]
+}

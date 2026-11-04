@@ -1,0 +1,12 @@
+FAIL latest-quiet-layout: 1 steps in .verify/main-238-r2-siri-et-quiet/latest-quiet-layout/
+expect(locator).toBeVisible() failed
+
+Locator: getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:56')
+Expected: visible
+Timeout: 480000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:56') with timeout 480000ms
+  - waiting for getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:56')
+

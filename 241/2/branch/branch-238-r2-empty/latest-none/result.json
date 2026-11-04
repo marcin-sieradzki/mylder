@@ -1,0 +1,8 @@
+{
+  "journey": "latest-none",
+  "pass": true,
+  "steps": [
+    "01-map-opened: map opened (http://localhost:4402/en)",
+    "02-pill-shows-none: pill shows none (http://localhost:4402/en)"
+  ]
+}

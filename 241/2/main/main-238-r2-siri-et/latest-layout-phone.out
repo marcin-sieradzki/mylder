@@ -1,0 +1,12 @@
+FAIL latest-layout-phone: 1 steps in .verify/main-238-r2-siri-et/latest-layout-phone/
+expect(locator).toBeVisible() failed
+
+Locator: getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })
+Expected: visible
+Timeout: 90000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / }) with timeout 90000ms
+  - waiting for getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })
+

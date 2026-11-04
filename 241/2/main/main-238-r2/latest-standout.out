@@ -1,0 +1,8 @@
+FAIL latest-standout: 2 steps in .verify/main-238-r2/latest-standout/
+locator.ariaSnapshot: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })[22m
+
+
+Call Log:
+- Timeout 60000ms exceeded while waiting on the predicate

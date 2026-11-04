@@ -1,0 +1,26 @@
+import type { Journey } from '../../../.claude/skills/verify-mylder/scripts/drive.ts'
+export default async ({ page, step, expect }: Journey) => {
+  await page.goto('/en')
+  const v = page.locator('[data-vehicles]')
+  await expect(v).not.toHaveAttribute('data-vehicles', '0', { timeout: 30000 })
+  await page.getByRole('button', { name: 'Pause' }).click()
+  await page.waitForTimeout(1000)
+  const before = Number(await v.getAttribute('data-vehicles'))
+  const chip = page.getByRole('group', { name: 'Filters' }).getByRole('button', { name: /^Bus/ })
+  const count = Number((await chip.innerText()).match(/\d+/)![0])
+  await step('before filter')
+  await chip.click()
+  await expect.poll(async () => Number(await v.getAttribute('data-vehicles'))).toBeLessThanOrEqual(before - count)
+  await expect(chip).toContainText(String(count))
+  await step('buses off')
+  await chip.click()
+  await expect.poll(async () => Number(await v.getAttribute('data-vehicles'))).toBe(before)
+  await step('buses back')
+  const scale = page.getByText(/\d+\s(m|km)$/)
+  const before2 = await scale.innerText()
+  await page.getByRole('button', { name: 'Zoom in' }).click()
+  await expect.poll(async () => await scale.innerText()).not.toBe(before2)
+  await step('zoomed in ' + before2 + ' -> ' + (await scale.innerText()))
+  const toMetres = (s: string) => { const m = s.match(/([\d.]+)\s(m|km)/)!; return Number(m[1]) * (m[2] === 'km' ? 1000 : 1) }
+  if (!(toMetres(await scale.innerText()) < toMetres(before2))) throw new Error('scale did not shorten')
+}

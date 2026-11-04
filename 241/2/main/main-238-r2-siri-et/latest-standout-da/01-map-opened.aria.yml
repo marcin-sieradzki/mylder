@@ -1,0 +1,55 @@
+- main:
+  - region "Livekort over København"
+- banner:
+  - link "Mylder":
+    - /url: /da
+  - time: Opdateret —
+  - navigation "Sprog":
+    - link "English":
+      - /url: /en
+  - button "Om Mylder"
+- list "Datatilstande":
+  - listitem: Live
+  - listitem: Ældre
+  - listitem: Beregnet
+  - listitem: Kun køreplan
+  - listitem: Intet signal
+- text: Målestok 1 km
+- toolbar "Kortknapper":
+  - button "Zoom ind"
+  - button "Zoom ud"
+  - separator
+  - button "Centrér kortet"
+  - separator
+  - button "3D-visning"
+  - button "Drej mod nord"
+  - separator
+  - button "Pause"
+- text: "Trafikdata:"
+- link "Rejseplanen":
+  - /url: https://www.rejseplanen.dk/
+- text: (
+- link "CC BY 4.0":
+  - /url: https://creativecommons.org/licenses/by/4.0/
+- text: ) ·
+- link "© OpenStreetMap-bidragydere":
+  - /url: https://www.openstreetmap.org/copyright
+- text: ·
+- link "© OpenMapTiles":
+  - /url: https://openmaptiles.org/
+- text: ·
+- link "OpenFreeMap":
+  - /url: https://openfreemap.org/
+- dialog "Overblik":
+  - heading "Overblik" [level=2]
+  - button "Luk"
+  - tablist "Overblik":
+    - tab "Byens puls" [selected]
+    - tab "Køretøjer"
+    - tab "Driftsforstyrrelser 0"
+  - tabpanel "Byens puls":
+    - group "I bevægelse":
+      - text: I bevægelse Ukendt
+      - paragraph
+- alert
+- region "Notifikationer"
