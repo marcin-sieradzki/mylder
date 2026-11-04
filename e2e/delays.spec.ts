@@ -172,6 +172,76 @@ test('the Latest now pill names the trip running latest and opens its panel', as
   await expect(page.getByRole('dialog', { name: /to Hillerød/ })).toContainText('950R')
 })
 
+/** Where the canvas draws the spotlight's ring, in px from the page's top left, while it does. */
+async function ringAt(page: Page) {
+  const at = await page.locator('[data-vehicles]').getAttribute('data-spotlight-at')
+  if (!at) return undefined
+  const [x, y] = at.split(' ').map(Number)
+  return { x, y }
+}
+
+/** The ring's outer radius, size.target-min's 24 px across. */
+const RING = 12
+
+for (const [layout, viewport] of [
+  ['a desktop', { width: 1280, height: 800 }],
+  ['a 412 px phone', { width: 412, height: 915 }],
+] as const) {
+  test(`on ${layout}, a press on the pill flies to the latest trip and rings its dot, until its panel closes`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport)
+    // At 09:22 the 950R to Hillerød runs 77 min late, far out of the opening view.
+    await onSavedMinute(page)
+    await page.goto(`${UPDATES_URL}/en`)
+    const map = page.locator('[data-vehicles]')
+    await expect(map).not.toHaveAttribute('data-spotlight')
+    await page
+      .getByRole('banner')
+      .getByRole('button', { name: /^Biggest delay right now: 950R to Hillerød/ })
+      .click()
+    await expect(page).toHaveURL(/[?&]trip=train\.950R\.bacca19217\.20261031\.0733(&|$)/)
+    const panel = page.getByRole('dialog', { name: /to Hillerød/ })
+    await expect(panel).toBeVisible()
+    // The ring is on the named trip's dot, and on no other.
+    await expect(map).toHaveAttribute('data-spotlight', 'train.950R.bacca19217.20261031.0733')
+    // Once the camera has landed, the ring is clear of the header, the pill's row included, and
+    // of the panel: beside it on a desktop, clear of the Overview sheet too, above its peek and
+    // the map's foot on a phone.
+    const header = await boxOf(page.getByRole('banner'))
+    await expect(async () => {
+      const at = (await ringAt(page))!
+      const open = await boxOf(panel)
+      expect(at.y - RING).toBeGreaterThan(header.y + header.height)
+      expect(at.x - RING).toBeGreaterThan(0)
+      if (viewport.width > 760) {
+        const sheet = await boxOf(page.getByRole('dialog', { name: 'Overview' }))
+        expect(at.x - RING).toBeGreaterThan(sheet.x + sheet.width)
+        expect(at.x + RING).toBeLessThan(open.x)
+        expect(at.y + RING).toBeLessThan(viewport.height)
+      } else {
+        expect(at.x + RING).toBeLessThan(viewport.width)
+        // Above the map's foot too, which stands on the peek: the legend, the controls.
+        const legend = await boxOf(page.getByRole('list', { name: 'Data states' }))
+        expect(at.y + RING).toBeLessThan(legend.y)
+        expect(at.y + RING).toBeLessThan(open.y)
+      }
+    }).toPass({ timeout: 10_000 })
+    // The dot under the ring is the 950R's: its card names it.
+    await expect(async () => {
+      const at = (await ringAt(page))!
+      await page.mouse.move(at.x + 30, at.y + 30)
+      await page.mouse.move(at.x, at.y)
+      await expect(page.getByRole('tooltip')).toContainText('950R to Hillerød', { timeout: 1000 })
+    }).toPass()
+    // Closing the panel takes the ring off.
+    await panel.getByRole('button', { name: 'Close' }).click()
+    await expect(panel).toBeHidden()
+    await expect(map).not.toHaveAttribute('data-spotlight')
+    await expect(map).not.toHaveAttribute('data-spotlight-at')
+  })
+}
+
 /**
  * How many characters of the pill's stop name show before the ellipsis: those whose glyphs end
  * inside the stop's visible box, short of the ellipsis's room; all of them when none is cut.

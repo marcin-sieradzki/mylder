@@ -140,6 +140,16 @@ describe('the flight to a trip', () => {
     }
   })
 
+  it("lands its dot above the map's foot on a phone, not beside the legend and the controls", () => {
+    // The legend, the controls and the credit stand on the panel's peek, up to 460 px from the
+    // foot of a 915 px phone, under a header down to 228 px with a page notice.
+    const { map, landed } = mapAt(412, 915, 10.4)
+    flyOnto(map, { width: 412, height: 915 }, BUS_AT, { top: 228, bottom: 460 }, followStore())
+    const at = landed(BUS_AT)
+    expect(at.y).toBeGreaterThan(228 + 24)
+    expect(at.y).toBeLessThan(915 - 460 - 24)
+  })
+
   it('keeps the zoom of a rider already closer in', () => {
     const { map, flown, landed } = mapAt(1280, 800, 16.5)
     flyOnto(map, { width: 1280, height: 800 }, BUS_AT, { top: 70 }, followStore())
