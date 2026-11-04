@@ -17,6 +17,18 @@
     "about": "Om Mylder",
     "updatedPaused": "Opdateret {time}, sat på pause"
   },
+  "latest": {
+    "now": "Mest forsinket nu",
+    "at": "ved {stop}",
+    "label": "Største forsinkelse lige nu: {line} mod {headsign}, {minutes} min forsinket, {where}",
+    "labelAt": "ved {stop}",
+    "labelBetween": "mellem {from} og {to}",
+    "atMost": "højst {delay}",
+    "minutes": "{minutes} min",
+    "noDelays": "Metroen sender ingen forsinkelser",
+    "quiet": "Forsinkelser fra Rejseplanen ikke opdateret siden {time}",
+    "quietNever": "Forsinkelser fra Rejseplanen endnu ikke modtaget"
+  },
   "modes": {
     "bus": "Bus",
     "metro": "Metro",

@@ -1,0 +1,80 @@
+/* The Latest now pill. "Latest now", the line badge and the delay stay whole; the stop's name,
+   last, is cut short with an ellipsis rather than push the pill past its room: in the top bar's
+   tools the room the bar leaves, which the top bar measures and sets as `--latest-room`
+   (latestPlace.ts), and on its row under the bar the row's width. */
+.pill {
+  min-inline-size: 0;
+  max-inline-size: var(--latest-room, 100%);
+}
+
+/* Perron's Button sizes to its label and never lets the label shrink below its words, so a tight
+   Button spills them past its edges. Let the label shrink with the Button, so the pill's words cut
+   the stop's name instead. A stand-in for a Button whose label can be cut short in a tight row:
+   goes when Perron's Button has it. perron-stand-in: perron#198 */
+.pill :global(.pn-Button-label) {
+  min-inline-size: 0;
+}
+
+/* The pill's label: the words, the line badge and the delay in one row, space.150 apart, never
+   wider than the label. */
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--perron-space-150);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  vertical-align: middle;
+}
+
+.content > * {
+  flex: none;
+}
+
+.content > .where {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The pill's words when it names no trip: one line in the bar, which keeps it there only while the
+   whole line fits; on its row, wrapping at its spaces where the row is narrower. */
+.line {
+  margin: 0;
+}
+
+/* A row of its own at the start under the top bar, the pill alone on glass, as wide as its words
+   and never wider than the header, on a phone or wherever the bar has no room for it. */
+.row {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  min-block-size: var(--perron-size-control);
+  padding-block: var(--perron-space-100);
+  padding-inline: var(--perron-space-200);
+}
+
+/* On its row, where the bar's room rule doesn't hold, the stop keeps "at " and about ten of its
+   characters (16ch, an ellipsis's room included) on the pill's line, and where that much won't
+   fit, it moves onto a second line of its own and takes the pill's whole width there, cut with an
+   ellipsis only beyond it. One line wherever it fits. */
+.row .content {
+  flex-wrap: wrap;
+  row-gap: var(--perron-space-050);
+}
+
+.row .content > .where {
+  flex: 1 1 16ch;
+  max-inline-size: max-content;
+}
+
+/* Perron's Button is one line tall; on its row, the pill grows a second line for its stop, its
+   padding keeping the lines off its edge. A stand-in for a Button whose label may take a second
+   line: goes when Perron's Button has it. perron-stand-in: perron#198 */
+.row .pill {
+  block-size: auto;
+  min-block-size: var(--perron-size-button-sm);
+  padding-block: var(--perron-space-100);
+}

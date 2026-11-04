@@ -1,8 +1,10 @@
-/* A side panel opens under the top bar rather than over its end, where the language switch and
-   About sit: the bar's offset, its height on a desktop, then the panel's own gap. Doubled, to
+/* A side panel opens under the page's header rather than over the bar's end, where the language
+   switch and About sit, or over the Latest now pill's row: the header's bottom edge (`--map-top`,
+   ./mapTop.ts; the bar on one row until measured), then the panel's own gap. Doubled, to
    outrank the Sheet's own padding whichever stylesheet loads last. */
 .side.side[data-anchor='right'] {
   padding-block-start: calc(
-    var(--perron-space-300) + var(--perron-size-top-bar) + var(--perron-size-panel-gap)
+    var(--map-top, calc(var(--perron-space-300) + var(--perron-size-top-bar))) +
+      var(--perron-size-panel-gap)
   );
 }
