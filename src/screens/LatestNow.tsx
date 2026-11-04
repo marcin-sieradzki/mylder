@@ -1,11 +1,10 @@
 'use client'
 
 import { Button, Delay, LineBadge, Surface, Text } from '@mylder/perron'
-import { useSyncExternalStore, type ReactNode } from 'react'
+import type { CSSProperties, ReactNode, Ref } from 'react'
 import type { ClientDictionary } from '../i18n/dictionary'
 import { useI18n } from '../i18n/useI18n'
-import { liveSnapshot, useSnapshot, type LiveSnapshot } from '../map/live'
-import { tickingStore } from '../map/ticking'
+import { useSnapshot } from '../map/live'
 import { timezoneOf, useNetwork } from '../map/timetable'
 import { openPanel } from '../map/view'
 import { whereOf, type Where } from '../map/where'
@@ -13,7 +12,7 @@ import type { Network } from '../timetable/network'
 import { clockTime } from '../timetable/time'
 import type { Snapshot } from '../tracker/index'
 import { badgeLine } from './departureRow'
-import { latestOf, wholeMinutes, type Latest, type RankedTrip } from './latest'
+import { wholeMinutes, type Latest, type RankedTrip } from './latest'
 import styles from './LatestNow.module.css'
 import { fill } from './vehicleLabel'
 
@@ -22,48 +21,13 @@ type Words = ClientDictionary['latest']
 /** Where the pill sits: in the top bar's tools, or on a row under the bar, a phone's or centred. */
 export type LatestPlace = 'bar' | 'phone' | 'centred'
 
-/**
- * A screen this wide or wider has room for the pill in the top bar's tools, with six mode and
- * plane chips on its one row; a narrower one, above a phone, puts it on a row under the bar.
- */
-export const WIDE_QUERY = '(min-width: 1280px)'
-
-/** Whether two outcomes say the same: the same trips of the same snapshot, the same figures. */
-function sameLatest(a: Latest | undefined, b: Latest | undefined): boolean {
-  if (a === b) return true
-  if (!a || !b || a.kind !== b.kind) return false
-  switch (a.kind) {
-    case 'standout': {
-      const other = b as typeof a
-      return (
-        a.count === other.count &&
-        a.trips.length === other.trips.length &&
-        a.trips.every((each, i) => each.trip === other.trips[i].trip)
-      )
-    }
-    case 'calm': {
-      const other = b as typeof a
-      return a.delay === other.delay && a.count === other.count
-    }
-    case 'quiet':
-      return a.since === (b as typeof a).since
-    case 'none':
-      return true
-  }
+/** How the pill is laid out and reached: what the top bar measures it by (./latestPlace.ts). */
+interface PillProps {
+  /** The pill's widest, in px, in the bar's tools; none to take its words' width. */
+  readonly room?: number
+  /** The pill's own element, the button or the line of words, for the top bar to measure. */
+  readonly pillRef?: Ref<HTMLElement>
 }
-
-/**
- * The page's outcome, by the server's clock: it moves on when a snapshot lands, and on the second a
- * trip's delay is no longer known or the feed goes quiet.
- */
-const latestNow = tickingStore(
-  ({ snapshot }: LiveSnapshot, now: number) => snapshot && latestOf(snapshot, now),
-  sameLatest,
-  liveSnapshot,
-)
-
-const useLatest = (): Latest | undefined =>
-  useSyncExternalStore(latestNow.subscribe, latestNow.get, () => undefined)
 
 /**
  * Where the trip was when the snapshot placed it, as its panel says it: at a stop, or between the
@@ -90,7 +54,7 @@ const signed = (delay: number, words: Words) => {
   return `${minutes > 0 ? '+' : ''}${fill(words.minutes, { minutes })}`
 }
 
-interface StandoutProps {
+interface StandoutProps extends PillProps {
   ranked: RankedTrip
   snapshot: Snapshot
   network: Network
@@ -102,7 +66,7 @@ interface StandoutProps {
  * passed, heard with the stops it is between; a press opens its vehicle panel, as a tap on its
  * dot does.
  */
-function Standout({ ranked, snapshot, network, words }: StandoutProps) {
+function Standout({ ranked, snapshot, network, words, room, pillRef }: StandoutProps) {
   const { trip, delay } = ranked
   const pattern = network.patterns.patterns[trip.pattern]
   const where = whereAt(ranked, snapshot, network)
@@ -113,11 +77,14 @@ function Standout({ ranked, snapshot, network, words }: StandoutProps) {
       ? fill(words.labelBetween, { from: name(where.from), to: name(where.to) })
       : fill(words.labelAt, { stop: name(shown) })
   const colour = network.patterns.lines[pattern.line]?.colour ?? ''
+  const [before, after] = words.at.split('{stop}')
   return (
     <Button
+      ref={pillRef as Ref<HTMLButtonElement>}
       variant="outline"
       size="small"
       className={styles.pill}
+      style={roomStyle(room)}
       aria-label={fill(words.label, {
         line: trip.line,
         headsign: trip.headsign,
@@ -130,10 +97,24 @@ function Standout({ ranked, snapshot, network, words }: StandoutProps) {
         <span>{words.now}</span>
         <LineBadge line={badgeLine(colour, trip.mode)}>{trip.line}</LineBadge>
         <Delay minutes={delay / 60} />
-        <span className={styles.where}>{fill(words.at, { stop: name(shown) })}</span>
+        <span className={styles.where} data-latest-where="">
+          {before}
+          <span data-latest-stop="">{name(shown)}</span>
+          {after}
+        </span>
       </span>
     </Button>
   )
+}
+
+/** The pill's room as the style its CSS reads it by; none leaves it its words' width. */
+const roomStyle = (room: number | undefined): CSSProperties | undefined =>
+  room === undefined ? undefined : ({ '--latest-room': `${room}px` } as CSSProperties)
+
+export interface LatestNowProps extends PillProps {
+  /** The page's outcome now (./useLatest.ts); none with the delays off. */
+  readonly latest: Latest | undefined
+  readonly place: LatestPlace
 }
 
 /**
@@ -141,19 +122,18 @@ function Standout({ ranked, snapshot, network, words }: StandoutProps) {
  * now, or, naming no trip, that none is 3 min late, that the delays have stopped coming, or that
  * no trip on the map sends them. None with the delays off, or before the timetable has loaded.
  * In the top bar's tools, or alone on a glass row of its own under the bar: at the start on a
- * phone, centred where the screen is too narrow for it in the bar.
+ * phone, centred on a wider screen; the top bar chooses (./latestPlace.ts).
  */
-export function LatestNow({ place = 'bar' }: { place?: LatestPlace }) {
+export function LatestNow({ latest, place, room, pillRef }: LatestNowProps) {
   const { dictionary } = useI18n()
   const words = dictionary.latest
-  const latest = useLatest()
   const snapshot = useSnapshot()
   const network = useNetwork(snapshot?.timetableVersion)
   if (!latest || !snapshot || !network) return null
   // The timetable before the snapshot's, still shown while it loads, may lack the trip's pattern.
   if (latest.kind === 'standout' && !network.patterns.patterns[latest.trips[0].trip.pattern])
     return null
-  const pill = pillOf(latest, snapshot, network, words)
+  const pill = pillOf(latest, snapshot, network, words, { room, pillRef })
   return place === 'bar' ? (
     pill
   ) : (
@@ -164,31 +144,49 @@ export function LatestNow({ place = 'bar' }: { place?: LatestPlace }) {
 }
 
 /** The pill for each outcome. */
-function pillOf(latest: Latest, snapshot: Snapshot, network: Network, words: Words): ReactNode {
+function pillOf(
+  latest: Latest,
+  snapshot: Snapshot,
+  network: Network,
+  words: Words,
+  { room, pillRef }: PillProps,
+): ReactNode {
+  const line = (children: ReactNode) => (
+    <Text
+      ref={pillRef as Ref<HTMLParagraphElement>}
+      variant="label"
+      render={<p />}
+      className={styles.line}
+      style={roomStyle(room)}
+    >
+      {children}
+    </Text>
+  )
   switch (latest.kind) {
     case 'standout':
       return (
-        <Standout ranked={latest.trips[0]} snapshot={snapshot} network={network} words={words} />
+        <Standout
+          ranked={latest.trips[0]}
+          snapshot={snapshot}
+          network={network}
+          words={words}
+          room={room}
+          pillRef={pillRef}
+        />
       )
     case 'calm':
-      return (
-        <Text variant="label" render={<p />} className={styles.line}>
-          {`${words.now} ${fill(words.atMost, { delay: signed(latest.delay, words) })}`}
-        </Text>
-      )
+      return line(`${words.now} ${fill(words.atMost, { delay: signed(latest.delay, words) })}`)
     case 'quiet':
-      return (
-        <Text variant="label" render={<p />} className={styles.line}>
-          {latest.since === undefined
-            ? words.quietNever
-            : fill(words.quiet, { time: clockTime(latest.since, timezoneOf(network)) })}
-        </Text>
+      return line(
+        latest.since === undefined
+          ? words.quietNever
+          : fill(words.quiet, { time: clockTime(latest.since, timezoneOf(network)) }),
       )
     case 'none':
-      return (
-        <Text variant="label" render={<p />} className={styles.line}>
+      return line(
+        <>
           {words.now} <Delay minutes={null} /> · {words.noDelays}
-        </Text>
+        </>,
       )
   }
 }

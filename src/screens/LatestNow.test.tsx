@@ -11,7 +11,6 @@ import { liveSnapshot } from '../map/live'
 import { openPanel } from '../map/view'
 import { timetableRoutesOf } from '../test/timetableRoutes'
 import type { Snapshot, SnapshotTrip } from '../tracker/index'
-import { WIDE_QUERY } from './LatestNow'
 import { MapScreen } from './MapScreen'
 import { Providers } from './Providers'
 
@@ -58,17 +57,16 @@ const empty = JSON.parse(
   readFileSync(join(process.cwd(), 'recordings', 'empty', 'snapshots', '0001.json'), 'utf8'),
 ) as Snapshot
 
-/** Whether the page is as narrow as a phone, or wide enough for the pill in the bar, as each test sets it. */
+/** Whether the page is as narrow as a phone, as each test sets it. */
 let phone = false
-let wide = true
 const mediaLists = new Map<string, object>()
-/** The browser's `matchMedia`, which jsdom lacks: the phone's query with `phone`, the wide one's with `wide`. */
+/** The browser's `matchMedia`, which jsdom lacks: only the phone's query matches, with `phone`. */
 function matchMedia(query: string) {
   let list = mediaLists.get(query)
   if (!list) {
     list = {
       get matches() {
-        return query === PHONE_QUERY ? phone : query === WIDE_QUERY && wide
+        return query === PHONE_QUERY && phone
       },
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -102,7 +100,6 @@ const banner = () => screen.getByRole('banner')
 
 beforeEach(() => {
   phone = false
-  wide = true
   vi.stubGlobal('matchMedia', matchMedia)
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.stubGlobal('fetch', routes)
@@ -129,7 +126,7 @@ describe('the Latest now pill', () => {
     const delay = pill.querySelector('.pn-Delay')!
     expect(delay).toHaveAttribute('data-delay', 'late')
     expect(delay).toHaveTextContent(/^\+77 min/)
-    expect(within(pill).getByText('at Slotspavillonen St.')).toBeInTheDocument()
+    expect(pill.querySelector('[data-latest-where]')).toHaveTextContent(/^at Slotspavillonen St\.$/)
   })
 
   it('says it in Danish', async () => {
@@ -139,7 +136,9 @@ describe('the Latest now pill', () => {
       'Største forsinkelse lige nu: 950R mod Hillerød, 77 min forsinket, mellem Slotspavillonen St. og Hillerød St.',
     )
     expect(within(pill).getByText('Mest forsinket nu')).toBeInTheDocument()
-    expect(within(pill).getByText('ved Slotspavillonen St.')).toBeInTheDocument()
+    expect(pill.querySelector('[data-latest-where]')).toHaveTextContent(
+      /^ved Slotspavillonen St\.$/,
+    )
   })
 
   it("opens the named trip's vehicle panel in the address, as a tap on its dot does", async () => {
@@ -165,7 +164,9 @@ describe('the Latest now pill', () => {
     expect(pill).toHaveAccessibleName(
       'Biggest delay right now: 144 to Vallensbæk St., 22 min late, at Idræts Allé (Vejlegårdsvej)',
     )
-    expect(within(pill).getByText('at Idræts Allé (Vejlegårdsvej)')).toBeInTheDocument()
+    expect(pill.querySelector('[data-latest-where]')).toHaveTextContent(
+      /^at Idræts Allé \(Vejlegårdsvej\)$/,
+    )
   })
 
   it('names no trip when none is 3 min late', async () => {
@@ -234,28 +235,11 @@ describe('the Latest now pill', () => {
     expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
   })
 
-  it('sits among the top bar’s tools on a wide screen', async () => {
-    await open('en')
-    const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
-    const about = within(banner()).getByRole('button', { name: 'About Mylder' })
-    expect(pill.parentElement).toBe(about.parentElement)
-  })
-
-  it('takes a row of its own under the top bar, centred, between a phone and a wide screen', async () => {
-    wide = false
-    await open('en')
-    const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
-    const bar = within(banner())
-      .getByRole('button', { name: 'About Mylder' })
-      .closest('.pn-TopBar')!
-    expect(bar.contains(pill)).toBe(false)
-    expect(pill.parentElement).toHaveClass('pn-Surface')
-    expect(pill.parentElement).toHaveAttribute('data-place', 'centred')
-  })
+  // Whether it sits in the bar or on its row wider than a phone is the bar's layout's to say,
+  // which jsdom doesn't lay out: the e2e journeys in e2e/delays.spec.ts measure it.
 
   it('takes a row of its own under the top bar on a phone', async () => {
     phone = true
-    wide = false
     await open('en')
     const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
     const about = within(banner()).getByRole('button', { name: 'About Mylder' })

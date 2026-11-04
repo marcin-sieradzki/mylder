@@ -1,31 +1,29 @@
-/* The Latest now pill. Its words get `--latest-room` across, measured on the header's width
-   (TopBar.module.css makes the header a container): "Latest now", the line badge and the delay
-   stay whole, and the stop's name, last, is cut short with an ellipsis rather than push the pill
-   past its room. Perron's Button sizes to its label, so the room caps the label's own row; the
-   Button's small padding, space.300 a side, and its edge come off it.
-
-   In the top bar's tools the room is what the bar leaves at 1280 px with six mode and plane chips,
-   the brand and the Updated line, the language switch and About on its one row: the header less
-   1016 px, up to 28rem, so the pill never wraps the bar onto a second row. */
-.pill,
-.line {
-  --latest-room: min(28rem, 100cqi - 1016px);
+/* The Latest now pill. "Latest now", the line badge and the delay stay whole; the stop's name,
+   last, is cut short with an ellipsis rather than push the pill past its room: in the top bar's
+   tools the room the bar leaves, which the top bar measures and sets as `--latest-room`
+   (latestPlace.ts), and on its row under the bar the row's width. */
+.pill {
+  min-inline-size: 0;
+  max-inline-size: var(--latest-room, 100%);
 }
 
-.pill {
-  max-inline-size: 100%;
+/* Perron's Button sizes to its label and never lets the label shrink below its words, so a tight
+   Button spills them past its edges. Let the label shrink with the Button, so the pill's words cut
+   the stop's name instead. A stand-in for a Button whose label can be cut short in a tight row:
+   goes when Perron's Button has it. perron-stand-in: perron#TBD */
+.pill :global(.pn-Button-label) {
   min-inline-size: 0;
 }
 
-/* The pill's label: the words, the line badge and the delay in one row, space.150 apart. */
+/* The pill's label: the words, the line badge and the delay in one row, space.150 apart, never
+   wider than the label. */
 .content {
   display: inline-flex;
   align-items: center;
   gap: var(--perron-space-150);
   min-inline-size: 0;
-  max-inline-size: calc(
-    var(--latest-room) - 2 * var(--perron-space-300) - 2 * var(--perron-border-width-025)
-  );
+  max-inline-size: 100%;
+  vertical-align: middle;
 }
 
 .content > * {
@@ -39,15 +37,14 @@
   text-overflow: ellipsis;
 }
 
-/* The pill's words when it names no trip: within the room, wrapping at its spaces onto a second
-   line rather than widen the bar, which keeps its height for two lines of a label. */
+/* The pill's words when it names no trip: one line in the bar, which keeps it there only while the
+   whole line fits; on its row, wrapping at its spaces where the row is narrower. */
 .line {
-  max-inline-size: var(--latest-room);
   margin: 0;
 }
 
-/* A row of its own under the top bar, the pill alone on glass, as wide as its words: on a phone
-   at the start, its room the bar's width less the row's padding. */
+/* A row of its own under the top bar, the pill alone on glass, as wide as its words and never
+   wider than the header: at the start on a phone. */
 .row {
   display: flex;
   align-items: center;
@@ -59,22 +56,10 @@
   padding-inline: var(--perron-space-200);
 }
 
-.row .pill,
-.row .line {
-  --latest-room: calc(100cqi - 2 * var(--perron-space-200));
-}
-
-/* Between a phone and a screen wide enough for the pill in the bar: the row centred under the bar,
-   its room the map's between the Overview sheet on the left and a detail panel on the right, each
-   a sheet's width in from the edge, so it covers neither's heading. */
+/* Wider than a phone, the row is centred under the bar, in the map between the Overview sheet on
+   the left and a detail panel on the right, each a sheet's width in from the edge, so it covers
+   neither's heading. */
 .row[data-place='centred'] {
   align-self: center;
-}
-
-.row[data-place='centred'] .pill,
-.row[data-place='centred'] .line {
-  --latest-room: calc(
-    100cqi - 2 * (var(--perron-size-sheet-width) + var(--perron-size-panel-gap)) - 2 *
-      var(--perron-space-200)
-  );
+  max-inline-size: calc(100% - 2 * (var(--perron-size-sheet-width) + var(--perron-size-panel-gap)));
 }

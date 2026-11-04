@@ -2,7 +2,7 @@
 
 import { FilterChip, IconButton } from '@mylder/perron'
 import { TopBar as PerronTopBar } from '@mylder/perron/patterns'
-import type { MouseEvent } from 'react'
+import { useRef, useState, type MouseEvent } from 'react'
 import { useI18n } from '../i18n/useI18n'
 import { useAircraftOff } from '../map/aircraft'
 import { useAircraftCount } from '../map/aircraft-states'
@@ -16,10 +16,12 @@ import { clockTime } from '../timetable/time'
 import type { Snapshot } from '../tracker/index'
 import { aboutDialog } from './about'
 import { LanguageSwitch } from './LanguageSwitch'
-import { LatestNow, WIDE_QUERY } from './LatestNow'
+import { LatestNow } from './LatestNow'
+import { useLatestPlace } from './latestPlace'
 import { PerronIcon } from './PerronIcon'
 import styles from './TopBar.module.css'
-import { useMediaQuery, usePhone } from './usePhone'
+import { useLatest } from './useLatest'
+import { usePhone } from './usePhone'
 
 const openAbout = (event: MouseEvent<HTMLButtonElement>) => aboutDialog.open(event.currentTarget)
 
@@ -46,9 +48,10 @@ const showAircraft = (_event: Event, shown: boolean) => mapView.update({ aircraf
  * the Updated line, the mode filters and the Planes filter, the Latest now pill, the language
  * switch and the About button, in the page's header. Its phone layout follows the window's width
  * in Perron's own CSS, from one render, so the prerendered page paints a phone its own bar first.
- * Below a screen wide enough for it in the bar, the pill takes a row of its own under the bar, on
- * glass of its own; it shows only once a snapshot has landed, so the prerendered page never paints
- * it in the wrong place.
+ * The pill sits in the tools while the bar keeps it on its one row, the start of its stop's name in
+ * view (./latestPlace.ts), else on a row of its own under the bar, on glass of its own, as it
+ * always does on a phone; it shows only once a snapshot has landed, so the prerendered page never
+ * paints it in the wrong place.
  */
 export function TopBar() {
   const { lang, dictionary } = useI18n()
@@ -65,7 +68,14 @@ export function TopBar() {
   const underway = underwayByMode(snapshot)
   const timezone = timezoneOf(network)
   const phone = usePhone()
-  const wide = useMediaQuery(WIDE_QUERY)
+  const latest = useLatest()
+  const header = useRef<HTMLElement>(null)
+  const identity = useRef<HTMLDivElement>(null)
+  const filters = useRef<HTMLFieldSetElement>(null)
+  const tools = useRef<HTMLDivElement>(null)
+  const [pill, setPill] = useState<HTMLElement | null>(null)
+  const placement = useLatestPlace({ header, identity, filters, tools, pill }, !phone)
+  const inBar = !phone && placement.place === 'bar'
   // The Planes chip shows once the aircraft have answered, so a server with them off never names
   // them, or while the address hides them, to turn them on again. Off, the page no longer asks
   // for them, so the count it last had is left out.
@@ -88,9 +98,14 @@ export function TopBar() {
   }
 
   return (
-    <header className={styles.header}>
+    <header ref={header} className={styles.header}>
       <PerronTopBar
         size="responsive"
+        slotProps={{
+          identity: { ref: identity },
+          filters: { ref: filters },
+          tools: { ref: tools },
+        }}
         brandHref={`/${lang}`}
         time={
           updatedAt === undefined ? undefined : clockTime(updatedAt, timezone, { seconds: true })
@@ -123,7 +138,16 @@ export function TopBar() {
         }
         tools={
           <>
-            {wide ? <LatestNow /> : null}
+            {inBar ? (
+              <LatestNow
+                latest={latest}
+                place="bar"
+                {...(placement.place === 'bar' && placement.room !== undefined
+                  ? { room: placement.room }
+                  : {})}
+                pillRef={setPill}
+              />
+            ) : null}
             <LanguageSwitch />
             <IconButton label={dictionary.topBar.about} size="large" onClick={openAbout}>
               <PerronIcon name="info" />
@@ -131,7 +155,9 @@ export function TopBar() {
           </>
         }
       />
-      {wide ? null : <LatestNow place={phone ? 'phone' : 'centred'} />}
+      {inBar ? null : (
+        <LatestNow latest={latest} place={phone ? 'phone' : 'centred'} pillRef={setPill} />
+      )}
     </header>
   )
 }
