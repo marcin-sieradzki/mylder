@@ -266,7 +266,11 @@ describe('delaySteps and expectedTimes', () => {
   })
 
   it('shifts every call by the delay without steps, and gives none with neither', () => {
-    expect(expectedTimes(calls, { delay: 60 })).toEqual(timedCalls(calls, 60))
+    expect(expectedTimes(calls, { delay: 60 })).toEqual([
+      { arrival: minutes(1), departure: minutes(1) },
+      { arrival: minutes(11), departure: minutes(12) },
+      { arrival: minutes(16), departure: minutes(16) },
+    ])
     expect(expectedTimes(calls, {})).toBeUndefined()
   })
 })
