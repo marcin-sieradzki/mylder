@@ -191,6 +191,19 @@ describe('Latest now', () => {
     expect(latestOf(off, minute2.fetched)).toBeUndefined()
   })
 
+  it('is none, not nothing, on a source that can send delays when no trip has one', () => {
+    // The `empty` recording: Rejseplanen's answers, every trip Timetable only, none with a delay,
+    // and SIRI-ET off. Rejseplanen could send delays, so the pill says none shows one now.
+    const empty = saved('empty', '0001.json')
+    expect(empty.trips.some((each) => each.delay !== undefined)).toBe(false)
+    expect(latestOf(empty, empty.fetched)).toEqual({ kind: 'none' })
+    // The same on the simulation, and on SIRI-ET's feed with no trip updated yet.
+    expect(latestOf({ ...empty, source: { kind: 'simulated' } }, empty.fetched)).toEqual({
+      kind: 'none',
+    })
+    expect(latestOf({ ...minute2, trips: [] }, minute2.fetched)).toEqual({ kind: 'none' })
+  })
+
   it('ranks the delays a source with positions brings, with SIRI-ET off', () => {
     // The weekday's S-train A at 07:07 runs 4 min late, the most of its 13 trips with a delay.
     const latest = latestOf(weekday, weekday.fetched)

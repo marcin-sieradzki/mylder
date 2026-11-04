@@ -49,6 +49,14 @@ const delaysOff = JSON.parse(
   ),
 ) as Snapshot
 
+/**
+ * The `empty` recording's first minute: Rejseplanen's answers with every trip Timetable only and
+ * none with a delay, SIRI-ET off. Rejseplanen can send delays, so the delays are on.
+ */
+const empty = JSON.parse(
+  readFileSync(join(process.cwd(), 'recordings', 'empty', 'snapshots', '0001.json'), 'utf8'),
+) as Snapshot
+
 /** Whether the page is as narrow as a phone, as each test sets it. */
 let phone = false
 const mediaLists = new Map<string, object>()
@@ -196,6 +204,22 @@ describe('the Latest now pill', () => {
   it('shows "—" in Danish', async () => {
     await open('da', metroOnly)
     expect(within(banner()).getByText(/^Mest forsinket nu/)).toHaveTextContent(
+      /^Mest forsinket nu —.+ · Metroen sender ingen forsinkelser$/,
+    )
+  })
+
+  it('shows "—" on a source that sends delays when no trip has one', async () => {
+    vi.stubGlobal('fetch', timetableRoutesOf('empty'))
+    await open('en', empty)
+    expect(await within(banner()).findByText(/^Latest now/)).toHaveTextContent(
+      /^Latest now —Delay unknown · the Metro sends no delays$/,
+    )
+  })
+
+  it('shows "—" in Danish on a source that sends delays when no trip has one', async () => {
+    vi.stubGlobal('fetch', timetableRoutesOf('empty'))
+    await open('da', empty)
+    expect(await within(banner()).findByText(/^Mest forsinket nu/)).toHaveTextContent(
       /^Mest forsinket nu —.+ · Metroen sender ingen forsinkelser$/,
     )
   })

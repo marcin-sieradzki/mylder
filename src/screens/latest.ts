@@ -4,12 +4,12 @@
 // the clock, as the map's dots are, so a trip whose delay is no longer known drops out on the
 // second it ages. Delays are in seconds.
 import { feedFresh, type DataState } from '../domain/data-state'
-import { delaysOn } from '../map/live'
+import { delaysOn, describeSnapshotSource } from '../map/live'
 import { statesAt } from '../map/states'
 import { onMap } from '../map/vehicles'
 import type { Mode } from '../timetable/format'
 import type { Snapshot, SnapshotTrip } from '../tracker/index'
-import { carriesDelays, DELAY_KNOWN } from './delays'
+import { DELAY_KNOWN } from './delays'
 
 /** A trip in the ranking, and how late it runs, in seconds. */
 export interface RankedTrip {
@@ -54,11 +54,13 @@ const byDelay = (a: RankedTrip, b: RankedTrip) =>
 
 /**
  * The pill's outcome for `snapshot` at `now`, on the server's clock; none with the delays off:
- * SIRI-ET's feed off and no trip carrying a delay of its source's.
+ * SIRI-ET's feed off on a source that can send none, the timetable alone. A source that can send
+ * delays, Rejseplanen's answers, real, simulated or recorded, or SIRI-ET's feed, with no trip
+ * showing one now, is `none`.
  */
 export function latestOf(snapshot: Snapshot, now: number): Latest | undefined {
   const feedOn = delaysOn(snapshot)
-  if (!feedOn && !carriesDelays(snapshot)) return undefined
+  if (!feedOn && !describeSnapshotSource(snapshot).positions) return undefined
   const { lastMessage } = snapshot.updates
   // A quiet feed names no trip, so the pill never points at an old delay.
   if (feedOn && !feedFresh(lastMessage, now))

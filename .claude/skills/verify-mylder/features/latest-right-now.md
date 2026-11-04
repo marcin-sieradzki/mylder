@@ -8,8 +8,8 @@ The Latest now pill names the trip running furthest behind its timetable right n
 - `latest-open` opens the named trip's vehicle panel on a press, kept in the address as `?trip=<key>`, as a tap on its dot does.
 - `latest-calm` reads "Latest now +2 min at most" when no trip is 3 min late, naming no trip.
 - `latest-quiet` reads "Delays from Rejseplanen not updated since HH:MM" once SIRI-ET's feed has sent nothing for 5 min, naming no trip.
-- `latest-none` reads "Latest now —" and "the Metro sends no delays" when no trip on the map shows a delay.
-- `latest-off` shows no pill with the delays off, as on the timetable source alone.
+- `latest-none` reads "Latest now —" and "the Metro sends no delays" when no trip on the map shows a delay on a source that can send them, such as the `empty` recording.
+- `latest-off` shows no pill with the delays off: the timetable source with SIRI-ET's feed off, the one source that can send no delay.
 - `latest-phone` puts the pill on a row of its own under the top bar on a phone, never wider than the screen.
 - `latest-da` says it all in Danish: "Mest forsinket nu", "Største forsinkelse lige nu: … min forsinket, mellem … og …".
 
@@ -19,6 +19,7 @@ The Latest now pill names the trip running furthest behind its timetable right n
 - Press the pill.
 - On a launch on the quiet moment (`launch.sh <run-id> <port> updates:siri-et/quiet`), open `/en` once the feed has gone quiet.
 - On the `weekday` recording, open `/en`: Rejseplanen's own delays there name a trip too.
+- On a launch on the `empty` recording (`launch.sh <run-id> <port> empty`), open `/en`: "Latest now —".
 - On a launch on the timetable source (`launch.sh <run-id> <port> timetable`), open `/en`: no pill.
 - Open `/da` for the Danish words; add `--phone` for the phone's layout.
 
@@ -32,7 +33,7 @@ Preconditions:
 - **Standout.** `page.getByRole('banner').getByRole('button', { name: /^Biggest delay right now: / })` is visible; its name starts `Biggest delay right now: <line> to <headsign>, <n> min late, ` and goes on `between <stop> and <stop>` or `at <stop>`; its text holds `Latest now`, `<line>`, `+<n> min` and `at <stop>`, that stop the first of the two in its name, or its only one. `n` is 3 or more; when it isn't, the minute is calm (below).
 - **Open.** Click the pill; the address has `?trip=<key>` of that trip, and `page.getByRole('dialog', { name: new RegExp(`to ${headsign}`) })` is visible with the line's badge.
 - **Calm.** The recording promises no calm minute, and the screen tests cover one: when `/api/snapshot`'s largest known delay rounds under 3 min, `page.getByRole('banner').getByText(/^Latest now [+]\d+ min at most$/)` shows the largest, and no button named `/^Biggest delay/` is there.
-- **None.** The recording promises no minute without a known delay, and the screen tests cover one: when no trip of `/api/snapshot` has a `delay` in one of those states, the banner's `getByText(/^Latest now —/)` holds `the Metro sends no delays`.
+- **None.** On a launch on the `empty` recording (`launch.sh <run-id> <port> empty`: Rejseplanen's answers, every trip Timetable only, none with a delay), the banner's `getByText(/^Latest now —/)` is visible and holds `the Metro sends no delays`, with no button named `/^Biggest delay/`; on `/da`, `getByText(/^Mest forsinket nu —/)` holds `Metroen sender ingen forsinkelser`.
 - **Quiet.** On a launch with `updates:siri-et/quiet`, once `/api/snapshot`'s `updates` reads `"fresh":false` (about 6 minutes in), the banner's `getByText('Delays from Rejseplanen not updated since 09:56')` is visible and no button named `/^Biggest delay/` is there; on `/da`, `Forsinkelser fra Rejseplanen ikke opdateret siden 09:56`. Before then the pill names a trip as in Standout.
 - **Off.** On a launch with `timetable` as the third argument, `page.getByRole('banner').getByText(/Latest now|Delays from Rejseplanen/)` has a count of 0.
 - **Danish.** On `/da` the button's name starts `Største forsinkelse lige nu: <line> mod <headsign>, <n> min forsinket, ` and its text holds `Mest forsinket nu` and `ved <stop>`.
