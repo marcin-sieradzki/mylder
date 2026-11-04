@@ -248,6 +248,5 @@ describe('the Latest now pill', () => {
     // After the bar in the header, on glass of its own.
     expect(bar.compareDocumentPosition(pill) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(pill.parentElement).toHaveClass('pn-Surface')
-    expect(pill.parentElement).toHaveAttribute('data-place', 'phone')
   })
 })

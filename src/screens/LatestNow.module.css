@@ -43,8 +43,8 @@
   margin: 0;
 }
 
-/* A row of its own under the top bar, the pill alone on glass, as wide as its words and never
-   wider than the header: at the start on a phone. */
+/* A row of its own at the start under the top bar, the pill alone on glass, as wide as its words
+   and never wider than the header, on a phone or wherever the bar has no room for it. */
 .row {
   display: flex;
   align-items: center;
@@ -54,12 +54,4 @@
   min-block-size: var(--perron-size-control);
   padding-block: var(--perron-space-100);
   padding-inline: var(--perron-space-200);
-}
-
-/* Wider than a phone, the row is centred under the bar, in the map between the Overview sheet on
-   the left and a detail panel on the right, each a sheet's width in from the edge, so it covers
-   neither's heading. */
-.row[data-place='centred'] {
-  align-self: center;
-  max-inline-size: calc(100% - 2 * (var(--perron-size-sheet-width) + var(--perron-size-panel-gap)));
 }

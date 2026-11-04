@@ -2,7 +2,7 @@
 
 import { FilterChip, IconButton } from '@mylder/perron'
 import { TopBar as PerronTopBar } from '@mylder/perron/patterns'
-import { useRef, useState, type MouseEvent } from 'react'
+import { useRef, type MouseEvent } from 'react'
 import { useI18n } from '../i18n/useI18n'
 import { useAircraftOff } from '../map/aircraft'
 import { useAircraftCount } from '../map/aircraft-states'
@@ -18,6 +18,7 @@ import { aboutDialog } from './about'
 import { LanguageSwitch } from './LanguageSwitch'
 import { LatestNow } from './LatestNow'
 import { useLatestPlace } from './latestPlace'
+import { useMapTop } from './mapTop'
 import { PerronIcon } from './PerronIcon'
 import styles from './TopBar.module.css'
 import { useLatest } from './useLatest'
@@ -49,9 +50,10 @@ const showAircraft = (_event: Event, shown: boolean) => mapView.update({ aircraf
  * switch and the About button, in the page's header. Its phone layout follows the window's width
  * in Perron's own CSS, from one render, so the prerendered page paints a phone its own bar first.
  * The pill sits in the tools while the bar keeps it on its one row, the start of its stop's name in
- * view (./latestPlace.ts), else on a row of its own under the bar, on glass of its own, as it
- * always does on a phone; it shows only once a snapshot has landed, so the prerendered page never
- * paints it in the wrong place.
+ * view (./latestPlace.ts), else on a row of its own at the start under the bar, on glass of its
+ * own, as it always does on a phone; it shows only once a snapshot has landed, so the prerendered
+ * page never paints it in the wrong place. The header's bottom edge, the pill's row included, is
+ * the map's top, which the sheet and the panels start below (./mapTop.ts).
  */
 export function TopBar() {
   const { lang, dictionary } = useI18n()
@@ -73,9 +75,9 @@ export function TopBar() {
   const identity = useRef<HTMLDivElement>(null)
   const filters = useRef<HTMLFieldSetElement>(null)
   const tools = useRef<HTMLDivElement>(null)
-  const [pill, setPill] = useState<HTMLElement | null>(null)
-  const placement = useLatestPlace({ header, identity, filters, tools, pill }, !phone)
+  const { placement, pillRef } = useLatestPlace({ header, identity, filters, tools }, !phone)
   const inBar = !phone && placement.place === 'bar'
+  useMapTop(header)
   // The Planes chip shows once the aircraft have answered, so a server with them off never names
   // them, or while the address hides them, to turn them on again. Off, the page no longer asks
   // for them, so the count it last had is left out.
@@ -145,7 +147,7 @@ export function TopBar() {
                 {...(placement.place === 'bar' && placement.room !== undefined
                   ? { room: placement.room }
                   : {})}
-                pillRef={setPill}
+                pillRef={pillRef}
               />
             ) : null}
             <LanguageSwitch />
@@ -155,9 +157,7 @@ export function TopBar() {
           </>
         }
       />
-      {inBar ? null : (
-        <LatestNow latest={latest} place={phone ? 'phone' : 'centred'} pillRef={setPill} />
-      )}
+      {inBar ? null : <LatestNow latest={latest} place="row" pillRef={pillRef} />}
     </header>
   )
 }

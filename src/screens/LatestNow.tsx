@@ -18,8 +18,8 @@ import { fill } from './vehicleLabel'
 
 type Words = ClientDictionary['latest']
 
-/** Where the pill sits: in the top bar's tools, or on a row under the bar, a phone's or centred. */
-export type LatestPlace = 'bar' | 'phone' | 'centred'
+/** Where the pill sits: in the top bar's tools, or on a row of its own under the bar. */
+export type LatestPlace = 'bar' | 'row'
 
 /** How the pill is laid out and reached: what the top bar measures it by (./latestPlace.ts). */
 interface PillProps {
@@ -121,8 +121,8 @@ export interface LatestNowProps extends PillProps {
  * The Latest now pill (docs/screens.md, "Latest now"): the trip furthest behind its timetable right
  * now, or, naming no trip, that none is 3 min late, that the delays have stopped coming, or that
  * no trip on the map sends them. None with the delays off, or before the timetable has loaded.
- * In the top bar's tools, or alone on a glass row of its own under the bar: at the start on a
- * phone, centred on a wider screen; the top bar chooses (./latestPlace.ts).
+ * In the top bar's tools, or alone on a glass row of its own at the start under the bar; the top
+ * bar chooses (./latestPlace.ts).
  */
 export function LatestNow({ latest, place, room, pillRef }: LatestNowProps) {
   const { dictionary } = useI18n()
@@ -137,7 +137,7 @@ export function LatestNow({ latest, place, room, pillRef }: LatestNowProps) {
   return place === 'bar' ? (
     pill
   ) : (
-    <Surface variant="glass" className={styles.row} data-place={place}>
+    <Surface variant="glass" className={styles.row}>
       {pill}
     </Surface>
   )

@@ -1,10 +1,14 @@
 /* The highlight chip floats alone over the map, centred under the top bar and the page notices,
    above the sheet and below the detail panel (Perron's layout, "Stacking"). The screen sets its
-   top to the notices' bottom edge; until it has, it sits under the top bar's glass group, 68px
-   tall on a desktop and 114px on a phone, with the filters on a second row. */
+   top to the notices' bottom edge; until it has, it sits under the page's header (`--map-top`,
+   ./mapTop.ts), and until that is measured under the top bar's glass group, 68px tall on a
+   desktop and 114px on a phone, with the filters on a second row. */
 .chip {
   position: absolute;
-  inset-block-start: calc(var(--perron-space-300) + var(--perron-size-top-bar) + 22px);
+  inset-block-start: var(
+    --map-top,
+    calc(var(--perron-space-300) + var(--perron-size-top-bar) + 22px)
+  );
   inset-inline: var(--perron-size-panel-gap);
   z-index: var(--perron-z-index-highlight);
   inline-size: fit-content;
@@ -14,6 +18,6 @@
 
 @media (max-width: 759.98px) {
   .chip {
-    inset-block-start: calc(var(--perron-space-300) + 114px);
+    inset-block-start: var(--map-top, calc(var(--perron-space-300) + 114px));
   }
 }
