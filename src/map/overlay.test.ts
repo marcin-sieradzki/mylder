@@ -11,8 +11,9 @@ import { liveAircraft } from './aircraft.ts'
 import { liveSnapshot } from './live.ts'
 import { motionPause } from './pause.ts'
 import { pickedVehicle } from './picking.ts'
+import { vehicleSpotlight } from './spotlight.ts'
 import { vehicleOverlay, type VehicleOverlay } from './overlay.ts'
-import { mapView } from './view.ts'
+import { mapView, openPanel } from './view.ts'
 
 // deck.gl's overlay draws with WebGL, which jsdom lacks: a stand-in keeps each set of vehicles it
 // is given, by the positions the loop moves frame by frame, and the layers of its latest render.
@@ -25,7 +26,10 @@ interface Moving {
 }
 interface Drawn {
   readonly id: string
-  readonly props: { readonly data: { readonly attributes?: Moving } }
+  readonly props: {
+    readonly data: { readonly length?: number; readonly attributes?: Moving }
+    readonly [prop: string]: unknown
+  }
 }
 const hovering = vi.hoisted(() => ({
   onHover: undefined as ((info: unknown) => void) | undefined,
@@ -113,6 +117,8 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.useRealTimers()
   motionPause.set(false)
+  vehicleSpotlight.clear()
+  openPanel(undefined)
   window.history.replaceState(null, '', '/')
 })
 
@@ -411,5 +417,111 @@ describe('the overlay on a turned map', () => {
       hovering.onClick!({ picked: false, index: -1, x: x + 3, y: y - 3 })
       expect(mapView.get().panel).toEqual({ kind: 'stop', id })
     }
+  })
+})
+
+describe('the spotlight on the map', () => {
+  /** The weekday's minute drawn over a flat map at Nørreport, the dots standing still. */
+  async function drawnStill() {
+    motionPause.set(true)
+    const camera = stubProjection({ centre: [12.57, 55.68], zoom: 14 })
+    const container = document.createElement('div')
+    overlay = vehicleOverlay(
+      { ...map, project: camera.project } as unknown as MapLibreMap,
+      container,
+    )
+    liveSnapshot.update({ snapshot: minute6 })
+    await vi.waitFor(() => expect(container.dataset.vehicles).toBe('18'))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    return { container, camera }
+  }
+  const layerOf = (id: string) => (rendered.layers as Drawn[]).find((each) => each.id === id)
+  /** The trip on a strand, drawn off its position where lines share a track, by its index. */
+  const onStrand = () => renderedOf('vehicles').offsets!.findIndex((offset) => offset !== 0) >> 1
+  const ringOn = (key: string) => {
+    openPanel({ kind: 'trip', id: key })
+    vehicleSpotlight.ring(key)
+  }
+
+  it('draws no ring while no trip is rung', async () => {
+    const { container } = await drawnStill()
+    expect(rendered.ids).toEqual(['vehicle-halos', 'vehicles'])
+    expect(container.dataset.spotlight).toBeUndefined()
+  })
+
+  it("rings the trip's dot alone, above the vehicles, where the dot is drawn on its strand", async () => {
+    const { container, camera } = await drawnStill()
+    const i = onStrand()
+    const key = minute6.trips.filter((trip) => !trip.cancelled)[i].key
+    const vehicles = layerOf('vehicles')!.props.data.attributes!
+    const position = [...(vehicles.getPosition.value as Float64Array).slice(i * 2, i * 2 + 2)]
+    const offset = [...vehicles.getPixelOffset!.value.slice(i * 2, i * 2 + 2)]
+    ringOn(key)
+    // The dots stand still: the ring draws on the next frame.
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(rendered.ids).toEqual(['vehicle-halos', 'vehicles', 'spotlight'])
+    const ring = layerOf('spotlight')!
+    expect(ring.props.data.length).toBe(1)
+    expect([...(ring.props.data.attributes!.getPosition.value as Float64Array)]).toEqual(position)
+    expect([...ring.props.data.attributes!.getPixelOffset!.value]).toEqual(offset)
+    // Where the canvas draws it, for tests: the dot's point, moved onto its strand.
+    const at = camera.project(position as [number, number])
+    expect(container.dataset.spotlight).toBe(key)
+    expect(container.dataset.spotlightAt).toBe(
+      `${Math.round(at.x + offset[0])} ${Math.round(at.y - offset[1])}`,
+    )
+  })
+
+  it("is a ring in Perron's danger colour round the dot's 24 px target, which picks nothing", async () => {
+    await drawnStill()
+    ringOn(minute6.trips[0].key)
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const { props } = layerOf('spotlight')!
+    // color.status.danger in the light theme, #C2410C; size.target-min, 24 px across, and
+    // focus.width, 2 px, as deck.gl centres a stroke on its radius.
+    expect(props).toMatchObject({
+      filled: false,
+      stroked: true,
+      pickable: false,
+      radiusUnits: 'pixels',
+      lineWidthUnits: 'pixels',
+      billboard: true,
+      getLineColor: [194, 65, 12, 255],
+    })
+    expect((props.getRadius as number) + (props.getLineWidth as number) / 2).toBe(12)
+    expect(props.getLineWidth).toBe(2)
+  })
+
+  it('changes no other dot', async () => {
+    await drawnStill()
+    const before = layerOf('vehicles')!.props
+    ringOn(minute6.trips[0].key)
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const after = layerOf('vehicles')!.props
+    expect(after.data).toEqual(before.data)
+    expect(after.radiusScale).toBe(before.radiusScale)
+  })
+
+  it('takes the ring off when its panel closes', async () => {
+    const { container } = await drawnStill()
+    ringOn(minute6.trips[0].key)
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(rendered.ids).toContain('spotlight')
+    openPanel(undefined)
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(rendered.ids).toEqual(['vehicle-halos', 'vehicles'])
+    expect(container.dataset.spotlight).toBeUndefined()
+    expect(container.dataset.spotlightAt).toBeUndefined()
+  })
+
+  it('draws no ring for a trip whose dot is off the map, such as one a filter hides', async () => {
+    const { container } = await drawnStill()
+    const bus = minute6.trips.find((trip) => trip.mode === 'bus' && !trip.cancelled)!
+    ringOn(bus.key)
+    mapView.update({ hidden: new Set(['bus']) })
+    await vi.waitFor(() => expect(container.dataset.vehicles).toBe('11'))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(rendered.ids).toEqual(['vehicle-halos', 'vehicles'])
+    expect(container.dataset.spotlight).toBeUndefined()
   })
 })

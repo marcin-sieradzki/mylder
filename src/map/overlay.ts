@@ -34,6 +34,13 @@ import { liveSnapshot, pollSnapshot, serverNow } from './live.ts'
 import { vehicleLoop } from './loop.ts'
 import { readPaint } from './paint.ts'
 import { dotPicking, TAP_RADIUS, type DrawnKind } from './picking.ts'
+import { vehicleSpotlight } from './spotlight.ts'
+import {
+  spotlightLayer,
+  spotlightLookOf,
+  spotlightTokens,
+  type SpotlightLook,
+} from './SpotlightLayer.ts'
 import { dataStates } from './states.ts'
 import { timetables } from './timetable.ts'
 import { tripsDrawn } from './VehicleGlyphLayer.ts'
@@ -119,6 +126,30 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
     ...(aircraft ? [aircraftDrawn(aircraft)] : []),
   ]
 
+  // The spotlight's ring, read once per theme, round the rung trip's dot where it is drawn.
+  let spotlightLook: SpotlightLook | undefined
+  // Where the rung trip was found last, so a frame looks it up only when either changes.
+  let rung: { vehicles: Vehicles; key: string; index: number } | undefined
+  /** The index of the rung trip's dot among the vehicles drawn, if it is drawn. */
+  const spotlit = (): number | undefined => {
+    const key = vehicleSpotlight.get()
+    if (!vehicles || key === undefined) return undefined
+    if (rung?.vehicles !== vehicles || rung.key !== key)
+      rung = { vehicles, key, index: vehicles.keys.indexOf(key) }
+    return rung.index < 0 ? undefined : rung.index
+  }
+  /** The ring's trip and its point on the canvas, on the container for tests, while drawn. */
+  const markSpotlight = (i: number | undefined) => {
+    if (!vehicles || i === undefined) {
+      delete container.dataset.spotlight
+      delete container.dataset.spotlightAt
+      return
+    }
+    const [x, y] = tripsDrawn(vehicles).at(i, project)
+    container.dataset.spotlight = vehicles.keys[i]
+    container.dataset.spotlightAt = `${Math.round(x)} ${Math.round(y)}`
+  }
+
   // One render a frame draws every kind, wherever their motion has placed them.
   const render = () => {
     if (reproject) {
@@ -129,7 +160,23 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
     // no layers clear what was drawn.
     const drawn = kinds()
     const heading = map.getBearing()
-    overlay.setProps({ layers: drawn.flatMap((kind) => kind.layers(radiusScale, heading)) })
+    // The ring sits just above the vehicles, under the aircraft.
+    const ringed = spotlit()
+    const ring =
+      vehicles && ringed !== undefined
+        ? spotlightLayer(
+            vehicles,
+            ringed,
+            (spotlightLook ??= spotlightLookOf(readPaint(root, spotlightTokens()))),
+          )
+        : undefined
+    overlay.setProps({
+      layers: drawn.flatMap((kind) => [
+        ...kind.layers(radiusScale, heading),
+        ...(ring && kind.kind === 'trip' ? [ring] : []),
+      ]),
+    })
+    markSpotlight(ringed)
     if (vehicles) {
       container.dataset.vehicles = String(vehicles.length)
       follow.frame(vehicles, along)
@@ -230,6 +277,8 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
     redraw()
   })
   const stopAgeing = dataStates.subscribe(redraw)
+  // A ring rung or taken off draws on the next frame, though the dots stand still.
+  const stopSpotlight = vehicleSpotlight.subscribe(() => frames.request())
   // A mode filter turned on or off draws the same snapshot again without that mode.
   let filteredBy = mapView.get().hidden
   const stopFiltering = mapView.subscribe(() => {
@@ -301,6 +350,7 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
   const onMove = () => {
     onCamera()
     picking.follow(kinds(), project)
+    markSpotlight(spotlit())
   }
   map.on('move', onMove)
   // A resized window moves the canvas on the page, which the card's point counts from.
@@ -313,6 +363,7 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
   return {
     repaint() {
       lookOfAircraft = undefined
+      spotlightLook = undefined
       drawAircraft()
       void draw()
     },
@@ -320,6 +371,7 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
       removed = true
       stopListening()
       stopAgeing()
+      stopSpotlight()
       stopFiltering()
       stopPolling()
       stopWatchingAircraft?.()
@@ -336,6 +388,7 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
       map.removeControl(overlay)
       delete container.dataset.vehicles
       delete container.dataset.aircraft
+      markSpotlight(undefined)
     },
   }
 }
