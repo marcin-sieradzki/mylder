@@ -1,5 +1,17 @@
-/* The Latest now pill in the top bar's tools, or alone on a phone's row under the bar: never
-   wider than its row, the stop's name cut short with an ellipsis rather than pushing past it. */
+/* The Latest now pill. Its words get `--latest-room` across, measured on the header's width
+   (TopBar.module.css makes the header a container): "Latest now", the line badge and the delay
+   stay whole, and the stop's name, last, is cut short with an ellipsis rather than push the pill
+   past its room. Perron's Button sizes to its label, so the room caps the label's own row; the
+   Button's small padding, space.300 a side, and its edge come off it.
+
+   In the top bar's tools the room is what the bar leaves at 1280 px with six mode and plane chips,
+   the brand and the Updated line, the language switch and About on its one row: the header less
+   1016 px, up to 28rem, so the pill never wraps the bar onto a second row. */
+.pill,
+.line {
+  --latest-room: min(28rem, 100cqi - 1016px);
+}
+
 .pill {
   max-inline-size: 100%;
   min-inline-size: 0;
@@ -11,7 +23,9 @@
   align-items: center;
   gap: var(--perron-space-150);
   min-inline-size: 0;
-  max-inline-size: 100%;
+  max-inline-size: calc(
+    var(--latest-room) - 2 * var(--perron-space-300) - 2 * var(--perron-border-width-025)
+  );
 }
 
 .content > * {
@@ -25,14 +39,15 @@
   text-overflow: ellipsis;
 }
 
-/* The pill's words when it names no trip: one line, wrapping at its spaces where the row is
-   narrower. */
+/* The pill's words when it names no trip: within the room, wrapping at its spaces onto a second
+   line rather than widen the bar, which keeps its height for two lines of a label. */
 .line {
+  max-inline-size: var(--latest-room);
   margin: 0;
 }
 
-/* A phone's row under the top bar: the pill alone on glass, as wide as its words and never wider
-   than the bar, so the map takes presses beside it. */
+/* A row of its own under the top bar, the pill alone on glass, as wide as its words: on a phone
+   at the start, its room the bar's width less the row's padding. */
 .row {
   display: flex;
   align-items: center;
@@ -42,4 +57,24 @@
   min-block-size: var(--perron-size-control);
   padding-block: var(--perron-space-100);
   padding-inline: var(--perron-space-200);
+}
+
+.row .pill,
+.row .line {
+  --latest-room: calc(100cqi - 2 * var(--perron-space-200));
+}
+
+/* Between a phone and a screen wide enough for the pill in the bar: the row centred under the bar,
+   its room the map's between the Overview sheet on the left and a detail panel on the right, each
+   a sheet's width in from the edge, so it covers neither's heading. */
+.row[data-place='centred'] {
+  align-self: center;
+}
+
+.row[data-place='centred'] .pill,
+.row[data-place='centred'] .line {
+  --latest-room: calc(
+    100cqi - 2 * (var(--perron-size-sheet-width) + var(--perron-size-panel-gap)) - 2 *
+      var(--perron-space-200)
+  );
 }

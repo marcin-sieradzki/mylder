@@ -1,6 +1,6 @@
 # Latest right now
 
-The Latest now pill names the trip running furthest behind its timetable right now, anywhere on the map, among the trips whose delay is known: "Latest now [950R] +77 min at Slotspavillonen St.", its line badge, its delay in whole minutes and the stop it is at or last passed. A press opens that trip's vehicle panel. When no trip is 3 min late, when SIRI-ET's delays stop coming, or when no trip on the map shows a delay, it says so and names no trip; with the delays off there is no pill. It sits in the top bar's tools on a wide screen and on a row of its own under the bar on a phone.
+The Latest now pill names the trip running furthest behind its timetable right now, anywhere on the map, among the trips whose delay is known: "Latest now [950R] +77 min at Slotspavillonen St.", its line badge, its delay in whole minutes and the stop it is at or last passed. A press opens that trip's vehicle panel. When no trip is 3 min late, when SIRI-ET's delays stop coming, or when no trip on the map shows a delay, it says so and names no trip; with the delays off there is no pill. It sits in the top bar's tools from 1280 px wide, keeping the bar on one row, and on a row of its own under the bar below that: at the start on a phone, centred between the Overview sheet and a detail panel on a narrower desktop.
 
 ## Sub-features
 
@@ -10,7 +10,8 @@ The Latest now pill names the trip running furthest behind its timetable right n
 - `latest-quiet` reads "Delays from Rejseplanen not updated since HH:MM" once SIRI-ET's feed has sent nothing for 5 min, naming no trip.
 - `latest-none` reads "Latest now —" and "the Metro sends no delays" when no trip on the map shows a delay on a source that can send them, such as the `empty` recording.
 - `latest-off` shows no pill with the delays off: the timetable source with SIRI-ET's feed off, the one source that can send no delay.
-- `latest-phone` puts the pill on a row of its own under the top bar on a phone, never wider than the screen.
+- `latest-phone` puts the pill on a row of its own under the top bar on a phone, never wider than the screen, "Latest now", the badge and the delay whole and a long stop's name cut by an ellipsis.
+- `latest-wide` keeps the top bar on one row at 1280 px with six chips (Bus, Metro, S-tog, Train, Light rail, Planes), the pill in its tools, standing out or quiet.
 - `latest-da` says it all in Danish: "Mest forsinket nu", "Største forsinkelse lige nu: … min forsinket, mellem … og …".
 
 ## How to get to it (user POV)
@@ -37,7 +38,8 @@ Preconditions:
 - **Quiet.** On a launch with `updates:siri-et/quiet`, once `/api/snapshot`'s `updates` reads `"fresh":false` (about 6 minutes in), the banner's `getByText('Delays from Rejseplanen not updated since 09:56')` is visible and no button named `/^Biggest delay/` is there; on `/da`, `Forsinkelser fra Rejseplanen ikke opdateret siden 09:56`. Before then the pill names a trip as in Standout.
 - **Off.** On a launch with `timetable` as the third argument, `page.getByRole('banner').getByText(/Latest now|Delays from Rejseplanen/)` has a count of 0.
 - **Danish.** On `/da` the button's name starts `Største forsinkelse lige nu: <line> mod <headsign>, <n> min forsinket, ` and its text holds `Mest forsinket nu` and `ved <stop>`.
-- **Phone.** With `--phone`, the pill's `boundingBox()` starts at or below the bottom of `getByRole('button', { name: 'About Mylder' })`'s, and its right edge is within the viewport's width; on a desktop it sits beside the About button in the bar.
+- **Phone.** With `--phone` (and again at 360 px, `page.setViewportSize({ width: 360, height: 800 })`), the pill's `boundingBox()` starts at or below the bottom of `getByRole('button', { name: 'About Mylder' })`'s, lies inside the viewport, and `pill.evaluate((e) => e.scrollWidth <= e.clientWidth)` is true; `pill.getByText('Latest now')`, the badge and `pill.locator('.pn-Delay')` each lie inside the pill's box. A long stop name, such as one with a street in brackets, ends in an ellipsis: its `<span>`'s `scrollWidth` exceeds its `clientWidth`, and the button's name still holds the whole name.
+- **Wide.** At `page.setViewportSize({ width: 1280, height: 800 })` on `updates:siri-et`, whose launch has the planes, the `Filters` group holds six buttons; the pill's middle is level with the About button's, the brand link `Mylder`'s middle level with About's (one row), the `.pn-TopBar` no taller than 58 px, and the Overview sheet's `Overview` heading starts at or below the bar's bottom. The same on `updates:siri-et/quiet` once it is quiet. Below 1280 px, above a phone, the pill sits on a row of its own under the bar, centred.
 
 ## Gotchas
 

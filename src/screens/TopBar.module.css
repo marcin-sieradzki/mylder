@@ -1,9 +1,11 @@
-/* The page's header: the top bar and, on a phone, the Latest now pill's row under it. Only the two
-   take presses, so the map takes them in the gap between. */
+/* The page's header: the top bar and, below a wide screen, the Latest now pill's row under it.
+   Only the two take presses, so the map takes them in the gap between. A container, so the pill
+   measures its room on the header's width (LatestNow.module.css). */
 .header {
   display: flex;
   flex-direction: column;
   gap: var(--perron-space-200);
+  container-type: inline-size;
   pointer-events: none;
 }
 

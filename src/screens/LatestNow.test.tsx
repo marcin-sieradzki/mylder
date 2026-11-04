@@ -11,6 +11,7 @@ import { liveSnapshot } from '../map/live'
 import { openPanel } from '../map/view'
 import { timetableRoutesOf } from '../test/timetableRoutes'
 import type { Snapshot, SnapshotTrip } from '../tracker/index'
+import { WIDE_QUERY } from './LatestNow'
 import { MapScreen } from './MapScreen'
 import { Providers } from './Providers'
 
@@ -57,16 +58,17 @@ const empty = JSON.parse(
   readFileSync(join(process.cwd(), 'recordings', 'empty', 'snapshots', '0001.json'), 'utf8'),
 ) as Snapshot
 
-/** Whether the page is as narrow as a phone, as each test sets it. */
+/** Whether the page is as narrow as a phone, or wide enough for the pill in the bar, as each test sets it. */
 let phone = false
+let wide = true
 const mediaLists = new Map<string, object>()
-/** The browser's `matchMedia`, which jsdom lacks: only the phone's query matches, with `phone`. */
+/** The browser's `matchMedia`, which jsdom lacks: the phone's query with `phone`, the wide one's with `wide`. */
 function matchMedia(query: string) {
   let list = mediaLists.get(query)
   if (!list) {
     list = {
       get matches() {
-        return query === PHONE_QUERY && phone
+        return query === PHONE_QUERY ? phone : query === WIDE_QUERY && wide
       },
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -100,6 +102,7 @@ const banner = () => screen.getByRole('banner')
 
 beforeEach(() => {
   phone = false
+  wide = true
   vi.stubGlobal('matchMedia', matchMedia)
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.stubGlobal('fetch', routes)
@@ -238,8 +241,21 @@ describe('the Latest now pill', () => {
     expect(pill.parentElement).toBe(about.parentElement)
   })
 
+  it('takes a row of its own under the top bar, centred, between a phone and a wide screen', async () => {
+    wide = false
+    await open('en')
+    const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
+    const bar = within(banner())
+      .getByRole('button', { name: 'About Mylder' })
+      .closest('.pn-TopBar')!
+    expect(bar.contains(pill)).toBe(false)
+    expect(pill.parentElement).toHaveClass('pn-Surface')
+    expect(pill.parentElement).toHaveAttribute('data-place', 'centred')
+  })
+
   it('takes a row of its own under the top bar on a phone', async () => {
     phone = true
+    wide = false
     await open('en')
     const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
     const about = within(banner()).getByRole('button', { name: 'About Mylder' })
@@ -248,5 +264,6 @@ describe('the Latest now pill', () => {
     // After the bar in the header, on glass of its own.
     expect(bar.compareDocumentPosition(pill) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(pill.parentElement).toHaveClass('pn-Surface')
+    expect(pill.parentElement).toHaveAttribute('data-place', 'phone')
   })
 })

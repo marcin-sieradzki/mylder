@@ -19,6 +19,15 @@ import { fill } from './vehicleLabel'
 
 type Words = ClientDictionary['latest']
 
+/** Where the pill sits: in the top bar's tools, or on a row under the bar, a phone's or centred. */
+export type LatestPlace = 'bar' | 'phone' | 'centred'
+
+/**
+ * A screen this wide or wider has room for the pill in the top bar's tools, with six mode and
+ * plane chips on its one row; a narrower one, above a phone, puts it on a row under the bar.
+ */
+export const WIDE_QUERY = '(min-width: 1280px)'
+
 /** Whether two outcomes say the same: the same trips of the same snapshot, the same figures. */
 function sameLatest(a: Latest | undefined, b: Latest | undefined): boolean {
   if (a === b) return true
@@ -131,9 +140,10 @@ function Standout({ ranked, snapshot, network, words }: StandoutProps) {
  * The Latest now pill (docs/screens.md, "Latest now"): the trip furthest behind its timetable right
  * now, or, naming no trip, that none is 3 min late, that the delays have stopped coming, or that
  * no trip on the map sends them. None with the delays off, or before the timetable has loaded.
- * In the top bar's tools, or with `phone`, alone on a glass row of its own under the bar.
+ * In the top bar's tools, or alone on a glass row of its own under the bar: at the start on a
+ * phone, centred where the screen is too narrow for it in the bar.
  */
-export function LatestNow({ phone = false }: { phone?: boolean }) {
+export function LatestNow({ place = 'bar' }: { place?: LatestPlace }) {
   const { dictionary } = useI18n()
   const words = dictionary.latest
   const latest = useLatest()
@@ -144,12 +154,12 @@ export function LatestNow({ phone = false }: { phone?: boolean }) {
   if (latest.kind === 'standout' && !network.patterns.patterns[latest.trips[0].trip.pattern])
     return null
   const pill = pillOf(latest, snapshot, network, words)
-  return phone ? (
-    <Surface variant="glass" className={styles.row}>
+  return place === 'bar' ? (
+    pill
+  ) : (
+    <Surface variant="glass" className={styles.row} data-place={place}>
       {pill}
     </Surface>
-  ) : (
-    pill
   )
 }
 

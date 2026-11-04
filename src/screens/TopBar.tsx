@@ -16,10 +16,10 @@ import { clockTime } from '../timetable/time'
 import type { Snapshot } from '../tracker/index'
 import { aboutDialog } from './about'
 import { LanguageSwitch } from './LanguageSwitch'
-import { LatestNow } from './LatestNow'
+import { LatestNow, WIDE_QUERY } from './LatestNow'
 import { PerronIcon } from './PerronIcon'
 import styles from './TopBar.module.css'
-import { usePhone } from './usePhone'
+import { useMediaQuery, usePhone } from './usePhone'
 
 const openAbout = (event: MouseEvent<HTMLButtonElement>) => aboutDialog.open(event.currentTarget)
 
@@ -46,8 +46,9 @@ const showAircraft = (_event: Event, shown: boolean) => mapView.update({ aircraf
  * the Updated line, the mode filters and the Planes filter, the Latest now pill, the language
  * switch and the About button, in the page's header. Its phone layout follows the window's width
  * in Perron's own CSS, from one render, so the prerendered page paints a phone its own bar first.
- * On a phone the pill takes a row of its own under the bar, on glass of its own; it shows only once
- * a snapshot has landed, so the prerendered page never paints it in the wrong place.
+ * Below a screen wide enough for it in the bar, the pill takes a row of its own under the bar, on
+ * glass of its own; it shows only once a snapshot has landed, so the prerendered page never paints
+ * it in the wrong place.
  */
 export function TopBar() {
   const { lang, dictionary } = useI18n()
@@ -64,6 +65,7 @@ export function TopBar() {
   const underway = underwayByMode(snapshot)
   const timezone = timezoneOf(network)
   const phone = usePhone()
+  const wide = useMediaQuery(WIDE_QUERY)
   // The Planes chip shows once the aircraft have answered, so a server with them off never names
   // them, or while the address hides them, to turn them on again. Off, the page no longer asks
   // for them, so the count it last had is left out.
@@ -121,7 +123,7 @@ export function TopBar() {
         }
         tools={
           <>
-            {phone ? null : <LatestNow />}
+            {wide ? <LatestNow /> : null}
             <LanguageSwitch />
             <IconButton label={dictionary.topBar.about} size="large" onClick={openAbout}>
               <PerronIcon name="info" />
@@ -129,7 +131,7 @@ export function TopBar() {
           </>
         }
       />
-      {phone ? <LatestNow phone /> : null}
+      {wide ? null : <LatestNow place={phone ? 'phone' : 'centred'} />}
     </header>
   )
 }

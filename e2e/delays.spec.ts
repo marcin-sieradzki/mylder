@@ -1,5 +1,5 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
-import { savedUpdatesSnapshot, UPDATES_URL } from './recording'
+import { expect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test'
+import { savedUpdatesSnapshot, serveAircraft, UPDATES_URL } from './recording'
 
 // SIRI-ET's delays on the map (spec #146): a server on the timetable source with updates from the
 // SIRI-ET recording, which runs the reader inside the tracker over its messages from 09:00 on
@@ -118,17 +118,39 @@ test('an opened delayed bus and its next stop show its expected times and the de
   )
 })
 
-/** Serves the saved minute of 09:22 at its moment, so the pill names its trips. */
-async function onSavedMinute(page: Page) {
-  const saved = savedUpdatesSnapshot('0002.json') as SnapshotLike
-  await page.clock.install({ time: saved.fetched })
+/**
+ * Serves the saved minute of 09:22, changed by `change`, with the server's clock `after` ms past
+ * it, so the pill names its trips.
+ */
+async function onSavedMinute(
+  page: Page,
+  change: (saved: SnapshotLike) => SnapshotLike = (saved) => saved,
+  after = 0,
+) {
+  const minute = savedUpdatesSnapshot('0002.json') as SnapshotLike
+  const saved = change(minute)
+  const now = minute.fetched + after
+  await page.clock.install({ time: now })
   await page.route('**/api/snapshot', (route) =>
     route.fulfill({
       json: saved,
-      headers: { date: new Date(saved.fetched).toUTCString(), 'cache-control': 'no-store' },
+      headers: { date: new Date(now).toUTCString(), 'cache-control': 'no-store' },
     }),
   )
 }
+
+/**
+ * The bus 250S at 09:04, its last stop passed Hillerødmotorvejen, Tingbjerg (Hillerødmotorvejen),
+ * made the latest, 100 min late: the longest stop name a pill can name in the saved minute.
+ */
+const LONG_STOP = 'bus.250S.0c7bd8e0e7.20261031.0904'
+const longStopLatest = (saved: SnapshotLike): SnapshotLike => ({
+  ...saved,
+  trips: saved.trips.map((trip) => (trip.key === LONG_STOP ? { ...trip, delay: 6000 } : trip)),
+})
+
+/** The box of `locator`, which must be on the page. */
+const boxOf = async (locator: Locator) => (await locator.boundingBox())!
 
 test('the Latest now pill names the trip running latest and opens its panel', async ({ page }) => {
   // At 09:22 the 950R to Hillerød runs 77 min late, between Slotspavillonen St. and Hillerød St.
@@ -144,16 +166,90 @@ test('the Latest now pill names the trip running latest and opens its panel', as
   await expect(page.getByRole('dialog', { name: /to Hillerød/ })).toContainText('950R')
 })
 
-test('on a phone the pill takes a row of its own under the top bar', async ({ page }) => {
-  await page.setViewportSize({ width: 412, height: 915 })
-  await onSavedMinute(page)
+for (const width of [412, 360]) {
+  test(`on a ${width} px phone the pill takes a row of its own and fits it, the stop cut short`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 })
+    await onSavedMinute(page, longStopLatest)
+    await page.goto(`${UPDATES_URL}/en`)
+    const pill = page.getByRole('banner').getByRole('button', {
+      name: /^Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, /,
+    })
+    await expect(pill).toBeVisible()
+    // Under the bar's first row, and inside the screen.
+    const about = await boxOf(page.getByRole('button', { name: 'About Mylder' }))
+    const box = await boxOf(pill)
+    expect(box.y).toBeGreaterThanOrEqual(about.y + about.height)
+    expect(box.x).toBeGreaterThanOrEqual(0)
+    expect(box.x + box.width).toBeLessThanOrEqual(width)
+    // Its words never spill out of it.
+    expect(await pill.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+    // "Latest now", the badge and the delay whole inside it; the stop's name cut by an ellipsis.
+    for (const part of [
+      pill.getByText('Latest now'),
+      pill.getByText('250S'),
+      pill.locator('.pn-Delay'),
+    ]) {
+      const inside = await boxOf(part)
+      expect(inside.x).toBeGreaterThanOrEqual(box.x)
+      expect(inside.x + inside.width).toBeLessThanOrEqual(box.x + box.width)
+    }
+    const stop = pill.getByText(/^at Hillerødmotorvejen, Tingbjerg/)
+    expect(await stop.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
+    expect(await stop.evaluate((element) => getComputedStyle(element).textOverflow)).toBe(
+      'ellipsis',
+    )
+    const inside = await boxOf(stop)
+    expect(inside.x + inside.width).toBeLessThanOrEqual(box.x + box.width)
+  })
+}
+
+/**
+ * Expects the top bar on one row, as without the pill, and the Overview sheet's heading clear of
+ * it: the tools on the brand's row, the bar no taller than its one row of 58 px.
+ */
+async function expectOneRow(page: Page) {
+  const bar = page.locator('.pn-TopBar')
+  const brand = await boxOf(page.getByRole('link', { name: 'Mylder' }))
+  const about = await boxOf(page.getByRole('button', { name: 'About Mylder' }))
+  expect(Math.abs(about.y + about.height / 2 - (brand.y + brand.height / 2))).toBeLessThan(4)
+  const { y, height } = await boxOf(bar)
+  expect(height).toBeLessThanOrEqual(58)
+  const sheet = await boxOf(
+    page.getByRole('dialog', { name: 'Overview' }).getByRole('heading', { name: 'Overview' }),
+  )
+  expect(sheet.y).toBeGreaterThanOrEqual(y + height)
+}
+
+test('at 1280 px with six chips the pill keeps the top bar on one row', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await serveAircraft(page, 0)
+  await onSavedMinute(page, longStopLatest)
   await page.goto(`${UPDATES_URL}/en`)
+  // Bus, Metro, S-tog, Train, Light rail and Planes.
+  await expect(page.getByRole('group', { name: 'Filters' }).getByRole('button')).toHaveCount(6)
   const pill = page.getByRole('banner').getByRole('button', { name: /^Biggest delay right now:/ })
   await expect(pill).toBeVisible()
-  const about = await page.getByRole('button', { name: 'About Mylder' }).boundingBox()
-  const box = (await pill.boundingBox())!
-  expect(box.y).toBeGreaterThanOrEqual(about!.y + about!.height)
-  // Never wider than the screen.
-  expect(box.x).toBeGreaterThanOrEqual(0)
-  expect(box.x + box.width).toBeLessThanOrEqual(412)
+  await expectOneRow(page)
+  // In the bar's tools, beside the About button.
+  const about = await boxOf(page.getByRole('button', { name: 'About Mylder' }))
+  const box = await boxOf(pill)
+  expect(Math.abs(box.y + box.height / 2 - (about.y + about.height / 2))).toBeLessThan(4)
+  expect(await pill.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+})
+
+test('at 1280 px with six chips the quiet pill keeps the top bar on one row', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await serveAircraft(page, 0)
+  // A snapshot of 09:28, six minutes past the delays' last message, at 09:21:52: the feed is
+  // quiet, while the positions are as fresh as the server's runs keep them.
+  const later = 6 * 60_000
+  await onSavedMinute(page, (saved) => ({ ...saved, fetched: saved.fetched + later }), later)
+  await page.goto(`${UPDATES_URL}/en`)
+  await expect(page.getByRole('group', { name: 'Filters' }).getByRole('button')).toHaveCount(6)
+  await expect(
+    page.getByRole('banner').getByText('Delays from Rejseplanen not updated since 09:21'),
+  ).toBeVisible()
+  await expectOneRow(page)
 })
