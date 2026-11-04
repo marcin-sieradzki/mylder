@@ -29,6 +29,12 @@ test('the map fills with simulated vehicles, and says they are made up', async (
   await expect(page.getByRole('banner').getByText(/^Updated /)).toBeVisible()
 })
 
+test('the top bar says which trip runs latest on the simulated delays', async ({ page }) => {
+  await page.goto('/mylder/en')
+  // Calm or standing out, whichever the simulation's delays make it; never absent, never quiet.
+  await expect(page.getByRole('banner').getByText(/^Latest now/)).toBeVisible()
+})
+
 test('the map draws the recorded planes, counts them on the Planes filter, and says they are recorded adsb.lol data', async ({
   page,
 }) => {

@@ -95,6 +95,7 @@ interface StandoutProps {
  */
 function Standout({ ranked, snapshot, network, words }: StandoutProps) {
   const { trip, delay } = ranked
+  const pattern = network.patterns.patterns[trip.pattern]
   const where = whereAt(ranked, snapshot, network)
   const name = (index: number) => stopName(network, trip.pattern, index)
   const shown = where.kind === 'between' ? where.from : where.kind === 'waiting' ? 0 : where.stop
@@ -102,7 +103,6 @@ function Standout({ ranked, snapshot, network, words }: StandoutProps) {
     where.kind === 'between'
       ? fill(words.labelBetween, { from: name(where.from), to: name(where.to) })
       : fill(words.labelAt, { stop: name(shown) })
-  const pattern = network.patterns.patterns[trip.pattern]
   const colour = network.patterns.lines[pattern.line]?.colour ?? ''
   return (
     <Button
@@ -140,6 +140,9 @@ export function LatestNow({ phone = false }: { phone?: boolean }) {
   const snapshot = useSnapshot()
   const network = useNetwork(snapshot?.timetableVersion)
   if (!latest || !snapshot || !network) return null
+  // The timetable before the snapshot's, still shown while it loads, may lack the trip's pattern.
+  if (latest.kind === 'standout' && !network.patterns.patterns[latest.trips[0].trip.pattern])
+    return null
   const pill = pillOf(latest, snapshot, network, words)
   return phone ? (
     <Surface variant="glass" className={styles.row}>
