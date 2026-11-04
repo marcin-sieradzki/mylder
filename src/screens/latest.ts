@@ -3,7 +3,7 @@
 // alone, as City pulse's figures are (./pulse.ts). Each trip's data state is worked out again by
 // the clock, as the map's dots are, so a trip whose delay is no longer known drops out on the
 // second it ages. Delays are in seconds.
-import { feedFresh } from '../domain/data-state'
+import { feedFresh, type DataState } from '../domain/data-state'
 import { delaysOn } from '../map/live'
 import { statesAt } from '../map/states'
 import { onMap } from '../map/vehicles'
@@ -16,6 +16,8 @@ export interface RankedTrip {
   /** The snapshot's trip: its key, line, mode, headsign, next call and place on its pattern. */
   readonly trip: SnapshotTrip
   readonly delay: number
+  /** Its data state now, by the clock: one that shows a delay. */
+  readonly state: DataState
 }
 
 /**
@@ -67,7 +69,7 @@ export function latestOf(snapshot: Snapshot, now: number): Latest | undefined {
   for (const trip of snapshot.trips) {
     const state = states.get(trip.key) ?? trip.state
     if (!onMap(trip, NO_FILTER) || trip.delay === undefined || !DELAY_KNOWN.has(state)) continue
-    known.push({ trip, delay: trip.delay })
+    known.push({ trip, delay: trip.delay, state })
   }
   if (known.length === 0) return { kind: 'none' }
   const late = known.filter(({ delay }) => delay > 0).sort(byDelay)

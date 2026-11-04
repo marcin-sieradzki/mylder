@@ -16,7 +16,10 @@ import { clockTime } from '../timetable/time'
 import type { Snapshot } from '../tracker/index'
 import { aboutDialog } from './about'
 import { LanguageSwitch } from './LanguageSwitch'
+import { LatestNow } from './LatestNow'
 import { PerronIcon } from './PerronIcon'
+import styles from './TopBar.module.css'
+import { usePhone } from './usePhone'
 
 const openAbout = (event: MouseEvent<HTMLButtonElement>) => aboutDialog.open(event.currentTarget)
 
@@ -40,9 +43,11 @@ const showAircraft = (_event: Event, shown: boolean) => mapView.update({ aircraf
 
 /**
  * The moving map's top bar (docs/screens.md, "The moving map"): Perron's TopBar with the brand,
- * the Updated line, the mode filters and the Planes filter, the language switch and the About
- * button, in the page's header. Its phone layout follows the window's width in Perron's own CSS,
- * from one render, so the prerendered page paints a phone its own bar first.
+ * the Updated line, the mode filters and the Planes filter, the Latest now pill, the language
+ * switch and the About button, in the page's header. Its phone layout follows the window's width
+ * in Perron's own CSS, from one render, so the prerendered page paints a phone its own bar first.
+ * On a phone the pill takes a row of its own under the bar, on glass of its own; it shows only once
+ * a snapshot has landed, so the prerendered page never paints it in the wrong place.
  */
 export function TopBar() {
   const { lang, dictionary } = useI18n()
@@ -58,6 +63,7 @@ export function TopBar() {
   const outOfDate = useOutOfDate()
   const underway = underwayByMode(snapshot)
   const timezone = timezoneOf(network)
+  const phone = usePhone()
   // The Planes chip shows once the aircraft have answered, so a server with them off never names
   // them, or while the address hides them, to turn them on again. Off, the page no longer asks
   // for them, so the count it last had is left out.
@@ -80,7 +86,7 @@ export function TopBar() {
   }
 
   return (
-    <header>
+    <header className={styles.header}>
       <PerronTopBar
         size="responsive"
         brandHref={`/${lang}`}
@@ -115,6 +121,7 @@ export function TopBar() {
         }
         tools={
           <>
+            {phone ? null : <LatestNow />}
             <LanguageSwitch />
             <IconButton label={dictionary.topBar.about} size="large" onClick={openAbout}>
               <PerronIcon name="info" />
@@ -122,6 +129,7 @@ export function TopBar() {
           </>
         }
       />
+      {phone ? <LatestNow phone /> : null}
     </header>
   )
 }

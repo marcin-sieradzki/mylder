@@ -1,0 +1,12 @@
+/* The page's header: the top bar and, on a phone, the Latest now pill's row under it. Only the two
+   take presses, so the map takes them in the gap between. */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--perron-space-200);
+  pointer-events: none;
+}
+
+.header > * {
+  pointer-events: auto;
+}
