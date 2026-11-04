@@ -72,7 +72,7 @@
 
 /* Perron's Button is one line tall; on its row, the pill grows a second line for its stop, its
    padding keeping the lines off its edge. A stand-in for a Button whose label may take a second
-   line: goes when Perron's Button has it. perron-stand-in: perron#TBD */
+   line: goes when Perron's Button has it. perron-stand-in: perron#198 */
 .row .pill {
   block-size: auto;
   min-block-size: var(--perron-size-button-sm);
