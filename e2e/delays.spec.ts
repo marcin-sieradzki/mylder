@@ -215,34 +215,92 @@ async function expectPillWhole(pill: Locator, now: string, line: string, kept: n
   expect(await visibleStopCharacters(pill)).toBeGreaterThanOrEqual(kept)
 }
 
-for (const width of [412, 360]) {
-  test(`on a ${width} px phone the pill takes a row of its own and fits it, the stop cut short`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width, height: 800 })
-    await onSavedMinute(page, longStopLatest)
-    await page.goto(`${UPDATES_URL}/en`)
-    const pill = page.getByRole('banner').getByRole('button', {
-      name: /^Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, /,
+const PHONE = {
+  en: {
+    now: 'Latest now',
+    name: 'Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, ',
+    at: 'at',
+  },
+  da: {
+    now: 'Mest forsinket nu',
+    name: 'Største forsinkelse lige nu: 250S mod Dragør Stationsplads, 100 min forsinket, ',
+    at: 'ved',
+  },
+} as const
+
+for (const lang of ['en', 'da'] as const) {
+  for (const width of [412, 360]) {
+    test(`on a ${width} px phone in ${lang} the pill takes a row of its own and fits it, ten characters of the stop in view`, async ({
+      page,
+    }) => {
+      const words = PHONE[lang]
+      await page.setViewportSize({ width, height: 800 })
+      await onSavedMinute(page, longStopLatest)
+      await page.goto(`${UPDATES_URL}/${lang}`)
+      const pill = page.getByRole('banner').getByRole('button', {
+        name: new RegExp(`^${words.name}`),
+      })
+      await expect(pill).toBeVisible()
+      // Under the bar's first row, inside the screen, and inside its row's glass.
+      const about = await boxOf(page.getByRole('button', { name: WORDS[lang].about }))
+      const box = await boxOf(pill)
+      expect(box.y).toBeGreaterThanOrEqual(about.y + about.height)
+      expect(box.x).toBeGreaterThanOrEqual(0)
+      expect(box.x + box.width).toBeLessThanOrEqual(width)
+      const row = await boxOf(pill.locator('xpath=..'))
+      expect(box.y).toBeGreaterThanOrEqual(row.y)
+      expect(box.y + box.height).toBeLessThanOrEqual(row.y + row.height)
+      // "Latest now", the badge, the delay, and at least ten characters of the stop's name: on
+      // the pill's line where they fit, else on a second line of its own.
+      await expectPillWhole(pill, words.now, '250S', 10)
+      // The stop's long name is cut by an ellipsis past what its line holds.
+      const where = pill.locator('[data-latest-where]')
+      await expect(where).toHaveText(new RegExp(`^${words.at} Hillerødmotorvejen, Tingbjerg`))
+      expect(await where.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(
+        true,
+      )
+      expect(await where.evaluate((element) => getComputedStyle(element).textOverflow)).toBe(
+        'ellipsis',
+      )
+      // The Overview sheet starts below the header, the pill's taller row included.
+      await expectBelowHeader(
+        page,
+        page.getByRole('dialog', { name: WORDS[lang].overview }).getByRole('heading', {
+          name: WORDS[lang].overview,
+        }),
+      )
     })
-    await expect(pill).toBeVisible()
-    // Under the bar's first row, and inside the screen.
-    const about = await boxOf(page.getByRole('button', { name: 'About Mylder' }))
-    const box = await boxOf(pill)
-    expect(box.y).toBeGreaterThanOrEqual(about.y + about.height)
-    expect(box.x).toBeGreaterThanOrEqual(0)
-    expect(box.x + box.width).toBeLessThanOrEqual(width)
-    // A phone's row is as wide as the screen allows: the start of the stop's name still shows.
-    await expectPillWhole(pill, 'Latest now', '250S', 5)
-    // The stop's name is cut by an ellipsis.
-    const where = pill.locator('[data-latest-where]')
-    await expect(where).toHaveText(/^at Hillerødmotorvejen, Tingbjerg/)
-    expect(await where.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
-    expect(await where.evaluate((element) => getComputedStyle(element).textOverflow)).toBe(
-      'ellipsis',
-    )
-  })
+  }
 }
+
+/** Whether the stop's words sit on a line of their own under "Latest now" in the pill. */
+const whereWrapped = async (pill: Locator, now: string) =>
+  (await boxOf(pill.locator('[data-latest-where]'))).y >=
+  (await boxOf(pill.getByText(now, { exact: true }))).y +
+    (await boxOf(pill.getByText(now, { exact: true }))).height
+
+test('on a 412 px phone in English the pill keeps its stop on its one line', async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 800 })
+  await onSavedMinute(page, longStopLatest)
+  await page.goto(`${UPDATES_URL}/en`)
+  const pill = page
+    .getByRole('banner')
+    .getByRole('button', { name: new RegExp(`^${PHONE.en.name}`) })
+  await expect(pill).toBeVisible()
+  expect(await whereWrapped(pill, PHONE.en.now)).toBe(false)
+  expect(await visibleStopCharacters(pill)).toBeGreaterThanOrEqual(10)
+})
+
+test('on a 360 px phone in Danish the pill puts its stop on a second line', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 })
+  await onSavedMinute(page, longStopLatest)
+  await page.goto(`${UPDATES_URL}/da`)
+  const pill = page
+    .getByRole('banner')
+    .getByRole('button', { name: new RegExp(`^${PHONE.da.name}`) })
+  await expect(pill).toBeVisible()
+  expect(await whereWrapped(pill, PHONE.da.now)).toBe(true)
+})
 
 const WORDS = {
   en: {

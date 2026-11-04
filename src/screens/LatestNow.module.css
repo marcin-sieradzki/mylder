@@ -55,3 +55,26 @@
   padding-block: var(--perron-space-100);
   padding-inline: var(--perron-space-200);
 }
+
+/* On its row, where the bar's room rule doesn't hold, the stop keeps "at " and about ten of its
+   characters (16ch, an ellipsis's room included) on the pill's line, and where that much won't
+   fit, it moves onto a second line of its own and takes the pill's whole width there, cut with an
+   ellipsis only beyond it. One line wherever it fits. */
+.row .content {
+  flex-wrap: wrap;
+  row-gap: var(--perron-space-050);
+}
+
+.row .content > .where {
+  flex: 1 1 16ch;
+  max-inline-size: max-content;
+}
+
+/* Perron's Button is one line tall; on its row, the pill grows a second line for its stop, its
+   padding keeping the lines off its edge. A stand-in for a Button whose label may take a second
+   line: goes when Perron's Button has it. perron-stand-in: perron#TBD */
+.row .pill {
+  block-size: auto;
+  min-block-size: var(--perron-size-button-sm);
+  padding-block: var(--perron-space-100);
+}
