@@ -1,7 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { followStore } from './follow.ts'
-import { groundLens } from './highlight.ts'
-import { flyOnto, spotlightStore, type FlightMap } from './spotlight.ts'
+import { groundLens, type Floating } from './highlight.ts'
+import {
+  flyOnto,
+  flyToTrip,
+  spotlightStore,
+  type FlightCamera,
+  type FlightMap,
+} from './spotlight.ts'
 import { mapView, openPanel } from './view.ts'
 
 // The spotlight, from the Latest now pill (docs/screens.md, "Latest now"): which trip it rings,
@@ -165,5 +171,231 @@ describe('the flight to a trip', () => {
     const { map } = mapAt(1280, 800, 12)
     flyOnto(map, { width: 1280, height: 800 }, BUS_AT, { top: 70 }, follow)
     expect(follow.get()).toBeUndefined()
+  })
+})
+
+/**
+ * A map `width` by `height` whose camera goes straight to where a move aims and stays moving
+ * until the test brings it to rest, as MapLibre's does at a move's end, flat and north-up.
+ */
+function flyingMap(width: number, height: number, zoom: number, moving = false) {
+  const camera = { centre: [12.565, 55.68] as [number, number], zoom, moving }
+  const handlers = new Map<string, Set<(event: object) => void>>()
+  const emit = (type: string, event: object = {}) => {
+    for (const handler of handlers.get(type) ?? []) handler(event)
+  }
+  const moves: { kind: 'fly' | 'ease'; duration?: number }[] = []
+  const move = (kind: 'fly' | 'ease') => (options: object) => {
+    const {
+      center,
+      zoom: to,
+      duration,
+    } = options as {
+      center: [number, number]
+      zoom?: number
+      duration?: number
+    }
+    moves.push({ kind, ...(duration === undefined ? {} : { duration }) })
+    // A move under way ends, at its moveend, as MapLibre stops it for the new one.
+    if (camera.moving) {
+      camera.moving = false
+      emit('moveend')
+    }
+    camera.centre = center
+    camera.zoom = to ?? camera.zoom
+    camera.moving = true
+    emit('movestart')
+    return map as never
+  }
+  const lens = () =>
+    groundLens({ width, height, pitch: 0, bearing: 0, fov: FOV })({
+      centre: camera.centre,
+      zoom: camera.zoom,
+    })
+  const map: FlightCamera = {
+    flyTo: move('fly'),
+    easeTo: move('ease'),
+    getZoom: () => camera.zoom,
+    getPitch: () => 0,
+    getBearing: () => 0,
+    getVerticalFieldOfView: () => FOV,
+    getCenter: () => ({ lng: camera.centre[0], lat: camera.centre[1] }) as never,
+    project: (point) => lens().project(point as [number, number]) as never,
+    isMoving: () => camera.moving,
+    on: ((type: string, handler: (event: object) => void) => {
+      if (!handlers.has(type)) handlers.set(type, new Set())
+      handlers.get(type)!.add(handler)
+      return map
+    }) as never,
+    off: ((type: string, handler: (event: object) => void) => {
+      handlers.get(type)?.delete(handler)
+      return map
+    }) as never,
+  }
+  /** The camera comes to rest where the move aimed. */
+  const rest = () => {
+    camera.moving = false
+    emit('moveend')
+  }
+  /** Where `point` is drawn now. */
+  const drawn = (point: [number, number]) => lens().project(point)
+  return { map, moves, rest, emit, drawn }
+}
+
+/** The bus a snapshot moved 2 km on up Nørrebrogade while the camera flew to where it was. */
+const MOVED: [number, number] = [12.5345, 55.7085]
+
+describe('the flight to a trip, as snapshots land', () => {
+  const area = { width: 1280, height: 800 }
+  const floating: Floating = { top: 122 }
+  /** Expects `at` in the room clear of the header, the Overview sheet and the panel, at 1280. */
+  const expectClear = (at: { x: number; y: number }) => {
+    expect(at.x).toBeGreaterThan(388 + 24)
+    expect(at.x).toBeLessThan(904 - 24)
+    expect(at.y).toBeGreaterThan(122 + 24)
+    expect(at.y).toBeLessThan(800 - 24)
+  }
+  /** A flight to the bus at `BUS_AT`, its dot where `where` says, and a snapshot to land. */
+  function flying(follow = followStore(), moving = false) {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] })
+    const camera = flyingMap(area.width, area.height, 11.2, moving)
+    let where: [number, number] = BUS_AT
+    const landings = new Set<() => void>()
+    const end = flyToTrip(
+      camera.map,
+      BUS,
+      {
+        whereIs: (key) => (key === BUS ? where : undefined),
+        area: () => area,
+        floating: () => floating,
+        onLanding: (heard) => {
+          landings.add(heard)
+          return () => landings.delete(heard)
+        },
+      },
+      follow,
+    )
+    const moveTo = (to: [number, number]) => (where = to)
+    /** A snapshot lands and moves the dot to `to`. */
+    const land = (to: [number, number]) => {
+      moveTo(to)
+      for (const heard of landings) heard()
+    }
+    return { ...camera, end, land, moveTo, follow }
+  }
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('re-aims with a short ease when a snapshot moves the dot mid-flight', () => {
+    const flight = flying()
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(1_000)
+    expect(flight.moves).toHaveLength(2)
+    expect(flight.moves[1].kind).toBe('ease')
+    expect(flight.moves[1].duration).toBeLessThanOrEqual(800)
+    flight.rest()
+    vi.advanceTimersByTime(1_000)
+    expectClear(flight.drawn(MOVED))
+    // Landed in the room, it moves the camera no more.
+    expect(flight.moves).toHaveLength(2)
+  })
+
+  it('waits for the dot to reach its new place, when a snapshot lands just before the camera rests', () => {
+    const flight = flying()
+    // The dot eases from where it was to the snapshot's place over a second.
+    flight.land([12.5428, 55.7016])
+    vi.advanceTimersByTime(700)
+    flight.rest()
+    vi.advanceTimersByTime(100)
+    // Not looked at yet: the dot reaches the snapshot's place a second after it landed.
+    expect(flight.moves).toHaveLength(1)
+    flight.moveTo(MOVED)
+    vi.advanceTimersByTime(200)
+    flight.rest()
+    vi.advanceTimersByTime(1_000)
+    expect(flight.moves.map((move) => move.kind)).toEqual(['fly', 'ease'])
+    expectClear(flight.drawn(MOVED))
+  })
+
+  it('moves the camera no more when the dot lands in the room', () => {
+    const flight = flying()
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
+    expectClear(flight.drawn(BUS_AT))
+  })
+
+  it('does not chase the dot once landed: that is Follow', () => {
+    const flight = flying()
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
+  })
+
+  it('lets the rider have the map once they touch it, or move it otherwise, mid-flight', () => {
+    for (const take of [
+      (flight: ReturnType<typeof flying>) => flight.emit('mousedown'),
+      (flight: ReturnType<typeof flying>) => {
+        // An arrow key's pan takes over: the flight's move ends, then the pan's starts.
+        flight.rest()
+        flight.emit('movestart')
+      },
+    ]) {
+      const flight = flying()
+      flight.land(MOVED)
+      take(flight)
+      flight.rest()
+      vi.advanceTimersByTime(2_000)
+      expect(flight.moves).toEqual([{ kind: 'fly' }])
+      flight.end()
+    }
+  })
+
+  it('leaves the camera to Follow, started during the flight', () => {
+    const follow = followStore()
+    openPanel({ kind: 'trip', id: BUS })
+    const flight = flying(follow)
+    follow.start(BUS)
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
+  })
+
+  it('re-aims a few times at most, however often the dot moves on', () => {
+    const flight = flying()
+    for (let i = 0; i < 6; i++) {
+      flight.land(i % 2 === 0 ? MOVED : BUS_AT)
+      flight.rest()
+      vi.advanceTimersByTime(1_000)
+      // Each landing moves the dot away from where the last ease aimed.
+      flight.land(i % 2 === 0 ? BUS_AT : MOVED)
+    }
+    expect(flight.moves.filter((move) => move.kind === 'ease').length).toBeLessThanOrEqual(3)
+  })
+
+  it('takes off while another move is under way, whose end is not its own', () => {
+    // Such as the inertia of the rider's last drag, which the flight stops.
+    const flight = flying(followStore(), true)
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(1_000)
+    expect(flight.moves.map((move) => move.kind)).toEqual(['fly', 'ease'])
+  })
+
+  it('ends when asked, as a new flight starts', () => {
+    const flight = flying()
+    flight.end()
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
   })
 })

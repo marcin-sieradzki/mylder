@@ -6,10 +6,11 @@
 // frame. A new highlight ends Follow and fits the camera to it, clear of the top bar, the notices
 // and the legend the screen hands it, moving only the centre and zoom, so a tilted, turned map
 // keeps its tilt and heading, as it does under Follow; a flight to a trip from the Latest now pill
-// lands its dot clear of the same (spotlight.ts). The map lives outside React: React only names the
-// canvas, and the screen's controls move it through the camera (camera.ts). The address keeps its
-// heading and tilt too, so a link opens in 3D. Its tilt and heading at rest are on its container as
-// `data-tilt` and `data-heading`, for tests.
+// lands its dot clear of the same, the panel included, wherever a snapshot moves it meanwhile
+// (spotlight.ts). The map lives outside React: React only names the canvas, and the screen's
+// controls move it through the camera (camera.ts). The address keeps its heading and tilt too, so a
+// link opens in 3D. Its tilt and heading at rest are on its container as `data-tilt` and
+// `data-heading`, for tests.
 import 'client-only'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Map as MapLibreMap, setWorkerUrl } from 'maplibre-gl'
@@ -20,7 +21,7 @@ import { followedVehicle } from './follow.ts'
 import { fitPadding, fitPlace, groundLens, mapHighlight, type Floating } from './highlight.ts'
 import { vehicleOverlay } from './overlay.ts'
 import { sheetPeek } from './peek.ts'
-import { flyOnto, vehicleFlight } from './spotlight.ts'
+import { flyToTrip, vehicleFlight } from './spotlight.ts'
 import { readPaint, watchTheme } from './paint.ts'
 import { basemapStyle, paintTokens } from './style/basemap.ts'
 import { barImage } from './style/stations.ts'
@@ -148,12 +149,16 @@ export default function BaseMap({ label, className, top, foot }: BaseMapProps) {
       created.flyTo({ center: place.centre, zoom: place.zoom })
     })
     // A flight to a trip, from the Latest now pill, lands its dot clear of what floats over the
-    // map, the panel it opened included.
+    // map, the panel it opened included, aiming again if a snapshot moves the dot meanwhile; a new
+    // flight ends the one before.
+    let flight: (() => void) | undefined
     const stopFlying = vehicleFlight.subscribe((key) => {
-      const point = vehicles.whereIs(key)
-      if (!point) return
-      const area = { width: element.clientWidth, height: element.clientHeight }
-      flyOnto(created, area, point, floating(element))
+      flight?.()
+      flight = flyToTrip(created, key, {
+        whereIs: (trip) => vehicles.whereIs(trip),
+        area: () => ({ width: element.clientWidth, height: element.clientHeight }),
+        floating: () => floating(element),
+      })
     })
     timetables.current().then(
       (loaded) => {
@@ -173,6 +178,7 @@ export default function BaseMap({ label, className, top, foot }: BaseMapProps) {
       stopFollowing()
       stopHighlighting()
       stopFlying()
+      flight?.()
       stopWatching()
       vehicles.remove()
       detachCamera()
