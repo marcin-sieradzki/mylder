@@ -6,7 +6,7 @@ import type { ClientDictionary } from '../i18n/dictionary'
 import { useI18n } from '../i18n/useI18n'
 import { useSnapshot } from '../map/live'
 import { timezoneOf, useNetwork } from '../map/timetable'
-import { openPanel } from '../map/view'
+import { spotlightTrip } from '../map/spotlight'
 import { whereOf, type Where } from '../map/where'
 import type { Network } from '../timetable/network'
 import { clockTime } from '../timetable/time'
@@ -64,7 +64,7 @@ interface StandoutProps extends PillProps {
 /**
  * The latest trip, "Latest now [5C] +11 min at Nørrebros Runddel", the stop it is at or last
  * passed, heard with the stops it is between; a press opens its vehicle panel, as a tap on its
- * dot does.
+ * dot does, flies the map to its dot and rings it with the spotlight.
  */
 function Standout({ ranked, snapshot, network, words, room, pillRef }: StandoutProps) {
   const { trip, delay } = ranked
@@ -91,7 +91,7 @@ function Standout({ ranked, snapshot, network, words, room, pillRef }: StandoutP
         minutes: wholeMinutes(delay),
         where: heard,
       })}
-      onClick={() => openPanel({ kind: 'trip', id: trip.key })}
+      onClick={() => spotlightTrip(trip.key)}
     >
       <span className={styles.content}>
         <span>{words.now}</span>

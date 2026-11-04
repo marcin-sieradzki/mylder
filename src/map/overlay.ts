@@ -76,6 +76,11 @@ function stopAt(map: MapLibreMap, x: number, y: number): string | undefined {
 }
 
 export interface VehicleOverlay {
+  /**
+   * Where the trip `key`'s dot is drawn now, as longitude and latitude, or, where it isn't drawn,
+   * as when a filter hides its mode, where the snapshot put it; none for a trip not in it.
+   */
+  whereIs(key: string): [number, number] | undefined
   /** Reads Perron's paint again, after the theme changed. */
   repaint(): void
   remove(): void
@@ -361,6 +366,12 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
   map.on('resize', onResize)
 
   return {
+    whereIs(key) {
+      const i = vehicles?.keys.indexOf(key) ?? -1
+      if (vehicles && i >= 0) return [vehicles.positions[i * 2], vehicles.positions[i * 2 + 1]]
+      const trip = liveSnapshot.get().snapshot?.trips.find((each) => each.key === key)
+      return trip && [trip.position[1], trip.position[0]]
+    },
     repaint() {
       lookOfAircraft = undefined
       spotlightLook = undefined

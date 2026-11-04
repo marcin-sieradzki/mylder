@@ -5,7 +5,8 @@
 // the address names and keeps where it was left in the address (`view.ts`), except while Follow
 // moves it each frame. A new highlight ends Follow and fits the camera to it, clear of the top bar,
 // the notices and the legend the screen hands it, moving only the centre and zoom, so a tilted,
-// turned map keeps its tilt and heading, as it does under Follow. The map lives outside React:
+// turned map keeps its tilt and heading, as it does under Follow; a flight to a trip from the
+// Latest now pill lands its dot clear of the same (spotlight.ts). The map lives outside React:
 // React only names the canvas, and the screen's controls move it through the camera (camera.ts).
 // The address keeps its heading and tilt too, so a link opens in 3D. Its tilt and heading at rest are on its
 // container as `data-tilt` and `data-heading`, for tests.
@@ -19,6 +20,7 @@ import { followedVehicle } from './follow.ts'
 import { fitPadding, fitPlace, groundLens, mapHighlight, type Floating } from './highlight.ts'
 import { vehicleOverlay } from './overlay.ts'
 import { sheetPeek } from './peek.ts'
+import { flyOnto, vehicleFlight } from './spotlight.ts'
 import { readPaint, watchTheme } from './paint.ts'
 import { basemapStyle, paintTokens } from './style/basemap.ts'
 import { barImage } from './style/stations.ts'
@@ -145,6 +147,14 @@ export default function BaseMap({ label, className, top, foot }: BaseMapProps) {
       followedVehicle.stop()
       created.flyTo({ center: place.centre, zoom: place.zoom })
     })
+    // A flight to a trip, from the Latest now pill, lands its dot clear of what floats over the
+    // map, the panel it opened included.
+    const stopFlying = vehicleFlight.subscribe((key) => {
+      const point = vehicles.whereIs(key)
+      if (!point) return
+      const area = { width: element.clientWidth, height: element.clientHeight }
+      flyOnto(created, area, point, floating(element))
+    })
     timetables.current().then(
       (loaded) => {
         if (disposed) return
@@ -162,6 +172,7 @@ export default function BaseMap({ label, className, top, foot }: BaseMapProps) {
       stopGestures()
       stopFollowing()
       stopHighlighting()
+      stopFlying()
       stopWatching()
       vehicles.remove()
       detachCamera()

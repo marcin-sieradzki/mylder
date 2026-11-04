@@ -7,6 +7,7 @@ import da from '../i18n/da.json'
 import en from '../i18n/en.json'
 import type { Lang } from '../i18n/lang'
 import { liveSnapshot } from '../map/live'
+import { vehicleSpotlight } from '../map/spotlight'
 import { openPanel } from '../map/view'
 import type { Snapshot, SnapshotTrip, TripDetail, TripMessage } from '../tracker/index'
 import { MapScreen } from './MapScreen'
@@ -149,6 +150,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  act(() => vehicleSpotlight.clear())
   act(() => openPanel(undefined))
   liveSnapshot.update({ snapshot: undefined })
   vi.unstubAllGlobals()
@@ -405,6 +407,21 @@ describe("a vehicle's detail from its trip's detail", () => {
       'aria-pressed',
       'true',
     )
+  })
+
+  it('moves the spotlight with the vehicle opened once a snapshot files it under another trip', async () => {
+    answers.set(A_LATER, { ...saved(A_LIVE), key: A_LATER })
+    openTrip('en', A_LIVE)
+    await panel(/to Hillerød St\./, 'Reported by the vehicle; seen 07:21:00')
+    // Rung, as the Latest now pill rings the trip it opens.
+    act(() => vehicleSpotlight.ring(A_LIVE))
+    const journeyOf = (key: string) => minute2.trips.find((each) => each.key === key)!.journey
+    const refiled = withTrip(withTrip(minute2, A_LIVE, { journey: journeyOf(A_LATER) }), A_LATER, {
+      journey: journeyOf(A_LIVE),
+    })
+    act(() => liveSnapshot.update({ snapshot: { ...refiled }, clockOffset: 0 }))
+    expect(window.location.search).toBe(`?trip=${A_LATER}`)
+    expect(vehicleSpotlight.get()).toBe(A_LATER)
   })
 
   it('keeps to the vehicle opened when its journey has no number, which another trip may share', async () => {

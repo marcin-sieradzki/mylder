@@ -2,12 +2,13 @@
 
 import { FilterChip, IconButton } from '@mylder/perron'
 import { TopBar as PerronTopBar } from '@mylder/perron/patterns'
-import { useRef, type MouseEvent } from 'react'
+import { useEffect, useRef, type MouseEvent } from 'react'
 import { useI18n } from '../i18n/useI18n'
 import { useAircraftOff } from '../map/aircraft'
 import { useAircraftCount } from '../map/aircraft-states'
 import { useLastAnswer, useSnapshot } from '../map/live'
 import { useOutOfDate, usePaused } from '../map/notices'
+import { vehicleSpotlight } from '../map/spotlight'
 import { timezoneOf, useNetwork } from '../map/timetable'
 import { mapView, useAircraftHidden, useHiddenModes } from '../map/view'
 import { MODES, type Mode } from '../timetable/format'
@@ -71,6 +72,12 @@ export function TopBar() {
   const timezone = timezoneOf(network)
   const phone = usePhone()
   const latest = useLatest()
+  // The spotlight rings a trip only while the pill names one: once no trip is 3 min late, the
+  // delays stop coming or none is known, it goes, and the panel stays open.
+  const standout = latest?.kind === 'standout'
+  useEffect(() => {
+    if (!standout) vehicleSpotlight.clear()
+  }, [standout])
   const header = useRef<HTMLElement>(null)
   const identity = useRef<HTMLDivElement>(null)
   const filters = useRef<HTMLFieldSetElement>(null)

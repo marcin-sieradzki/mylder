@@ -525,3 +525,24 @@ describe('the spotlight on the map', () => {
     expect(container.dataset.spotlight).toBeUndefined()
   })
 })
+
+describe("where a trip's dot is, for a flight to it", () => {
+  it('is where the dot is drawn this frame, else where the snapshot put a trip a filter hides', async () => {
+    motionPause.set(true)
+    const container = document.createElement('div')
+    overlay = vehicleOverlay(map, container)
+    liveSnapshot.update({ snapshot: minute6 })
+    await vi.waitFor(() => expect(container.dataset.vehicles).toBe('18'))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const train = minute6.trips.find((trip) => trip.mode === 's-tog' && !trip.cancelled)!
+    const i = minute6.trips.filter((trip) => !trip.cancelled).indexOf(train)
+    const positions = (rendered.layers as Drawn[]).find((each) => each.id === 'vehicles')!.props
+      .data.attributes!.getPosition.value as Float64Array
+    expect(overlay.whereIs(train.key)).toEqual([positions[i * 2], positions[i * 2 + 1]])
+    const bus = minute6.trips.find((trip) => trip.mode === 'bus' && !trip.cancelled)!
+    mapView.update({ hidden: new Set(['bus']) })
+    await vi.waitFor(() => expect(container.dataset.vehicles).toBe('11'))
+    expect(overlay.whereIs(bus.key)).toEqual([bus.position[1], bus.position[0]])
+    expect(overlay.whereIs('bus.0.0.20260616.0000')).toBeUndefined()
+  })
+})

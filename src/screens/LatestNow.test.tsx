@@ -8,6 +8,7 @@ import en from '../i18n/en.json'
 import type { Lang } from '../i18n/lang'
 import { PHONE_QUERY } from '../map/highlight'
 import { liveSnapshot } from '../map/live'
+import { vehicleFlight, vehicleSpotlight } from '../map/spotlight'
 import { openPanel } from '../map/view'
 import { timetableRoutesOf } from '../test/timetableRoutes'
 import type { Snapshot, SnapshotTrip } from '../tracker/index'
@@ -106,6 +107,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  act(() => vehicleSpotlight.clear())
   act(() => openPanel(undefined))
   act(() => liveSnapshot.update({ snapshot: undefined, clockOffset: 0 }))
   vi.unstubAllGlobals()
@@ -249,4 +251,84 @@ describe('the Latest now pill', () => {
     expect(bar.compareDocumentPosition(pill) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(pill.parentElement).toHaveClass('pn-Surface')
   })
+})
+
+describe('a press on the pill', () => {
+  /** The flights the map is asked for, by their trips' keys, from now on. */
+  const flights = () => {
+    const asked: string[] = []
+    const stop = vehicleFlight.subscribe((key) => asked.push(key))
+    return { asked, stop }
+  }
+  const press = () =>
+    fireEvent.click(within(banner()).getByRole('button', { name: /^Biggest delay right now:/ }))
+
+  it('flies the map to the named trip and rings its dot', async () => {
+    await open('en')
+    const { asked, stop } = flights()
+    press()
+    expect(asked).toEqual([LATEST])
+    expect(vehicleSpotlight.get()).toBe(LATEST)
+    stop()
+  })
+
+  it('keeps the camera and the ring on the picked trip when the next snapshot names another', async () => {
+    await open('en')
+    const { asked, stop } = flights()
+    press()
+    const next: Snapshot = {
+      ...minute2,
+      trips: minute2.trips.map((trip): SnapshotTrip =>
+        trip.key === LATEST ? { ...trip, delay: 60 } : trip,
+      ),
+    }
+    act(() => liveSnapshot.update({ snapshot: next, clockOffset: 0 }))
+    expect(
+      within(banner()).getByRole('button', { name: /^Biggest delay right now: 144 to/ }),
+    ).toBeInTheDocument()
+    expect(vehicleSpotlight.get()).toBe(LATEST)
+    expect(asked).toEqual([LATEST])
+    expect(new URLSearchParams(window.location.search).get('trip')).toBe(LATEST)
+    stop()
+  })
+
+  it('rings the trip it names then, pressed again', async () => {
+    await open('en')
+    press()
+    const next: Snapshot = {
+      ...minute2,
+      trips: minute2.trips.map((trip): SnapshotTrip =>
+        trip.key === LATEST ? { ...trip, delay: 60 } : trip,
+      ),
+    }
+    act(() => liveSnapshot.update({ snapshot: next, clockOffset: 0 }))
+    press()
+    expect(vehicleSpotlight.get()).toBe('bus.144.bc5239a3e3.20261031.0815')
+  })
+
+  it('takes the ring off when the panel closes', async () => {
+    await open('en')
+    press()
+    const panel = await screen.findByRole('dialog', { name: /to Hillerød/ })
+    fireEvent.click(within(panel).getByRole('button', { name: 'Close' }))
+    expect(new URLSearchParams(window.location.search).get('trip')).toBeNull()
+    expect(vehicleSpotlight.get()).toBeUndefined()
+  })
+
+  for (const [state, next] of [
+    ['calm', () => calm(120)],
+    ['quiet', () => ({ ...minute2, fetched: minute2.updates.lastMessage! + 5 * 60_000 })],
+    ['none', () => metroOnly],
+  ] as const) {
+    it(`takes the ring off once the pill turns ${state}, the panel left open`, async () => {
+      await open('en')
+      press()
+      const after = next()
+      vi.setSystemTime(after.fetched)
+      act(() => liveSnapshot.update({ snapshot: after, clockOffset: 0 }))
+      expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
+      expect(vehicleSpotlight.get()).toBeUndefined()
+      expect(new URLSearchParams(window.location.search).get('trip')).toBe(LATEST)
+    })
+  }
 })
