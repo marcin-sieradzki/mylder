@@ -1,0 +1,2 @@
+CALM {"text":"Mest forsinket nu højst 0 min English Om Mylder","max":0,"known":6,"aria":"- banner:\n  - link \"Mylder\":\n    - /url: /da\n  - time: Opdateret 07:20:00\n  - group \"Filtre\":\n    - button \"S-tog 5\" [pressed]\n    - button \"Tog 0\" [pressed]\n    - button \"Fly 8\" [pressed]\n  - paragraph: Mest forsinket nu højst 0 min\n  - navigation \"Sprog\":\n    - link \"English\":\n      - /url: /en\n  - button \"Om Mylder\""}
+PASS latest-calm-da: 2 steps in .verify/branch-238-r3-crowded/latest-calm-da/

@@ -1,0 +1,2 @@
+ROWS [{"tag":"en 412px","inBar":false,"barH":90,"headerB":176,"pill":[29,127,334],"toolsTop":19,"brandTop":17,"vis":20,"name":"Nyvej (Vridsløsevej)","truncated":false,"secondLine":false,"whereText":"at Nyvej (Vridsløsevej)","pillH":32},{"tag":"en 360px","inBar":false,"barH":90,"headerB":195,"pill":[29,127,302],"toolsTop":19,"brandTop":17,"vis":20,"name":"Nyvej (Vridsløsevej)","truncated":false,"secondLine":true,"whereText":"at Nyvej (Vridsløsevej)","pillH":51}]
+PASS latest-layout-phone: 6 steps in .verify/branch-238-r3-siri-et/latest-layout-phone/

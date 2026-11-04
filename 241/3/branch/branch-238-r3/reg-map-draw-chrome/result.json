@@ -1,0 +1,7 @@
+{
+  "journey": "reg-map-draw-chrome",
+  "pass": true,
+  "steps": [
+    "01-map-and-chrome: map and chrome (http://localhost:4306/en)"
+  ]
+}

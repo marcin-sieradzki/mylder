@@ -1,0 +1,14 @@
+{
+  "journey": "latest-sample2-en",
+  "pass": true,
+  "steps": [
+    "01-en-360px-pill-on-its-row: en 360px pill on its row (http://localhost:4307/en)",
+    "02-en-412px-pill-on-its-row: en 412px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "03-en-800px-pill-on-its-row: en 800px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "04-en-1000px-pill-on-its-row: en 1000px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "05-en-1100px-pill-on-its-row: en 1100px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "06-en-1280px-pill-on-its-row: en 1280px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "07-en-1440px-pill-in-bar: en 1440px pill in bar (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "08-en-1920px-pill-in-bar: en 1920px pill in bar (http://localhost:4307/en?map=10.40/55.68000/12.56500)"
+  ]
+}

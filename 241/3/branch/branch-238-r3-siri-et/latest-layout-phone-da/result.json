@@ -1,0 +1,12 @@
+{
+  "journey": "latest-layout-phone-da",
+  "pass": true,
+  "steps": [
+    "01-da-412px-pill-on-its-row: da 412px pill on its row (http://localhost:4307/da)",
+    "02-da-412px-trip-panel-and-whole-line: da 412px trip panel and whole line (http://localhost:4307/da?trip=bus.144.bc5239a3e3.20261031.0815&map=9.89/55.69838/12.34783)",
+    "03-da-412px-stop-panel: da 412px stop panel (http://localhost:4307/da?stop=6584)",
+    "04-da-360px-pill-on-its-row: da 360px pill on its row (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "05-da-360px-trip-panel-and-whole-line: da 360px trip panel and whole line (http://localhost:4307/da?map=9.89/55.69838/12.34783&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "06-da-360px-stop-panel: da 360px stop panel (http://localhost:4307/da?stop=6584)"
+  ]
+}

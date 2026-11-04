@@ -1,0 +1,3 @@
+DIS {"w":1000,"headerBottom":132,"chipTop":213,"sheetTop":144,"url":"http://localhost:4306/en?tab=disruptions&map=15.00/55.66928/12.58214"}
+DIS {"w":1440,"headerBottom":58,"chipTop":139,"sheetTop":70,"url":"http://localhost:4306/en?tab=disruptions&map=15.00/55.66915/12.58213"}
+PASS reg-dis-show: 7 steps in .verify/branch-238-r3/reg-dis-show/

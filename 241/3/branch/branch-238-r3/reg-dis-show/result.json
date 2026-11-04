@@ -1,0 +1,13 @@
+{
+  "journey": "reg-dis-show",
+  "pass": true,
+  "steps": [
+    "01-1000px-disruptions: 1000px disruptions (http://localhost:4306/en?tab=disruptions)",
+    "02-1000px-show-on-map-5c: 1000px show on map 5C (http://localhost:4306/en?tab=disruptions&map=15.00/55.66928/12.58214)",
+    "03-1000px-cleared: 1000px cleared (http://localhost:4306/en?tab=disruptions&map=15.00/55.66928/12.58214)",
+    "04-1440px-disruptions: 1440px disruptions (http://localhost:4306/en?tab=disruptions)",
+    "05-1440px-show-on-map-5c: 1440px show on map 5C (http://localhost:4306/en?tab=disruptions&map=15.00/55.66915/12.58213)",
+    "06-1440px-cleared: 1440px cleared (http://localhost:4306/en?tab=disruptions&map=15.00/55.66915/12.58213)",
+    "07-switched-to-danish: switched to Danish (http://localhost:4306/da?tab=disruptions&map=15.00/55.66915/12.58213)"
+  ]
+}

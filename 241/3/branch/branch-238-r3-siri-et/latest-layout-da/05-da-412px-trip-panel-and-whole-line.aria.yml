@@ -1,0 +1,625 @@
+- main:
+  - region "Livekort over København"
+- banner:
+  - link "Mylder":
+    - /url: /da
+  - time: Opdateret 09:03:10
+  - group "Filtre":
+    - button "Bus 351" [pressed]
+    - button "Metro 37" [pressed]
+    - button "S-tog 27" [pressed]
+    - button "Tog 66" [pressed]
+    - button "Letbane 20" [pressed]
+    - button "Fly 9" [pressed]
+  - navigation "Sprog":
+    - link "English":
+      - /url: /en?map=9.89/55.69838/12.34783&trip=bus.144.bc5239a3e3.20261031.0815
+  - button "Om Mylder"
+  - 'button "Største forsinkelse lige nu: 144 mod Vallensbæk St., 25 min forsinket, mellem Porsager (Herstedvestervej) og Hvidager (Herstedvestervej)"': Mest forsinket nu 144 25 min forsinket ved Porsager (Herstedvestervej)
+- status: "Fly: optagne data fra adsb.lol."
+- list "Datatilstande":
+  - listitem: Live
+  - listitem: Ældre
+  - listitem: Beregnet
+  - listitem: Kun køreplan
+  - listitem: Intet signal
+  - listitem: Fly
+- text: Målestok 3 km
+- toolbar "Kortknapper":
+  - button "Zoom ind"
+  - button "Zoom ud"
+  - separator
+  - button "Centrér kortet"
+  - separator
+  - button "Pause"
+- text: "Trafikdata:"
+- link "Rejseplanen":
+  - /url: https://www.rejseplanen.dk/
+- text: (
+- link "CC BY 4.0":
+  - /url: https://creativecommons.org/licenses/by/4.0/
+- text: ") · Forsinkelser: Rejsekort & Rejseplan A/S · Fly:"
+- link "© adsb.lol-bidragydere":
+  - /url: https://adsb.lol/
+- text: under
+- link "ODbL":
+  - /url: https://opendatacommons.org/licenses/odbl/
+- text: ·
+- link "© OpenStreetMap-bidragydere":
+  - /url: https://www.openstreetmap.org/copyright
+- text: ·
+- link "© OpenMapTiles":
+  - /url: https://openmaptiles.org/
+- text: ·
+- link "OpenFreeMap":
+  - /url: https://openfreemap.org/
+- dialog "Overblik":
+  - heading "Overblik" [level=2]
+  - button "Luk"
+  - tablist "Overblik":
+    - tab "Byens puls" [selected]
+    - tab "Køretøjer 567"
+    - tab "Driftsforstyrrelser"
+  - tabpanel "Byens puls":
+    - group "I bevægelse":
+      - text: I bevægelse 501
+      - paragraph: af 567 i drift
+    - group "Meldt i dette minut":
+      - text: Meldt i dette minut Ukendt
+      - paragraph: Ingen livepositioner endnu; placeret efter køreplanen
+    - group "Gennemsnitlig forsinkelse":
+      - text: Gennemsnitlig forsinkelse +1,0
+      - paragraph: min, køretøjer med kendt forsinkelse, Metro udeladt
+    - paragraph:
+      - text: Køreplan ·
+      - time: placeret 09:03:10
+    - list "På kortet nu":
+      - listitem: Live 0
+      - listitem: Ældre 0
+      - listitem: Beregnet 346
+      - listitem: Kun køreplan 221
+      - listitem: Intet signal 0
+    - region "I bevægelse, efter transportform":
+      - heading "I bevægelse, efter transportform" [level=3]
+      - term: Bus
+      - definition: "351"
+      - term: Metro
+      - definition: "37"
+      - term: S-tog
+      - definition: "27"
+      - term: Tog
+      - definition: "66"
+      - term: Letbane
+      - definition: "20"
+    - region "Med forsinkelser, efter transportform":
+      - heading "Med forsinkelser, efter transportform" [level=3]
+      - meter "Bus": Bus x
+      - paragraph: 310/397 · Movia
+      - meter "Metro": Metro x
+      - paragraph: Ingen realtid fra Metroen; placeret efter køreplanen
+      - meter "S-tog": S-tog x
+      - paragraph: 15/30 · DSB
+      - meter "Tog": Tog x
+      - paragraph: 21/72 · DSB
+      - meter "Letbane": Letbane x
+      - paragraph: Rejseplanen sender ingen forsinkelser for denne transportform; placeret efter køreplanen
+    - region "Melder live, efter transportform":
+      - heading "Melder live, efter transportform" [level=3]
+      - meter "Bus": Bus x
+      - paragraph: Ingen livepositioner endnu; placeret efter køreplanen
+      - meter "Metro": Metro x
+      - paragraph: Ingen realtid fra Metroen; placeret efter køreplanen
+      - meter "S-tog": S-tog x
+      - paragraph: Ingen livepositioner endnu; placeret efter køreplanen
+      - meter "Tog": Tog x
+      - paragraph: Ingen livepositioner endnu; placeret efter køreplanen
+      - meter "Letbane": Letbane x
+      - paragraph: Ingen livepositioner endnu; placeret efter køreplanen
+    - status
+    - figure "Køretøjer i drift i dag Planlagt, ud fra dagens køreplan":
+      - text: Køretøjer i drift i dag Planlagt, ud fra dagens køreplan
+      - group "Køretøjer i drift i dag Planlagt, ud fra dagens køreplan":
+        - list:
+          - listitem:
+            - time: 00:00
+            - text: "351"
+          - listitem:
+            - time: 00:15
+            - text: "311"
+          - listitem:
+            - time: 00:30
+            - text: "262"
+          - listitem:
+            - time: 00:45
+            - text: "215"
+          - listitem:
+            - time: 01:00
+            - text: "167"
+          - listitem:
+            - time: 01:15
+            - text: "156"
+          - listitem:
+            - time: 01:30
+            - text: "137"
+          - listitem:
+            - time: 01:45
+            - text: "125"
+          - listitem:
+            - time: 02:00
+            - text: "116"
+          - listitem:
+            - time: 02:15
+            - text: "117"
+          - listitem:
+            - time: 02:30
+            - text: "123"
+          - listitem:
+            - time: 02:45
+            - text: "119"
+          - listitem:
+            - time: 03:00
+            - text: "114"
+          - listitem:
+            - time: 03:15
+            - text: "121"
+          - listitem:
+            - time: 03:30
+            - text: "120"
+          - listitem:
+            - time: 03:45
+            - text: "115"
+          - listitem:
+            - time: 04:00
+            - text: "110"
+          - listitem:
+            - time: 04:15
+            - text: "109"
+          - listitem:
+            - time: 04:30
+            - text: "119"
+          - listitem:
+            - time: 04:45
+            - text: "118"
+          - listitem:
+            - time: 05:00
+            - text: "116"
+          - listitem:
+            - time: 05:15
+            - text: "137"
+          - listitem:
+            - time: 05:30
+            - text: "152"
+          - listitem:
+            - time: 05:45
+            - text: "165"
+          - listitem:
+            - time: 06:00
+            - text: "179"
+          - listitem:
+            - time: 06:15
+            - text: "217"
+          - listitem:
+            - time: 06:30
+            - text: "260"
+          - listitem:
+            - time: 06:45
+            - text: "277"
+          - listitem:
+            - time: 07:00
+            - text: "314"
+          - listitem:
+            - time: 07:15
+            - text: "360"
+          - listitem:
+            - time: 07:30
+            - text: "381"
+          - listitem:
+            - time: 07:45
+            - text: "394"
+          - listitem:
+            - time: 08:00
+            - text: "419"
+          - listitem:
+            - time: 08:15
+            - text: "440"
+          - listitem:
+            - time: 08:30
+            - text: "446"
+          - listitem:
+            - time: 08:45
+            - text: "467"
+          - listitem:
+            - time: 09:00
+            - text: "491"
+          - listitem:
+            - time: 09:15
+            - text: "528"
+          - listitem:
+            - time: 09:30
+            - text: "541"
+          - listitem:
+            - time: 09:45
+            - text: "567"
+          - listitem:
+            - time: 10:00
+            - text: "597"
+          - listitem:
+            - time: 10:15
+            - text: "622"
+          - listitem:
+            - time: 10:30
+            - text: "621"
+          - listitem:
+            - time: 10:45
+            - text: "636"
+          - listitem:
+            - time: 11:00
+            - text: "642"
+          - listitem:
+            - time: 11:15
+            - text: "650"
+          - listitem:
+            - time: 11:30
+            - text: "637"
+          - listitem:
+            - time: 11:45
+            - text: "641"
+          - listitem:
+            - time: 12:00
+            - text: "649"
+          - listitem:
+            - time: 12:15
+            - text: "658"
+          - listitem:
+            - time: 12:30
+            - text: "641"
+          - listitem:
+            - time: 12:45
+            - text: "651"
+          - listitem:
+            - time: 13:00
+            - text: "652"
+          - listitem:
+            - time: 13:15
+            - text: "658"
+          - listitem:
+            - time: 13:30
+            - text: "644"
+          - listitem:
+            - time: 13:45
+            - text: "646"
+          - listitem:
+            - time: 14:00
+            - text: "649"
+          - listitem:
+            - time: 14:15
+            - text: "653"
+          - listitem:
+            - time: 14:30
+            - text: "636"
+          - listitem:
+            - time: 14:45
+            - text: "647"
+          - listitem:
+            - time: 15:00
+            - text: "647"
+          - listitem:
+            - time: 15:15
+            - text: "655"
+          - listitem:
+            - time: 15:30
+            - text: "634"
+          - listitem:
+            - time: 15:45
+            - text: "643"
+          - listitem:
+            - time: 16:00
+            - text: "639"
+          - listitem:
+            - time: 16:15
+            - text: "638"
+          - listitem:
+            - time: 16:30
+            - text: "613"
+          - listitem:
+            - time: 16:45
+            - text: "617"
+          - listitem:
+            - time: 17:00
+            - text: "606"
+          - listitem:
+            - time: 17:15
+            - text: "604"
+          - listitem:
+            - time: 17:30
+            - text: "583"
+          - listitem:
+            - time: 17:45
+            - text: "576"
+          - listitem:
+            - time: 18:00
+            - text: "566"
+          - listitem:
+            - time: 18:15
+            - text: "553"
+          - listitem:
+            - time: 18:30
+            - text: "533"
+          - listitem:
+            - time: 18:45
+            - text: "520"
+          - listitem:
+            - time: 19:00
+            - text: "512"
+          - listitem:
+            - time: 19:15
+            - text: "500"
+          - listitem:
+            - time: 19:30
+            - text: "493"
+          - listitem:
+            - time: 19:45
+            - text: "474"
+          - listitem:
+            - time: 20:00
+            - text: "464"
+          - listitem:
+            - time: 20:15
+            - text: "451"
+          - listitem:
+            - time: 20:30
+            - text: "447"
+          - listitem:
+            - time: 20:45
+            - text: "435"
+          - listitem:
+            - time: 21:00
+            - text: "439"
+          - listitem:
+            - time: 21:15
+            - text: "438"
+          - listitem:
+            - time: 21:30
+            - text: "430"
+          - listitem:
+            - time: 21:45
+            - text: "418"
+          - listitem:
+            - time: 22:00
+            - text: "424"
+          - listitem:
+            - time: 22:15
+            - text: "417"
+          - listitem:
+            - time: 22:30
+            - text: "423"
+          - listitem:
+            - time: 22:45
+            - text: "406"
+          - listitem:
+            - time: 23:00
+            - text: "407"
+          - listitem:
+            - time: 23:15
+            - text: "398"
+          - listitem:
+            - time: 23:30
+            - text: "382"
+          - listitem:
+            - time: 23:45
+            - text: "366"
+    - paragraph: Højest 658 kl. 12:15
+    - region "Hvor sikre er vi?":
+      - heading "Hvor sikre er vi?" [level=3]
+      - list "Hvor sikre er vi?":
+        - listitem: Live 0 Meldt af køretøjet i de seneste svar.
+        - listitem: Ældre 0 Sidst meldt for få minutter siden; kører siden videre ad sin rute.
+        - listitem: Beregnet 346 Placeret efter køreplanen og en kendt forsinkelse, eller beregnet af Rejseplanen.
+        - listitem: Kun køreplan 221 Ingen livepositioner endnu; placeret efter køreplanen.
+        - listitem: Intet signal 0 Havde realtid, mangler i 5 min; kører videre efter køreplanen og sin seneste forsinkelse.
+- 'button "Viser: linje 144 · Ryd" [pressed]'
+- dialog "144 mod Vallensbæk St.":
+  - heading "144 mod Vallensbæk St." [level=2]
+  - text: Bus
+  - button "Følg"
+  - button "Vis hele linjen"
+  - button "Luk"
+  - text: Beregnet
+  - paragraph: Beregnet ud fra køreplanen og en forsinkelse på +25 min
+  - term: Forsinkelse
+  - definition: 25 min forsinket
+  - term: Sidst set
+  - definition: Ukendt
+  - term: Næste stop
+  - definition: Hvidager (Herstedvestervej)
+  - paragraph: Mellem Porsager (Herstedvestervej) og Hvidager (Herstedvestervej)
+  - list "Stop":
+    - listitem:
+      - text: Ballerup St. (Banegårdspladsen) Passeret
+      - time: 08:15
+      - text: Forventet 08:40 25 min forsinket
+    - listitem:
+      - text: Lindehaven (Præstevænget) Passeret
+      - time: 08:16
+      - text: Forventet 08:41 25 min forsinket
+    - listitem:
+      - text: Nygårdsvej (Præstevænget) Passeret
+      - time: 08:16
+      - text: Forventet 08:41 25 min forsinket
+    - listitem:
+      - text: Telegrafvej (Vestbuen) Passeret
+      - time: 08:17
+      - text: Forventet 08:42 25 min forsinket
+    - listitem:
+      - text: Grantoftecentret (Vestbuen) Passeret
+      - time: 08:19
+      - text: Forventet 08:44 25 min forsinket
+    - listitem:
+      - text: Grantofteskolen (Ågerupvej) Passeret
+      - time: 08:20
+      - text: Forventet 08:45 25 min forsinket
+    - listitem:
+      - text: Grantofteparken (Ågerupvej) Passeret
+      - time: 08:20
+      - text: Forventet 08:45 25 min forsinket
+    - listitem:
+      - text: HF Rønhøjgård (Ågerupvej) Passeret
+      - time: 08:21
+      - text: Forventet 08:46 25 min forsinket
+    - listitem:
+      - text: HF Stuvehøjgård (Ågerupvej) Passeret
+      - time: 08:23
+      - text: Forventet 08:48 25 min forsinket
+    - listitem:
+      - text: Egegård (Ågerupvej) Passeret
+      - time: 08:24
+      - text: Forventet 08:49 25 min forsinket
+    - listitem:
+      - text: Præstetoften (Ledøjetoften) Passeret
+      - time: 08:26
+      - text: Forventet 08:51 25 min forsinket
+    - listitem:
+      - text: Ledøje, Holmevej (Ledøjetoften) Passeret
+      - time: 08:27
+      - text: Forventet 08:52 25 min forsinket
+    - listitem:
+      - text: Haretoften (Risbyvej) Passeret
+      - time: 08:27
+      - text: Forventet 08:52 25 min forsinket
+    - listitem:
+      - text: Margrethelund (Risbyvej) Passeret
+      - time: 08:28
+      - text: Forventet 08:53 25 min forsinket
+    - listitem:
+      - text: Tinghøjvej (Ledøjevej) Passeret
+      - time: 08:30
+      - text: Forventet 08:55 25 min forsinket
+    - listitem:
+      - text: Risby (Ledøjevej) Passeret
+      - time: 08:32
+      - text: Forventet 08:57 25 min forsinket
+    - listitem:
+      - text: Damgårdsvej (Herstedvestervej) Passeret
+      - time: 08:36
+      - text: Forventet 09:01 25 min forsinket
+    - listitem:
+      - text: Herstedvester Skole (Herstedvestervej) Passeret
+      - time: 08:37
+      - text: Forventet 09:02 25 min forsinket
+    - listitem:
+      - text: Porsager (Herstedvestervej) Passeret
+      - time: 08:38
+      - text: Forventet 09:03 25 min forsinket
+    - listitem:
+      - text: Hvidager (Herstedvestervej) Næste stop
+      - time: 08:39
+      - text: Forventet 09:04 25 min forsinket
+    - listitem:
+      - text: Nyvej (Vridsløsevej)
+      - time: 08:40
+      - text: Forventet 09:05 25 min forsinket
+    - listitem:
+      - text: Hjulets Kvarter (Kongsholm Allé)
+      - time: 08:41
+      - text: Forventet 09:06 25 min forsinket
+    - listitem:
+      - text: Faklens Kvarter (Kongsholm Allé)
+      - time: 08:42
+      - text: Forventet 09:07 25 min forsinket
+    - listitem:
+      - text: Liljens Kvarter (Kongsholm Allé)
+      - time: 08:43
+      - text: Forventet 09:08 25 min forsinket
+    - listitem:
+      - text: Nordmarks Allé (Albertslundvej)
+      - time: 08:43
+      - text: Forventet 09:08 25 min forsinket
+    - listitem:
+      - text: Albertslund St. (Hedemarksvej)
+      - time: 08:47
+      - text: Forventet 09:10 23 min forsinket
+    - listitem:
+      - text: Nordmarks Allé (Albertslundvej)
+      - time: 08:47
+      - text: Forventet 09:10 23 min forsinket
+    - listitem:
+      - text: Bibliotekstorvet (Nordmarks Allé)
+      - time: 08:48
+      - text: Forventet 09:11 23 min forsinket
+    - listitem:
+      - text: Rådhusdammen (Nordmarks Allé)
+      - time: 08:49
+      - text: Forventet 09:12 23 min forsinket
+    - listitem:
+      - text: Firkløverparken (Vallensbæk Torvevej)
+      - time: 08:50
+      - text: Forventet 09:13 23 min forsinket
+    - listitem:
+      - text: Kornmarksvej (Vallensbæk Torvevej)
+      - time: 08:51
+      - text: Forventet 09:16 25 min forsinket
+    - listitem:
+      - text: Syvhøjvænge (Vallensbækvej)
+      - time: 08:53
+      - text: Forventet 09:18 25 min forsinket
+    - listitem:
+      - text: Nørrestien (Vallensbækvej)
+      - time: 08:54
+      - text: Forventet 09:18 24 min forsinket
+    - listitem:
+      - text: Pilestien (Vallensbækvej)
+      - time: 08:55
+      - text: Forventet 09:18 23 min forsinket
+    - listitem:
+      - text: Korsagergård (Vejlegårdsvej)
+      - time: 08:56
+      - text: Forventet 09:20 24 min forsinket
+    - listitem:
+      - text: Bækrenden (Bygaden)
+      - time: 08:58
+      - text: Forventet 09:22 24 min forsinket
+    - listitem:
+      - text: Vallensbæk By, Toftevej (Bygaden)
+      - time: 08:58
+      - text: Forventet 09:22 24 min forsinket
+    - listitem:
+      - text: Bygaden (Møllestensager)
+      - time: 08:59
+      - text: Forventet 09:22 23 min forsinket
+    - listitem:
+      - text: Idræts Allé (Vejlegårdsvej)
+      - time: 09:00
+      - text: Forventet 09:23 23 min forsinket
+    - listitem:
+      - text: Lundbækvej (Vejlegårdsvej)
+      - time: 09:01
+      - text: Forventet 09:23 22 min forsinket
+    - listitem:
+      - text: Liselundsvej (Vejlesvinget)
+      - time: 09:02
+      - text: Forventet 09:24 22 min forsinket
+    - listitem:
+      - text: Vejlegårdsparken (Vejlesvinget)
+      - time: 09:03
+      - text: Forventet 09:27 24 min forsinket
+    - listitem:
+      - text: Vallensbæk St. Sdr. Ringvej (Vejlegårdsparken)
+      - time: 09:04
+      - text: Forventet 09:28 24 min forsinket
+    - listitem:
+      - text: Gammelgårds Allé (Vejlegårdsparken)
+      - time: 09:05
+      - text: Forventet 09:28 23 min forsinket
+    - listitem:
+      - text: Rønnebækhus (Vallensbæk Torvevej)
+      - time: 09:05
+      - text: Forventet 09:28 23 min forsinket
+    - listitem:
+      - text: Vallensbæk St.
+      - time: 09:07
+      - text: Forventet 09:31 24 min forsinket
+  - paragraph:
+    - text: Køreplan og Rejseplanens forsinkelser ·
+    - time: opdateret 09:03:06
+- alert
+- region "Notifikationer"

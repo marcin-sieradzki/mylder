@@ -1,0 +1,2 @@
+CALM {"text":"Latest now 0 min at most Dansk About Mylder","max":0,"known":6,"aria":"- banner:\n  - link \"Mylder\":\n    - /url: /en\n  - time: Updated 07:20:00\n  - group \"Filters\":\n    - button \"S-tog 5\" [pressed]\n    - button \"Train 0\" [pressed]\n    - button \"Planes 8\" [pressed]\n  - paragraph: Latest now 0 min at most\n  - navigation \"Language\":\n    - link \"Dansk\":\n      - /url: /da\n  - button \"About Mylder\""}
+PASS latest-calm: 2 steps in .verify/branch-238-r3-crowded/latest-calm/

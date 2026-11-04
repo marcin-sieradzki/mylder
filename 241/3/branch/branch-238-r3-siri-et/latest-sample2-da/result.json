@@ -1,0 +1,14 @@
+{
+  "journey": "latest-sample2-da",
+  "pass": true,
+  "steps": [
+    "01-da-360px-pill-on-its-row: da 360px pill on its row (http://localhost:4307/da)",
+    "02-da-412px-pill-on-its-row: da 412px pill on its row (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "03-da-800px-pill-on-its-row: da 800px pill on its row (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "04-da-1000px-pill-on-its-row: da 1000px pill on its row (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "05-da-1100px-pill-on-its-row: da 1100px pill on its row (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "06-da-1280px-pill-on-its-row: da 1280px pill on its row (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "07-da-1440px-pill-in-bar: da 1440px pill in bar (http://localhost:4307/da?map=10.40/55.68000/12.56500)",
+    "08-da-1920px-pill-in-bar: da 1920px pill in bar (http://localhost:4307/da?map=10.40/55.68000/12.56500)"
+  ]
+}

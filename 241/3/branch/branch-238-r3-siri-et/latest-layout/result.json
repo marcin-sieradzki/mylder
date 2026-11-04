@@ -1,0 +1,26 @@
+{
+  "journey": "latest-layout",
+  "pass": true,
+  "steps": [
+    "01-en-360px-pill-on-its-row: en 360px pill on its row (http://localhost:4307/en)",
+    "02-en-360px-trip-panel-and-whole-line: en 360px trip panel and whole line (http://localhost:4307/en?trip=bus.144.bc5239a3e3.20261031.0815&map=9.89/55.69838/12.34783)",
+    "03-en-360px-stop-panel: en 360px stop panel (http://localhost:4307/en?stop=6584)",
+    "04-en-412px-pill-on-its-row: en 412px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "05-en-412px-trip-panel-and-whole-line: en 412px trip panel and whole line (http://localhost:4307/en?map=9.99/55.69337/12.34783&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "06-en-412px-stop-panel: en 412px stop panel (http://localhost:4307/en?stop=6584)",
+    "07-en-800px-pill-on-its-row: en 800px pill on its row (http://localhost:4307/en?map=10.40/55.68000/12.56500)",
+    "08-en-800px-trip-panel-and-whole-line: en 800px trip panel and whole line (http://localhost:4307/en?map=9.81/55.67972/12.34429&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "09-en-800px-stop-panel: en 800px stop panel (http://localhost:4307/en?stop=6584)",
+    "10-en-1000px-pill-on-its-row: en 1000px pill on its row (http://localhost:4307/en?map=11.20/55.68000/12.56500)",
+    "11-en-1000px-trip-panel-and-whole-line: en 1000px trip panel and whole line (http://localhost:4307/en?map=9.75/55.68208/12.34333&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "12-en-1000px-stop-panel: en 1000px stop panel (http://localhost:4307/en?stop=6584)",
+    "13-en-1280px-pill-on-its-row: en 1280px pill on its row (http://localhost:4307/en?map=11.20/55.68000/12.56500)",
+    "14-en-1280px-trip-panel-and-whole-line: en 1280px trip panel and whole line (http://localhost:4307/en?map=10.30/55.68736/12.34448&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "15-en-1280px-stop-panel: en 1280px stop panel (http://localhost:4307/en?stop=6584)",
+    "16-en-1440px-pill-in-bar: en 1440px pill in bar (http://localhost:4307/en?map=11.20/55.68000/12.56500)",
+    "17-en-1440px-trip-panel-and-whole-line: en 1440px trip panel and whole line (http://localhost:4307/en?map=10.63/55.67852/12.34517&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "18-en-1440px-stop-panel: en 1440px stop panel (http://localhost:4307/en?stop=6584)",
+    "19-en-1000px-resized-back-pill-on-its-row: en 1000px (resized back) pill on its row (http://localhost:4307/en?map=11.20/55.68000/12.56500)",
+    "20-en-1440px-resized-back-pill-in-bar: en 1440px (resized back) pill in bar (http://localhost:4307/en?map=11.20/55.68000/12.56500)"
+  ]
+}
