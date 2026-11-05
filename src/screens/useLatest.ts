@@ -1,7 +1,7 @@
 'use client'
 
-// The Latest now pill's outcome for the page (docs/screens.md, "Latest now"), ticking by the
-// server's clock, read by the top bar, which places the pill, and by the pill.
+// The Latest now outcome for the page (docs/screens.md, "Latest now"), ticking by the server's
+// clock, read by the top bar, which places the pill, by the pill and by the Latest right now panel.
 import { useSyncExternalStore } from 'react'
 import { liveSnapshot, type LiveSnapshot } from '../map/live'
 import { tickingStore } from '../map/ticking'

@@ -2,8 +2,8 @@
 // dot, moved there as Follow starts and from the animation loop each frame it draws, outside
 // React, so the page renders again only when Follow starts or ends. It ends when the trip reaches
 // its last stop or leaves the map, when the viewer pans, when the trip's panel, or the Latest right
-// now panel it was started from, closes, and when the Latest now pill flies the map to a trip
-// (spotlight.ts). A zoom keeps it: the camera zooms on
+// now panel it was started from, closes, and when the Latest now pill or a row of that panel
+// flies the map to a trip (spotlight.ts). A zoom keeps it: the camera zooms on
 // the dot.
 import 'client-only'
 import type { Map as MapLibreMap, MapLibreEvent } from 'maplibre-gl'
