@@ -28,11 +28,11 @@ import type { PanelFrame } from './DetailPanels'
 import { badgeLine } from './departureRow'
 import { DELAY_KNOWN } from './delays'
 import { wholeMinutes, type Latest, type RankedTrip } from './latest'
-import { stopName } from './LatestNow'
 import styles from './LatestPanel.module.css'
 import { grouped } from './numbers'
 import { OpenTrip } from './OpenTrip'
 import { OPERATORS } from './operators'
+import { stopName } from './patternStops'
 import { useLatest } from './useLatest'
 import { useServerSecond } from './useServerSecond'
 import { VehicleActions } from './VehicleActions'
@@ -219,9 +219,9 @@ function Lead({ trip, snapshot, network }: LeadProps) {
     >
       <div className={styles.named}>
         <LineBadge line={line}>{trip.line}</LineBadge>
-        <Text variant="heading-sm" render={<h3 />} className={styles.headsign}>
-          {fill(tripWords.to, { headsign: trip.headsign })}
-        </Text>
+        <h3 className={styles.headsign}>
+          <Text variant="heading-sm">{fill(tripWords.to, { headsign: trip.headsign })}</Text>
+        </h3>
       </div>
       <Text variant="body-sm" emphasis="secondary">
         {fill(words.modeOperator, {

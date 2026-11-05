@@ -14,6 +14,7 @@ import type { Snapshot } from '../tracker/index'
 import { badgeLine } from './departureRow'
 import { wholeMinutes, type Latest, type RankedTrip } from './latest'
 import styles from './LatestNow.module.css'
+import { stopName } from './patternStops'
 import { fill } from './vehicleLabel'
 
 type Words = ClientDictionary['latest']
@@ -43,10 +44,6 @@ function whereAt({ trip, state }: RankedTrip, snapshot: Snapshot, network: Netwo
     now: snapshot.fetched,
   })
 }
-
-/** A stop of the trip's pattern by its index there, by its platform's name, as its calls name it. */
-export const stopName = (network: Network, pattern: number, index: number) =>
-  network.stops.platforms[network.patterns.patterns[pattern].stops[index]]?.name ?? ''
 
 /** A delay as the pill writes it, "+2 min", in whole minutes. */
 const signed = (delay: number, words: Words) => {
