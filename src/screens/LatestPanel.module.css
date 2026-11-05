@@ -1,0 +1,89 @@
+/* Latest right now: the trip it leads with on a raised card, its facts in one column space.200
+   apart, then the next latest as rows with a divider between, each a button over the whole row
+   (OpenTrip.module.css). */
+.lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--perron-space-200);
+}
+
+/* The line badge and "to Hillerød", the destination wrapping beside the badge on a narrow panel. */
+.named {
+  display: flex;
+  align-items: center;
+  gap: var(--perron-space-200);
+  min-inline-size: 0;
+}
+
+.headsign {
+  margin: 0;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The delay and where the trip is, the place wrapping under the delay where the panel is narrow. */
+.where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--perron-space-200);
+  row-gap: var(--perron-space-050);
+}
+
+/* The next stop's name and times, long names breaking rather than pushing the fact past its row. */
+.next {
+  overflow-wrap: anywhere;
+}
+
+.next s {
+  color: var(--perron-color-text-secondary);
+}
+
+/* Heard, not seen: the struck time and the expected one in words. A stand-in for Perron's
+   visually hidden text, which its DepartureRow keeps internal: goes with the struck time's piece.
+   perron-stand-in: perron#199 */
+.heard {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--perron-space-200);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A row: the badge, the destination over its next stop, and the delay at the end, never wider than
+   the panel, long names wrapping. */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--perron-space-200);
+  padding-block: var(--perron-space-200);
+  padding-inline: var(--perron-space-100);
+}
+
+.row + .row {
+  border-block-start: 1px solid var(--perron-color-border-subtle);
+}
+
+.rowWords {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}

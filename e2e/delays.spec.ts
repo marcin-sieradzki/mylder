@@ -168,8 +168,37 @@ test('the Latest now pill names the trip running latest and opens its panel', as
   await expect(pill).toContainText('Latest now')
   await expect(pill).toContainText('at Slotspavillonen St.')
   await pill.click()
-  await expect(page).toHaveURL(/[?&]trip=train\.950R\.bacca19217\.20261031\.0733(&|$)/)
-  await expect(page.getByRole('dialog', { name: /to Hillerød/ })).toContainText('950R')
+  await expect(page).toHaveURL(/[?&]latest=now(&|$)/)
+  const panel = page.getByRole('dialog', { name: 'Latest right now' })
+  const lead = panel.getByRole('region', { name: 'The latest trip' })
+  await expect(lead.getByRole('heading', { name: 'to Hillerød' })).toBeVisible()
+  await expect(lead).toContainText('950R')
+  await expect(lead).toContainText('Between Slotspavillonen St. and Hillerød St.')
+  // The next four latest, then what the ranking was drawn from.
+  await expect(panel.getByRole('region', { name: 'Next latest' }).getByRole('button')).toHaveCount(
+    4,
+  )
+  await expect(panel).toContainText(
+    'Of 406 trips with delays from Rejseplanen now. The Metro and light rail send none.',
+  )
+})
+
+test("the Latest right now panel's link opens it on the trip running latest, rung", async ({
+  page,
+}) => {
+  await onSavedMinute(page)
+  await page.goto(`${UPDATES_URL}/en?latest=now`)
+  const panel = page.getByRole('dialog', { name: 'Latest right now' })
+  await expect(
+    panel.getByRole('region', { name: 'The latest trip' }).getByRole('heading', {
+      name: 'to Hillerød',
+    }),
+  ).toBeVisible()
+  await expect(page.locator('[data-vehicles]')).toHaveAttribute(
+    'data-spotlight',
+    'train.950R.bacca19217.20261031.0733',
+  )
+  await expectRingClear(page, panel)
 })
 
 /** Where the canvas draws the spotlight's ring, in px from the page's top left, while it does. */
@@ -237,8 +266,8 @@ for (const [layout, viewport] of [
       .getByRole('banner')
       .getByRole('button', { name: /^Biggest delay right now: 950R to Hillerød/ })
       .click()
-    await expect(page).toHaveURL(/[?&]trip=train\.950R\.bacca19217\.20261031\.0733(&|$)/)
-    const panel = page.getByRole('dialog', { name: /to Hillerød/ })
+    await expect(page).toHaveURL(/[?&]latest=now(&|$)/)
+    const panel = page.getByRole('dialog', { name: 'Latest right now' })
     await expect(panel).toBeVisible()
     // The ring is on the named trip's dot, and on no other.
     await expect(map).toHaveAttribute('data-spotlight', 'train.950R.bacca19217.20261031.0733')
@@ -256,7 +285,61 @@ for (const [layout, viewport] of [
     await expect(map).not.toHaveAttribute('data-spotlight')
     await expect(map).not.toHaveAttribute('data-spotlight-at')
   })
+
+  test(`on ${layout}, a tap on the second latest trip moves the ring to it and opens its vehicle panel`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport)
+    // At 09:22 the 144 to Vallensbæk St. runs 22 min late, the second latest.
+    await onSavedMinute(page)
+    await page.goto(`${UPDATES_URL}/en`)
+    const map = page.locator('[data-vehicles]')
+    await page
+      .getByRole('banner')
+      .getByRole('button', { name: /^Biggest delay right now: 950R to Hillerød/ })
+      .click()
+    const latest = page.getByRole('dialog', { name: 'Latest right now' })
+    await expect(map).toHaveAttribute('data-spotlight', 'train.950R.bacca19217.20261031.0733')
+    await latest
+      .getByRole('region', { name: 'Next latest' })
+      .getByRole('button', { name: /^144 to Vallensbæk St\., 22 min late, / })
+      .click()
+    await expect(page).toHaveURL(/[?&]trip=bus\.144\.bc5239a3e3\.20261031\.0815(&|$)/)
+    const vehicle = page.getByRole('dialog', { name: /to Vallensbæk St\./ })
+    await expect(vehicle).toBeVisible()
+    await expect(map).toHaveAttribute('data-spotlight', 'bus.144.bc5239a3e3.20261031.0815')
+    await expectRingClear(page, vehicle)
+    await expect(async () => {
+      const at = (await ringAt(page))!
+      await page.mouse.move(at.x + 30, at.y + 30)
+      await page.mouse.move(at.x, at.y)
+      await expect(page.getByRole('tooltip')).toContainText('144 to Vallensbæk St.', {
+        timeout: 1000,
+      })
+    }).toPass()
+  })
 }
+
+test('when no trip is 3 min late, a press on the pill opens the panel on the latest trips, ringing none', async ({
+  page,
+}) => {
+  await onSavedMinute(page, (saved) => ({
+    ...saved,
+    trips: saved.trips.map((trip) =>
+      trip.delay === undefined ? trip : { ...trip, delay: Math.min(trip.delay, 120) },
+    ),
+  }))
+  await page.goto(`${UPDATES_URL}/en`)
+  await page.getByRole('banner').getByRole('button', { name: 'Latest now +2 min at most' }).click()
+  await expect(page).toHaveURL(/[?&]latest=now(&|$)/)
+  const panel = page.getByRole('dialog', { name: 'Latest right now' })
+  await expect(panel.getByText('No trip runs 3 min late or more now.')).toBeVisible()
+  await expect(panel.getByRole('region', { name: 'Latest trips' }).getByRole('button')).toHaveCount(
+    5,
+  )
+  await expect(panel.getByRole('region', { name: 'The latest trip' })).toHaveCount(0)
+  await expect(page.locator('[data-vehicles]')).not.toHaveAttribute('data-spotlight')
+})
 
 test('a snapshot that moves the trip while the camera flies to it still lands its ring clear of the header and the panel', async ({
   page,
@@ -304,7 +387,7 @@ test('a snapshot that moves the trip while the camera flies to it still lands it
   // The next minute lands while the camera is in the air.
   await page.waitForTimeout(300)
   release()
-  const panel = page.getByRole('dialog', { name: /to Hillerød/ })
+  const panel = page.getByRole('dialog', { name: 'Latest right now' })
   await expect(panel).toBeVisible()
   await expect(page.locator('[data-vehicles]')).toHaveAttribute('data-spotlight', LATEST)
   await expect.poll(() => asked).toBe(2)
@@ -446,6 +529,7 @@ const WORDS = {
     filters: 'Filters',
     about: 'About Mylder',
     overview: 'Overview',
+    latest: 'Latest right now',
     now: 'Latest now',
     pill: /^Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, /,
     outOfDate: /^Updated \d\d:\d\d:\d\d, may be out of date$/,
@@ -455,6 +539,7 @@ const WORDS = {
     filters: 'Filtre',
     about: 'Om Mylder',
     overview: 'Overblik',
+    latest: 'Mest forsinket lige nu',
     now: 'Mest forsinket nu',
     pill: /^Største forsinkelse lige nu: 250S mod Dragør Stationsplads, 100 min forsinket, /,
     outOfDate: /^Opdateret \d\d:\d\d:\d\d, /,
@@ -534,8 +619,8 @@ for (const lang of ['en', 'da'] as const) {
       await pill.click()
       await expectBelowHeader(
         page,
-        page.getByRole('dialog', { name: /Dragør Stationsplads/ }).getByRole('heading', {
-          name: /Dragør Stationsplads/,
+        page.getByRole('dialog', { name: words.latest }).getByRole('heading', {
+          name: words.latest,
         }),
       )
     })

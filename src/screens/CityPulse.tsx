@@ -9,13 +9,13 @@ import { usePaused as usePageNoticePaused } from '../map/notices'
 import { useDataStates } from '../map/states'
 import { timezoneOf, useNetwork } from '../map/timetable'
 import { useHiddenModes } from '../map/view'
-import type { Mode } from '../timetable/format'
 import { clockTime } from '../timetable/time'
 import type { Snapshot } from '../tracker/index'
 import { budgetLine } from './budget'
 import styles from './CityPulse.module.css'
 import { DayProfile } from './DayProfile'
 import { grouped } from './numbers'
+import { OPERATORS } from './operators'
 import { PositionsSource } from './PositionsSource'
 import {
   pausedFrom,
@@ -25,18 +25,6 @@ import {
   type ModeShare,
   type Share,
 } from './pulse'
-
-/**
- * Each mode's operator or authority, the second line under its meter. The timetable doesn't name
- * them yet, so they are the mode's, never a trip's.
- */
-const OPERATORS: Readonly<Record<Mode, string>> = {
-  bus: 'Movia',
-  metro: 'Metroselskabet',
-  's-tog': 'DSB',
-  train: 'DSB',
-  'light-rail': 'Hovedstadens Letbane',
-}
 
 /** A share's colour: green at or above 70 %, amber from 40 %, red under; provisional until #12. */
 const colourOf = ({ count, total }: Share) =>

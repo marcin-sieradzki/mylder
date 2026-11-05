@@ -150,6 +150,20 @@ describe('the open panel in the address', () => {
       }),
     ).toBe('?aircraft=4ab1e3')
   })
+
+  it('reads and writes the Latest right now panel as `latest=now`', () => {
+    expect(viewOf('?latest=now').panel).toEqual({ kind: 'latest', id: 'now' })
+    expect(viewOf('?latest=').panel).toBeUndefined()
+    expect(
+      searchWith('?line=5C&trip=bus.5C.32331e0e20.20260616.0707', {
+        hidden: new Set(),
+        panel: { kind: 'latest', id: 'now' },
+      }),
+    ).toBe('?line=5C&latest=now')
+    expect(
+      searchWith('?latest=now', { hidden: new Set(), panel: { kind: 'stop', id: '8600626' } }),
+    ).toBe('?stop=8600626')
+  })
 })
 
 describe("the stop panel's open list in the address", () => {

@@ -61,6 +61,24 @@ describe('the spotlight', () => {
     expect(spotlight.get()).toBeUndefined()
   })
 
+  it('stays on the trip the Latest right now panel picked while that panel is open', () => {
+    const spotlight = spotlightStore()
+    openPanel({ kind: 'latest', id: 'now' })
+    spotlight.ring(BUS)
+    mapView.update({ centre: [12.57, 55.68], zoom: 15 })
+    expect(spotlight.get()).toBe(BUS)
+    openPanel(undefined)
+    expect(spotlight.get()).toBeUndefined()
+  })
+
+  it("goes when a row of the Latest right now panel opens another trip's panel", () => {
+    const spotlight = spotlightStore()
+    openPanel({ kind: 'latest', id: 'now' })
+    spotlight.ring(BUS)
+    openPanel({ kind: 'trip', id: METRO })
+    expect(spotlight.get()).toBeUndefined()
+  })
+
   it('moves to the trip it is given next, and goes once cleared', () => {
     const spotlight = spotlightStore()
     openPanel({ kind: 'trip', id: BUS })
@@ -154,6 +172,16 @@ describe('the flight to a trip', () => {
     const at = landed(BUS_AT)
     expect(at.y).toBeGreaterThan(228 + 24)
     expect(at.y).toBeLessThan(915 - 460 - 24)
+  })
+
+  it('lands its dot between the header and the legend on a short phone, where they leave little room', () => {
+    // 360 by 800: the header with the pill's two-line row and a page notice down to 248 px, the
+    // legend's top 393 px from the foot, at 407 px. A dot needs far less room than a highlight.
+    const { map, landed } = mapAt(360, 800, 10.4)
+    flyOnto(map, { width: 360, height: 800 }, BUS_AT, { top: 248, bottom: 393 }, followStore())
+    const at = landed(BUS_AT)
+    expect(at.y - 12).toBeGreaterThan(248)
+    expect(at.y + 12).toBeLessThan(407)
   })
 
   it('keeps the zoom of a rider already closer in', () => {
@@ -255,9 +283,15 @@ describe('the flight to a trip, as snapshots land', () => {
     expect(at.y).toBeGreaterThan(122 + 24)
     expect(at.y).toBeLessThan(800 - 24)
   }
-  /** A flight to the bus at `BUS_AT`, its dot where `where` says, and a snapshot to land. */
+  /**
+   * A flight to the bus at `BUS_AT`, its dot where `where` says, and a snapshot to land; the bus
+   * picked, its panel open and its dot rung, as the pill and the Latest right now panel pick it.
+   */
   function flying(follow = followStore(), moving = false) {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] })
+    const spotlight = spotlightStore()
+    openPanel({ kind: 'trip', id: BUS })
+    spotlight.ring(BUS)
     const camera = flyingMap(area.width, area.height, 11.2, moving)
     let where: [number, number] = BUS_AT
     const landings = new Set<() => void>()
@@ -274,6 +308,7 @@ describe('the flight to a trip, as snapshots land', () => {
         },
       },
       follow,
+      spotlight,
     )
     const moveTo = (to: [number, number]) => (where = to)
     /** A snapshot lands and moves the dot to `to`. */
@@ -281,7 +316,7 @@ describe('the flight to a trip, as snapshots land', () => {
       moveTo(to)
       for (const heard of landings) heard()
     }
-    return { ...camera, end, land, moveTo, follow }
+    return { ...camera, end, land, moveTo, follow, spotlight }
   }
 
   afterEach(() => {
@@ -384,6 +419,37 @@ describe('the flight to a trip, as snapshots land', () => {
   it('takes off while another move is under way, whose end is not its own', () => {
     // Such as the inertia of the rider's last drag, which the flight stops.
     const flight = flying(followStore(), true)
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(1_000)
+    expect(flight.moves.map((move) => move.kind)).toEqual(['fly', 'ease'])
+  })
+
+  it('aims no more at a trip no longer picked, its panel closed mid-flight', () => {
+    const flight = flying()
+    // Esc closes the panel while the camera is in the air: the ring goes with it.
+    openPanel(undefined)
+    expect(flight.spotlight.get()).toBeUndefined()
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
+  })
+
+  it('aims no more at the old trip once another is picked mid-flight without a flight', () => {
+    const flight = flying()
+    // A tap on another dot opens its panel: the old trip is no longer picked.
+    openPanel({ kind: 'trip', id: METRO })
+    flight.land(MOVED)
+    flight.rest()
+    vi.advanceTimersByTime(2_000)
+    expect(flight.moves).toEqual([{ kind: 'fly' }])
+  })
+
+  it('still aims again at the trip the Latest right now panel keeps picked', () => {
+    const flight = flying()
+    openPanel({ kind: 'latest', id: 'now' })
+    flight.spotlight.ring(BUS)
     flight.land(MOVED)
     flight.rest()
     vi.advanceTimersByTime(1_000)

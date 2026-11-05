@@ -6,7 +6,7 @@ A panel for one trip: line badge and destination, its data state with one line o
 
 - `trip-open` opens from a dot, a Vehicles list row, or a shared link.
 - `trip-facts` shows state, delay, last seen, next stop and the next stops.
-- `trip-follow` keeps the camera on the dot, at the map's tilt and heading, until the rider pans, the panel closes or the trip reaches its last stop, or a press on the Latest now pill flies the map to a trip (`latest-spotlight` in [`latest-right-now.md`](./latest-right-now.md)).
+- `trip-follow` keeps the camera on the dot, at the map's tilt and heading, until the rider pans, the panel closes or the trip reaches its last stop, or a press on the Latest now pill or a row of the Latest right now panel flies the map to a trip (`latest-spotlight` in [`latest-right-now.md`](./latest-right-now.md)).
 - `trip-line` fits the whole line clear of the top bar, the notices and the legend, at the map's tilt and heading, and raises the highlight chip.
 - `trip-close` closes with Esc or the close button and drops `?trip=`.
 - `trip-missing` opens a not-found panel for an unknown trip.

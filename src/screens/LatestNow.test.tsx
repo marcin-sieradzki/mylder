@@ -143,12 +143,14 @@ describe('the Latest now pill', () => {
     )
   })
 
-  it("opens the named trip's vehicle panel in the address, as a tap on its dot does", async () => {
+  it('opens the Latest right now panel in the address, on the named trip', async () => {
     await open('en')
     fireEvent.click(within(banner()).getByRole('button', { name: /^Biggest delay right now:/ }))
-    expect(new URLSearchParams(window.location.search).get('trip')).toBe(LATEST)
-    expect(await screen.findByRole('dialog', { name: /to Hillerød/ })).toHaveTextContent(
-      /^950R950R to HillerødTrain/,
+    expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
+    expect(new URLSearchParams(window.location.search).get('trip')).toBeNull()
+    const panel = await screen.findByRole('dialog', { name: 'Latest right now' })
+    expect(within(panel).getByRole('region', { name: 'The latest trip' })).toHaveTextContent(
+      /^950R\s*to Hillerød/,
     )
   })
 
@@ -177,6 +179,18 @@ describe('the Latest now pill', () => {
     expect(within(banner()).getByText('Latest now +2 min at most')).toBeInTheDocument()
   })
 
+  it('opens the Latest right now panel when none is 3 min late, ringing no trip', async () => {
+    await open('en', calm(120))
+    const asked: string[] = []
+    const stop = vehicleFlight.subscribe((key) => asked.push(key))
+    fireEvent.click(within(banner()).getByRole('button', { name: 'Latest now +2 min at most' }))
+    expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
+    expect(await screen.findByRole('dialog', { name: 'Latest right now' })).toBeInTheDocument()
+    expect(vehicleSpotlight.get()).toBeUndefined()
+    expect(asked).toEqual([])
+    stop()
+  })
+
   it('names no trip when none is 3 min late, in Danish', async () => {
     await open('da', calm(120))
     expect(within(banner()).getByText('Mest forsinket nu højst +2 min')).toBeInTheDocument()
@@ -190,6 +204,8 @@ describe('the Latest now pill', () => {
     expect(
       within(banner()).getByText('Delays from Rejseplanen not updated since 09:21'),
     ).toBeInTheDocument()
+    // Naming no trip and no delay, it opens nothing.
+    expect(within(banner()).queryByRole('button', { name: /Delays from Rejseplanen/ })).toBeNull()
   })
 
   it('says it in Danish once the feed is quiet', async () => {
@@ -204,7 +220,9 @@ describe('the Latest now pill', () => {
     await open('en', metroOnly)
     const line = within(banner()).getByText(/^Latest now/)
     expect(line).toHaveTextContent(/^Latest now —Delay unknown · the Metro sends no delays$/)
-    expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
+    expect(
+      within(banner()).queryByRole('button', { name: /^Biggest delay|^Latest now/ }),
+    ).toBeNull()
   })
 
   it('shows "—" in Danish', async () => {
@@ -288,7 +306,7 @@ describe('a press on the pill', () => {
     ).toBeInTheDocument()
     expect(vehicleSpotlight.get()).toBe(LATEST)
     expect(asked).toEqual([LATEST])
-    expect(new URLSearchParams(window.location.search).get('trip')).toBe(LATEST)
+    expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
     stop()
   })
 
@@ -309,9 +327,9 @@ describe('a press on the pill', () => {
   it('takes the ring off when the panel closes', async () => {
     await open('en')
     press()
-    const panel = await screen.findByRole('dialog', { name: /to Hillerød/ })
+    const panel = await screen.findByRole('dialog', { name: 'Latest right now' })
     fireEvent.click(within(panel).getByRole('button', { name: 'Close' }))
-    expect(new URLSearchParams(window.location.search).get('trip')).toBeNull()
+    expect(new URLSearchParams(window.location.search).get('latest')).toBeNull()
     expect(vehicleSpotlight.get()).toBeUndefined()
   })
 
@@ -328,7 +346,7 @@ describe('a press on the pill', () => {
       act(() => liveSnapshot.update({ snapshot: after, clockOffset: 0 }))
       expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
       expect(vehicleSpotlight.get()).toBeUndefined()
-      expect(new URLSearchParams(window.location.search).get('trip')).toBe(LATEST)
+      expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
     })
   }
 })

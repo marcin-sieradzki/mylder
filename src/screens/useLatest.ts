@@ -1,7 +1,7 @@
 'use client'
 
-// The Latest now pill's outcome for the page (docs/screens.md, "Latest now"), ticking by the
-// server's clock, read by the top bar, which places the pill, and by the pill.
+// The Latest now outcome for the page (docs/screens.md, "Latest now"), ticking by the server's
+// clock, read by the top bar, which places the pill, by the pill and by the Latest right now panel.
 import { useSyncExternalStore } from 'react'
 import { liveSnapshot, type LiveSnapshot } from '../map/live'
 import { tickingStore } from '../map/ticking'
@@ -12,17 +12,16 @@ function sameLatest(a: Latest | undefined, b: Latest | undefined): boolean {
   if (a === b) return true
   if (!a || !b || a.kind !== b.kind) return false
   switch (a.kind) {
-    case 'standout': {
+    case 'standout':
+    case 'calm': {
       const other = b as typeof a
       return (
         a.count === other.count &&
         a.trips.length === other.trips.length &&
-        a.trips.every((each, i) => each.trip === other.trips[i].trip)
+        a.trips.every(
+          (each, i) => each.trip === other.trips[i].trip && each.state === other.trips[i].state,
+        )
       )
-    }
-    case 'calm': {
-      const other = b as typeof a
-      return a.delay === other.delay && a.count === other.count
     }
     case 'quiet':
       return a.since === (b as typeof a).since

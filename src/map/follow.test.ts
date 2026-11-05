@@ -97,6 +97,16 @@ describe('the followed trip', () => {
     expect(heard).toEqual([BUS, undefined, BUS, undefined])
   })
 
+  it('stays followed from the Latest right now panel while the map moves, until it closes', () => {
+    const follow = followStore(mapView)
+    openPanel({ kind: 'latest', id: 'now' })
+    follow.start(BUS)
+    mapView.update({ centre: [12.57, 55.68], zoom: 13 })
+    expect(follow.get()).toBe(BUS)
+    openPanel(undefined)
+    expect(follow.get()).toBeUndefined()
+  })
+
   it('stays followed while the map moves under it', () => {
     const follow = followStore(mapView)
     openPanel({ kind: 'trip', id: BUS })

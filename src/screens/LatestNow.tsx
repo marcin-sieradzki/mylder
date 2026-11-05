@@ -6,7 +6,7 @@ import type { ClientDictionary } from '../i18n/dictionary'
 import { useI18n } from '../i18n/useI18n'
 import { useSnapshot } from '../map/live'
 import { timezoneOf, useNetwork } from '../map/timetable'
-import { spotlightTrip } from '../map/spotlight'
+import { spotlightLatest } from '../map/spotlight'
 import { whereOf, type Where } from '../map/where'
 import type { Network } from '../timetable/network'
 import { clockTime } from '../timetable/time'
@@ -14,6 +14,7 @@ import type { Snapshot } from '../tracker/index'
 import { badgeLine } from './departureRow'
 import { wholeMinutes, type Latest, type RankedTrip } from './latest'
 import styles from './LatestNow.module.css'
+import { stopName } from './patternStops'
 import { fill } from './vehicleLabel'
 
 type Words = ClientDictionary['latest']
@@ -44,10 +45,6 @@ function whereAt({ trip, state }: RankedTrip, snapshot: Snapshot, network: Netwo
   })
 }
 
-/** A stop of the trip's pattern by its index there, by its platform's name, as its calls name it. */
-const stopName = (network: Network, pattern: number, index: number) =>
-  network.stops.platforms[network.patterns.patterns[pattern].stops[index]]?.name ?? ''
-
 /** A delay as the pill writes it, "+2 min", in whole minutes. */
 const signed = (delay: number, words: Words) => {
   const minutes = wholeMinutes(delay)
@@ -63,8 +60,8 @@ interface StandoutProps extends PillProps {
 
 /**
  * The latest trip, "Latest now [5C] +11 min at Nørrebros Runddel", the stop it is at or last
- * passed, heard with the stops it is between; a press opens its vehicle panel, as a tap on its
- * dot does, flies the map to its dot and rings it with the spotlight.
+ * passed, heard with the stops it is between; a press opens the Latest right now panel on it,
+ * flies the map to its dot and rings it with the spotlight.
  */
 function Standout({ ranked, snapshot, network, words, room, pillRef }: StandoutProps) {
   const { trip, delay } = ranked
@@ -91,7 +88,7 @@ function Standout({ ranked, snapshot, network, words, room, pillRef }: StandoutP
         minutes: wholeMinutes(delay),
         where: heard,
       })}
-      onClick={() => spotlightTrip(trip.key)}
+      onClick={() => spotlightLatest(trip.key)}
     >
       <span className={styles.content}>
         <span>{words.now}</span>
@@ -120,7 +117,8 @@ export interface LatestNowProps extends PillProps {
 /**
  * The Latest now pill (docs/screens.md, "Latest now"): the trip furthest behind its timetable right
  * now, or, naming no trip, that none is 3 min late, that the delays have stopped coming, or that
- * no trip on the map sends them. None with the delays off, or before the timetable has loaded.
+ * no trip on the map sends them. Naming a trip or none 3 min late, a press opens the Latest right
+ * now panel (./LatestPanel.tsx). None with the delays off, or before the timetable has loaded.
  * In the top bar's tools, or alone on a glass row of its own at the start under the bar; the top
  * bar chooses (./latestPlace.ts).
  */
@@ -175,7 +173,19 @@ function pillOf(
         />
       )
     case 'calm':
-      return line(`${words.now} ${fill(words.atMost, { delay: signed(latest.delay, words) })}`)
+      // Pressed, it opens the Latest right now panel on the latest trips, picking none.
+      return (
+        <Button
+          ref={pillRef as Ref<HTMLButtonElement>}
+          variant="outline"
+          size="small"
+          className={styles.pill}
+          style={roomStyle(room)}
+          onClick={() => spotlightLatest(undefined)}
+        >
+          {`${words.now} ${fill(words.atMost, { delay: signed(latest.delay, words) })}`}
+        </Button>
+      )
     case 'quiet':
       return line(
         latest.since === undefined

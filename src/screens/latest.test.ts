@@ -111,9 +111,11 @@ describe('Latest now', () => {
   })
 
   it('is calm when no trip is 3 min or more late, with the largest delay', () => {
-    expect(
-      latestOf(withTrips(trip('a', 60), trip('b', 149), trip('c', -120)), weekday.fetched),
-    ).toEqual({ kind: 'calm', delay: 149, count: 3 })
+    const latest = latestOf(
+      withTrips(trip('a', 60), trip('b', 149), trip('c', -120)),
+      weekday.fetched,
+    )
+    expect(latest).toMatchObject({ kind: 'calm', delay: 149, count: 3 })
     // 150 s shows as "+3 min", the Delay component's late, so it stands out.
     expect(keysOf(latestOf(withTrips(trip('a', 60), trip('b', 150)), weekday.fetched))).toEqual([
       'b',
@@ -122,11 +124,49 @@ describe('Latest now', () => {
   })
 
   it('is calm at 0 when every trip with a delay runs early or on time', () => {
-    expect(latestOf(withTrips(trip('a', -60), trip('b', 0)), weekday.fetched)).toEqual({
+    const latest = latestOf(withTrips(trip('a', -60), trip('b', 0)), weekday.fetched)
+    expect(latest).toMatchObject({ kind: 'calm', delay: 0, count: 2 })
+    // The on-time trip is listed, the early one never.
+    expect(latest?.kind === 'calm' && latest.trips.map((ranked) => ranked.trip.key)).toEqual(['b'])
+    expect(latestOf(withTrips(trip('a', -60), trip('b', -30)), weekday.fetched)).toMatchObject({
       kind: 'calm',
       delay: 0,
-      count: 2,
+      trips: [],
     })
+  })
+
+  it('keeps the latest trips when calm too, the top five, largest first, for its panel', () => {
+    const latest = latestOf(
+      withTrips(
+        trip('a', 30),
+        trip('b', 120),
+        trip('c', 60),
+        trip('d', 90),
+        trip('e', 45),
+        trip('f', 100),
+        trip('early', -120),
+      ),
+      weekday.fetched,
+    )
+    expect(latest?.kind).toBe('calm')
+    expect(latest?.kind === 'calm' && latest.trips.map((ranked) => ranked.trip.key)).toEqual([
+      'b',
+      'f',
+      'd',
+      'c',
+      'e',
+    ])
+  })
+
+  it('lists on-time trips when calm, after the late ones, but never an early one', () => {
+    const latest = latestOf(
+      withTrips(trip('on-time', 0), trip('early', -60), trip('late', 60)),
+      weekday.fetched,
+    )
+    expect(latest?.kind === 'calm' && latest.trips.map((ranked) => ranked.trip.key)).toEqual([
+      'late',
+      'on-time',
+    ])
   })
 
   it('counts only the trips whose state shows a delay now, by the clock', () => {
