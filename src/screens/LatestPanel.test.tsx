@@ -275,13 +275,30 @@ describe('the Latest right now panel', () => {
     expect(flown).toEqual([])
   })
 
-  it('lists none, calm in Danish too, when every trip with a delay runs on time or early', async () => {
+  it('lists the trips on time when none runs late, in Danish too', async () => {
     await open('da', calm(0))
     const panel = await press(/^Mest forsinket nu højst 0 min$/, 'Mest forsinket lige nu')
     expect(
-      within(panel).getByText('Alle ture med en forsinkelse kører til tiden eller før tid.'),
+      within(panel).getByText('Ingen tur er 3 min forsinket eller mere lige nu.'),
     ).toBeInTheDocument()
-    expect(within(panel).queryByRole('region', { name: 'Mest forsinkede ture' })).toBeNull()
+    const rows = within(
+      within(panel).getByRole('region', { name: 'Mest forsinkede ture' }),
+    ).getAllByRole('button')
+    expect(rows).toHaveLength(5)
+    for (const row of rows) expect(row).toHaveAccessibleName(/ mod .+, til tiden, næste stop /)
+  })
+
+  it('lists none when every trip with a delay runs early', async () => {
+    const early: Snapshot = {
+      ...minute2,
+      trips: minute2.trips.map((trip) =>
+        trip.delay === undefined ? trip : { ...trip, delay: -Math.abs(trip.delay) - 60 },
+      ),
+    }
+    await open('en', early)
+    const panel = await press(/^Latest now 0 min at most$/)
+    expect(within(panel).getByText('Every trip with a delay runs early now.')).toBeInTheDocument()
+    expect(within(panel).queryByRole('listitem')).toBeNull()
   })
 
   it('names no trip, and lists none, once the delays stop coming', async () => {

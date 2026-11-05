@@ -26,8 +26,8 @@ export interface RankedTrip {
  * - `standout`: the latest trips, the top `TOP` largest first, and `count`, how many trips with a
  *   known delay they were drawn from, early and on-time ones too;
  * - `calm`: no trip `STANDS_OUT` late; the largest delay (0 when every trip runs early or on time),
- *   the late trips, the top `TOP` largest first, as the Latest right now panel lists them, and the
- *   count;
+ *   the trips running late or on time, the top `TOP` largest first, as the Latest right now panel
+ *   lists them, early ones never, and the count;
  * - `quiet`: SIRI-ET's feed has sent nothing for 5 min, as the data cards judge it, since its last
  *   message, or with no time when none has come;
  * - `none`: no trip on the map shows a delay, as when only the Metro runs.
@@ -82,8 +82,9 @@ export function latestOf(snapshot: Snapshot, now: number): Latest | undefined {
   if (known.length === 0) return { kind: 'none' }
   const late = known.filter(({ delay }) => delay > 0).sort(byDelay)
   const count = known.length
-  const trips = late.slice(0, TOP)
-  if (late.length === 0 || wholeMinutes(late[0].delay) < STANDS_OUT)
-    return { kind: 'calm', delay: late[0]?.delay ?? 0, trips, count }
-  return { kind: 'standout', trips, count }
+  if (late.length === 0 || wholeMinutes(late[0].delay) < STANDS_OUT) {
+    const notEarly = known.filter(({ delay }) => delay >= 0).sort(byDelay)
+    return { kind: 'calm', delay: late[0]?.delay ?? 0, trips: notEarly.slice(0, TOP), count }
+  }
+  return { kind: 'standout', trips: late.slice(0, TOP), count }
 }

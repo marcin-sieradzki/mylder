@@ -124,10 +124,13 @@ describe('Latest now', () => {
   })
 
   it('is calm at 0 when every trip with a delay runs early or on time', () => {
-    expect(latestOf(withTrips(trip('a', -60), trip('b', 0)), weekday.fetched)).toEqual({
+    const latest = latestOf(withTrips(trip('a', -60), trip('b', 0)), weekday.fetched)
+    expect(latest).toMatchObject({ kind: 'calm', delay: 0, count: 2 })
+    // The on-time trip is listed, the early one never.
+    expect(latest?.kind === 'calm' && latest.trips.map((ranked) => ranked.trip.key)).toEqual(['b'])
+    expect(latestOf(withTrips(trip('a', -60), trip('b', -30)), weekday.fetched)).toMatchObject({
       kind: 'calm',
       delay: 0,
-      count: 2,
       trips: [],
     })
   })
@@ -152,6 +155,17 @@ describe('Latest now', () => {
       'd',
       'c',
       'e',
+    ])
+  })
+
+  it('lists on-time trips when calm, after the late ones, but never an early one', () => {
+    const latest = latestOf(
+      withTrips(trip('on-time', 0), trip('early', -60), trip('late', 60)),
+      weekday.fetched,
+    )
+    expect(latest?.kind === 'calm' && latest.trips.map((ranked) => ranked.trip.key)).toEqual([
+      'late',
+      'on-time',
     ])
   })
 

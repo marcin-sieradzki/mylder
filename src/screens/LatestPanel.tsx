@@ -338,7 +338,7 @@ function Row({ ranked, network, words }: RowProps) {
     <li className={styles.row}>
       <OpenTrip
         departure={{ trip: trip.key, mode: trip.mode, line: trip.line, headsign: trip.headsign }}
-        label={fill(words.row, {
+        label={fill(wholeMinutes(delay) === 0 ? words.rowOnTime : words.row, {
           line: trip.line,
           headsign: trip.headsign,
           minutes: wholeMinutes(delay),

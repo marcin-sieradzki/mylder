@@ -34,6 +34,6 @@ Each feature file starts with an H1 and one paragraph on what the rider sees, th
 - [Stop panel](./stop-panel.md): a stop's panel with the trips standing at its platforms, and its departures and arrivals as two tabs, with SIRI-ET's expected times and cancellations.
 - [The overview sheet](./overview-sheet.md): City pulse and the Vehicles list.
 - [Disruptions](./disruptions.md): the messages, Show on map and the highlight chip.
-- [Latest right now](./latest-right-now.md): the Latest now pill in the top bar, naming the trip running latest, the flight to it and its spotlight, and its calm, quiet and off states.
+- [Latest right now](./latest-right-now.md): the Latest now pill in the top bar, naming the trip running latest, the Latest right now panel it opens with the next latest a tap away, the flight to a trip and its spotlight, and its calm, quiet and off states.
 - [Planes](./planes.md): the aircraft, their card and the Planes filter.
 - [Language and About](./language-and-about.md): the language switch, `/da`, and the About dialog.
