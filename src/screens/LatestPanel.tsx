@@ -289,7 +289,7 @@ const STRIKE_FROM = 60_000
  * The next stop, its timetabled time struck through before the time the delay gives, "Hillerød St.
  * 08:06 ~09:23", heard "Hillerød St., Timetabled 08:06, expected 09:23"; with no delay known, the
  * time alone. A stand-in for Perron's struck timetabled time outside a departure row, as
- * DepartureRow draws its own, until Perron has one. perron-stand-in: perron#TBD
+ * DepartureRow draws its own, until Perron has one. perron-stand-in: perron#199
  */
 function NextStop({ stop, expected, delay, estimated, timezone, words }: NextStopProps) {
   const at = (moment: number) => clockTime(moment, timezone)

@@ -41,7 +41,7 @@
 
 /* Heard, not seen: the struck time and the expected one in words. A stand-in for Perron's
    visually hidden text, which its DepartureRow keeps internal: goes with the struck time's piece.
-   perron-stand-in: perron#TBD */
+   perron-stand-in: perron#199 */
 .heard {
   position: absolute;
   inline-size: 1px;
