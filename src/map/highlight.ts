@@ -185,13 +185,14 @@ export interface Floating {
  * measured them, it keeps clear of the page notices that push the chip down and, on a desktop, of
  * the legend; with `foot`, as a flight to one dot asks, of the legend on a phone too, where the
  * legend, the controls and the credit stand on the peek and a lone dot would land beside them. A
- * window too small for that pads less, at the bottom first, so the highlight keeps room.
+ * window too small for that pads less, at the bottom first, so the highlight keeps `room` px
+ * across and down, `ROOM` unless given, such as a lone dot's far smaller room.
  */
 export function fitPadding(
   width: number,
   height: number,
   floating: Floating = {},
-  { foot = false }: { readonly foot?: boolean } = {},
+  { foot = false, room = ROOM }: { readonly foot?: boolean; readonly room?: number } = {},
 ): Padding {
   const gap = 12 // size.panel-gap, and space.300 from the edge
   const chip = 34 + 8 // size.control, and its gap under the top bar (MapHighlight.module.css)
@@ -214,9 +215,9 @@ export function fitPadding(
         bottom: Math.max((floating.peek ?? 182) + gap + MARGIN, above), // size.sheet-peek
         left: MARGIN,
       }
-  const across = Math.min(1, Math.max(0, width - ROOM) / (padding.left + padding.right))
+  const across = Math.min(1, Math.max(0, width - room) / (padding.left + padding.right))
   // Down, the bottom gives way first, so the chip stays clear of the highlight longest.
-  const down = Math.max(0, height - ROOM)
+  const down = Math.max(0, height - room)
   const top = Math.min(padding.top, down)
   return {
     top: Math.floor(top),

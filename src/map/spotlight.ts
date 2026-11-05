@@ -135,6 +135,12 @@ export type FlightMap = Pick<
 
 type Area = { readonly width: number; readonly height: number }
 
+/**
+ * The room a lone dot needs, in px across and down: its ring, 24 px, and as much again around it,
+ * so on a short phone the dot lands between the header and the legend rather than beside it.
+ */
+const DOT_ROOM = 48
+
 /** The room a flight lands a dot in, clear of what floats over the map, and where it would land. */
 function aim(
   map: FlightMap,
@@ -149,7 +155,7 @@ function aim(
     bearing: map.getBearing(),
     fov: map.getVerticalFieldOfView(),
   })
-  const padding = fitPadding(area.width, area.height, floating, { foot: true })
+  const padding = fitPadding(area.width, area.height, floating, { foot: true, room: DOT_ROOM })
   return { padding, place: placeOn(point, { centre: point, zoom }, zoom, area, padding, lens) }
 }
 

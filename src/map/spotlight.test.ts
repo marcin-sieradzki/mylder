@@ -174,6 +174,16 @@ describe('the flight to a trip', () => {
     expect(at.y).toBeLessThan(915 - 460 - 24)
   })
 
+  it('lands its dot between the header and the legend on a short phone, where they leave little room', () => {
+    // 360 by 800: the header with the pill's two-line row and a page notice down to 248 px, the
+    // legend's top 393 px from the foot, at 407 px. A dot needs far less room than a highlight.
+    const { map, landed } = mapAt(360, 800, 10.4)
+    flyOnto(map, { width: 360, height: 800 }, BUS_AT, { top: 248, bottom: 393 }, followStore())
+    const at = landed(BUS_AT)
+    expect(at.y - 12).toBeGreaterThan(248)
+    expect(at.y + 12).toBeLessThan(407)
+  })
+
   it('keeps the zoom of a rider already closer in', () => {
     const { map, flown, landed } = mapAt(1280, 800, 16.5)
     flyOnto(map, { width: 1280, height: 800 }, BUS_AT, { top: 70 }, followStore())
