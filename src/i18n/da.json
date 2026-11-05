@@ -29,6 +29,28 @@
     "quiet": "Forsinkelser fra Rejseplanen ikke opdateret siden {time}",
     "quietNever": "Forsinkelser fra Rejseplanen endnu ikke modtaget"
   },
+  "latestPanel": {
+    "title": "Mest forsinket lige nu",
+    "loading": "Henter de mest forsinkede ture…",
+    "picked": "Den mest forsinkede tur",
+    "modeOperator": "{mode} · {operator}",
+    "waiting": "Venter ved {stop}",
+    "timetabled": "Planlagt {time}",
+    "expected": "forventet {time}",
+    "sent": "Forsinkelse sendt {time} af Rejseplanen",
+    "next": "Næste mest forsinkede",
+    "latestTrips": "Mest forsinkede ture",
+    "row": "{line} mod {headsign}, {minutes} min forsinket, næste stop {stop}",
+    "rowNext": "Næste stop: {stop}",
+    "calm": "Ingen tur er 3 min forsinket eller mere lige nu.",
+    "calmNone": "Alle ture med en forsinkelse kører til tiden eller før tid.",
+    "source": "Ud af {count} ture med forsinkelser fra Rejseplanen nu. Metroen og letbanen sender ingen. Opdateret {time}",
+    "quietDetail": "Mylder nævner ingen tur, før de kommer igen.",
+    "none": "Ingen tur på kortet viser en forsinkelse",
+    "noneDetail": "Metroen og letbanen sender ingen.",
+    "off": "Ingen forsinkelser på dette kort",
+    "offDetail": "Køreplanen alene sender ingen forsinkelser."
+  },
   "modes": {
     "bus": "Bus",
     "metro": "Metro",

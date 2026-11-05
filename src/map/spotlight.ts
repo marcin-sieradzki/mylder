@@ -7,6 +7,7 @@
 // rider's again from then on.
 import 'client-only'
 import type { Map as MapLibreMap } from 'maplibre-gl'
+import { useSyncExternalStore } from 'react'
 import { followedVehicle, type FollowStore } from './follow.ts'
 import {
   FIT_ZOOM,
@@ -67,6 +68,14 @@ export function spotlightStore(view: ViewStore = mapView): SpotlightStore {
 
 /** The page's one spotlight, which the pill rings and the canvas draws. */
 export const vehicleSpotlight = spotlightStore()
+
+/**
+ * The ringed trip's key, for a component such as the Latest right now panel, whose picked trip it
+ * is: it renders again when the ring moves or goes. The prerendered page rings none.
+ */
+export function useSpotlight(store: SpotlightStore = vehicleSpotlight): string | undefined {
+  return useSyncExternalStore(store.subscribe, store.get, () => undefined)
+}
 
 export interface FlightStore {
   /** Asks the map to fly to the trip `key`'s dot. */
