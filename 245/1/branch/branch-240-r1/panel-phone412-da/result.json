@@ -1,0 +1,15 @@
+{
+  "journey": "panel-phone412-da",
+  "pass": true,
+  "steps": [
+    "01-before-press: before press (http://localhost:4315/da)",
+    "02-pressed: pressed (http://localhost:4315/da?latest=now&map=15.00/55.64352/12.37041)",
+    "03-ring-at-rest: ring at rest (http://localhost:4315/da?latest=now&map=15.00/55.64352/12.37041)",
+    "04-panel-head-and-list: panel head and list (http://localhost:4315/da?latest=now&map=15.00/55.64352/12.37041)",
+    "05-sheet-dragged-up: sheet dragged up (http://localhost:4315/da?latest=now&map=15.00/55.64352/12.37041)",
+    "06-panel-scrolled-to-its-foot: panel scrolled to its foot (http://localhost:4315/da?latest=now&map=15.00/55.64352/12.37041)",
+    "07-row-tapped: row tapped (http://localhost:4315/da?map=15.00/55.64352/12.37041&trip=bus.500S.601b096611.20261031.0740)",
+    "08-ring-moved-at-rest: ring moved, at rest (http://localhost:4315/da?map=15.00/55.61416/12.47570&trip=bus.500S.601b096611.20261031.0740)",
+    "09-closed: closed (http://localhost:4315/da?map=15.00/55.61416/12.47570)"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "journey": "link-1440-en",
+  "pass": true,
+  "steps": [
+    "01-cold-load: cold load (http://localhost:4315/en?latest=now&map=15.00/55.62340/12.38927)",
+    "02-flown-to-at-rest: flown to, at rest (http://localhost:4315/en?latest=now&map=15.00/55.62340/12.38927)",
+    "03-next-minute-same-trip: next minute, same trip (http://localhost:4315/en?latest=now&map=15.00/55.62340/12.38927)"
+  ]
+}

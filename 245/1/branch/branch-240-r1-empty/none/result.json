@@ -1,0 +1,10 @@
+{
+  "journey": "none",
+  "pass": true,
+  "steps": [
+    "01-none: none (http://localhost:4412/en)",
+    "02-none-pressed: none pressed (http://localhost:4412/en)",
+    "03-none: none (http://localhost:4412/da)",
+    "04-none-pressed: none pressed (http://localhost:4412/da)"
+  ]
+}

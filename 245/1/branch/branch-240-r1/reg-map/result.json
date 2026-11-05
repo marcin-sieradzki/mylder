@@ -1,0 +1,10 @@
+{
+  "journey": "reg-map",
+  "pass": true,
+  "steps": [
+    "01-drawn: drawn (http://localhost:4315/en)",
+    "02-buses-off: buses off (http://localhost:4315/en?hide=bus)",
+    "03-tilted-and-turned: tilted and turned (http://localhost:4315/en?map=11.20/55.68000/12.56500/30.0/30.0)",
+    "04-centred: centred (http://localhost:4315/en?map=11.20/55.68000/12.56500)"
+  ]
+}

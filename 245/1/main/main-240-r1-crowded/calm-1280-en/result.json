@@ -1,0 +1,8 @@
+{
+  "journey": "calm-1280-en",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('banner').getByRole('button', { name: /^Latest now [+]?\\d+ min at most$/ })\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('banner').getByRole('button', { name: /^Latest now [+]?\\d+ min at most$/ }) with timeout 90000ms\n  - waiting for getByRole('banner').getByRole('button', { name: /^Latest now [+]?\\d+ min at most$/ })\n",
+  "steps": [
+    "01-failure: failure (http://localhost:4412/en)"
+  ]
+}

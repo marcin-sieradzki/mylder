@@ -1,0 +1,9 @@
+{
+  "journey": "race-1280-en",
+  "pass": true,
+  "steps": [
+    "01-panel-open-waiting-for-the-minute: panel open, waiting for the minute (http://localhost:4315/en?latest=now&map=15.00/55.97099/12.31562)",
+    "02-row-tapped-as-the-snapshot-is-requested: row tapped as the snapshot is requested (http://localhost:4315/en?map=15.00/55.97099/12.31562&trip=bus.144.bc5239a3e3.20261031.0815)",
+    "03-at-rest: at rest (http://localhost:4315/en?map=15.00/55.63736/12.35960&trip=bus.144.bc5239a3e3.20261031.0815)"
+  ]
+}

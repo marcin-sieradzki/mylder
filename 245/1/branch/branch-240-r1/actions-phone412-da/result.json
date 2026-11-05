@@ -1,0 +1,12 @@
+{
+  "journey": "actions-phone412-da",
+  "pass": true,
+  "steps": [
+    "01-panel-open: panel open (http://localhost:4315/da?latest=now&map=15.00/55.62343/12.38436)",
+    "02-follow-on: follow on (http://localhost:4315/da?latest=now&map=15.00/55.62343/12.38436)",
+    "03-following-9-s-later: following 9 s later (http://localhost:4315/da?latest=now&map=15.00/55.62343/12.38436)",
+    "04-dragged-follow-off: dragged: follow off (http://localhost:4315/da?latest=now&map=15.00/55.62593/12.38563)",
+    "05-whole-line-shown: whole line shown (http://localhost:4315/da?latest=now&map=10.09/55.69584/12.34783)",
+    "06-line-cleared: line cleared (http://localhost:4315/da?latest=now&map=10.09/55.69584/12.34783)"
+  ]
+}

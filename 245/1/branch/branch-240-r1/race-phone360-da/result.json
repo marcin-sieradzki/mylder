@@ -1,0 +1,9 @@
+{
+  "journey": "race-phone360-da",
+  "pass": true,
+  "steps": [
+    "01-panel-open-waiting-for-the-minute: panel open, waiting for the minute (http://localhost:4315/da?latest=now&map=15.00/55.94312/12.31098)",
+    "02-row-tapped-as-the-snapshot-is-requested: row tapped as the snapshot is requested (http://localhost:4315/da?map=15.00/55.94312/12.31098&trip=bus.123.be52df473f.20261031.0830)",
+    "03-at-rest: at rest (http://localhost:4315/da?map=15.00/55.64071/12.10299&trip=bus.123.be52df473f.20261031.0830)"
+  ]
+}

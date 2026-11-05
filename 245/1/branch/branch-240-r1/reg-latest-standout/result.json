@@ -1,0 +1,8 @@
+{
+  "journey": "reg-latest-standout",
+  "pass": true,
+  "steps": [
+    "01-pill-en: pill en (http://localhost:4315/en)",
+    "02-pill-da: pill da (http://localhost:4315/da)"
+  ]
+}

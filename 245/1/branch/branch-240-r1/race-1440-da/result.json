@@ -1,0 +1,9 @@
+{
+  "journey": "race-1440-da",
+  "pass": true,
+  "steps": [
+    "01-panel-open-waiting-for-the-minute: panel open, waiting for the minute (http://localhost:4315/da?latest=now&map=15.00/55.95394/12.30918)",
+    "02-row-tapped-as-the-snapshot-is-requested: row tapped as the snapshot is requested (http://localhost:4315/da?map=15.00/55.95394/12.30918&trip=bus.123.be52df473f.20261031.0830)",
+    "03-at-rest: at rest (http://localhost:4315/da?map=15.00/55.64199/12.10932&trip=bus.123.be52df473f.20261031.0830)"
+  ]
+}

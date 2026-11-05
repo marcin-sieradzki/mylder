@@ -1,0 +1,9 @@
+{
+  "journey": "link-phone360-da",
+  "pass": true,
+  "steps": [
+    "01-cold-load: cold load (http://localhost:4315/da?latest=now&map=15.00/55.62244/12.37844)",
+    "02-flown-to-at-rest: flown to, at rest (http://localhost:4315/da?latest=now&map=15.00/55.62244/12.37844)",
+    "03-next-minute-same-trip: next minute, same trip (http://localhost:4315/da?latest=now&map=15.00/55.62244/12.37844)"
+  ]
+}

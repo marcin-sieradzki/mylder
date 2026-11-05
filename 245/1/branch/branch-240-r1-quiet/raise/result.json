@@ -1,0 +1,9 @@
+{
+  "journey": "raise",
+  "pass": true,
+  "steps": [
+    "01-peek: peek (http://localhost:4412/da?trip=bus.1A.48c080f3c1.20261031.0855)",
+    "02-raised: raised (http://localhost:4412/da?trip=bus.1A.48c080f3c1.20261031.0855)",
+    "03-middle: middle (http://localhost:4412/da?trip=bus.1A.48c080f3c1.20261031.0855)"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "journey": "panel-phone360-en",
+  "pass": true,
+  "steps": [
+    "01-before-press: before press (http://localhost:4315/en)",
+    "02-pressed: pressed (http://localhost:4315/en?latest=now)",
+    "03-ring-at-rest: ring at rest (http://localhost:4315/en?latest=now&map=15.00/55.64325/12.36949)",
+    "04-panel-head-and-list: panel head and list (http://localhost:4315/en?latest=now&map=15.00/55.64325/12.36949)",
+    "05-sheet-dragged-up: sheet dragged up (http://localhost:4315/en?latest=now&map=15.00/55.64325/12.36949)",
+    "06-panel-scrolled-to-its-foot: panel scrolled to its foot (http://localhost:4315/en?latest=now&map=15.00/55.64325/12.36949)",
+    "07-row-tapped: row tapped (http://localhost:4315/en?map=15.00/55.64325/12.36949&trip=bus.500S.601b096611.20261031.0740)",
+    "08-ring-moved-at-rest: ring moved, at rest (http://localhost:4315/en?map=15.00/55.61472/12.47631&trip=bus.500S.601b096611.20261031.0740)",
+    "09-closed: closed (http://localhost:4315/en?map=15.00/55.61472/12.47631)"
+  ]
+}

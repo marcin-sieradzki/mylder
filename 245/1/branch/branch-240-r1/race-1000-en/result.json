@@ -1,0 +1,9 @@
+{
+  "journey": "race-1000-en",
+  "pass": true,
+  "steps": [
+    "01-panel-open-waiting-for-the-minute: panel open, waiting for the minute (http://localhost:4315/en?latest=now&map=15.00/55.93649/12.31371)",
+    "02-row-tapped-as-the-snapshot-is-requested: row tapped as the snapshot is requested (http://localhost:4315/en?map=15.00/55.93649/12.31371&trip=train.IC.4b951d7b67.20261031.0740)",
+    "03-at-rest: at rest (http://localhost:4315/en?map=15.00/55.41564/9.94495&trip=train.IC.4b951d7b67.20261031.0740)"
+  ]
+}

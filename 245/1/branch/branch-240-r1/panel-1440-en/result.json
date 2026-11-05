@@ -1,0 +1,15 @@
+{
+  "journey": "panel-1440-en",
+  "pass": true,
+  "steps": [
+    "01-before-press: before press (http://localhost:4315/en)",
+    "02-pressed: pressed (http://localhost:4315/en?latest=now)",
+    "03-ring-at-rest: ring at rest (http://localhost:4315/en?latest=now&map=15.00/55.64711/12.37283)",
+    "04-panel-head-and-list: panel head and list (http://localhost:4315/en?latest=now&map=15.00/55.64711/12.37283)",
+    "05-panel-scrolled-to-its-foot: panel scrolled to its foot (http://localhost:4315/en?latest=now&map=15.00/55.64711/12.37283)",
+    "06-row-tapped: row tapped (http://localhost:4315/en?map=15.00/55.64711/12.37283&trip=bus.8A.3b9d7ef130.20261031.0841)",
+    "07-ring-moved-at-rest: ring moved, at rest (http://localhost:4315/en?map=15.00/55.64661/12.62290&trip=bus.8A.3b9d7ef130.20261031.0841)",
+    "08-hover-on-moved-ring: hover on moved ring (http://localhost:4315/en?map=15.00/55.64661/12.62290&trip=bus.8A.3b9d7ef130.20261031.0841)",
+    "09-closed: closed (http://localhost:4315/en?map=15.00/55.64661/12.62290)"
+  ]
+}

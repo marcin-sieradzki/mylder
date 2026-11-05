@@ -1,0 +1,10 @@
+{
+  "journey": "link-phone360-da",
+  "pass": false,
+  "error": "expect(locator).toHaveAttribute(expected) failed\n\nLocator:  locator('[data-vehicles]')\nExpected: \"bus.144.bc5239a3e3.20261031.0815\"\nReceived: \"\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toHaveAttribute\" locator('[data-vehicles]') with timeout 5000ms\n  - waiting for locator('[data-vehicles]')\n    13 × locator resolved to <div data-tilt=\"0\" data-heading=\"0\" data-aircraft=\"10\" data-vehicles=\"596\" class=\"EEL_KW_canvas maplibregl-map\">…</div>\n       - unexpected value \"null\"\n",
+  "steps": [
+    "01-cold-load: cold load (http://localhost:4315/da?latest=now&map=15.00/55.62238/12.38865)",
+    "02-flown-to-at-rest: flown to, at rest (http://localhost:4315/da?latest=now&map=15.00/55.62238/12.38865)",
+    "03-failure: failure (http://localhost:4315/da?latest=now&map=15.00/55.62238/12.38865)"
+  ]
+}

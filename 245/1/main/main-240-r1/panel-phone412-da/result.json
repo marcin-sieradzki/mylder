@@ -1,0 +1,10 @@
+{
+  "journey": "panel-phone412-da",
+  "pass": false,
+  "error": "?latest=now\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: \"now\"\nReceived: null",
+  "steps": [
+    "01-before-press: before press (http://localhost:4314/da)",
+    "02-pressed: pressed (http://localhost:4314/da?trip=train.IC.4b951d7b67.20261031.0740)",
+    "03-failure: failure (http://localhost:4314/da?trip=train.IC.4b951d7b67.20261031.0740)"
+  ]
+}

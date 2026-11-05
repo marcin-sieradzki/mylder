@@ -1,0 +1,13 @@
+{
+  "journey": "quiet",
+  "pass": true,
+  "steps": [
+    "01-panel-open-while-fresh: panel open while fresh (http://localhost:4412/en?latest=now)",
+    "02-feed-went-quiet-with-the-panel-open: feed went quiet with the panel open (http://localhost:4412/en?latest=now&map=15.00/56.12423/12.30250)",
+    "03-quiet-pill-en: quiet pill en (http://localhost:4412/en)",
+    "04-quiet-pill-pressed-en: quiet pill pressed en (http://localhost:4412/en)",
+    "05-quiet-pill-da: quiet pill da (http://localhost:4412/da)",
+    "06-quiet-pill-pressed-da: quiet pill pressed da (http://localhost:4412/da)",
+    "07-link-while-quiet: link while quiet (http://localhost:4412/en?latest=now)"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "journey": "actions-1280-en",
+  "pass": true,
+  "steps": [
+    "01-panel-open: panel open (http://localhost:4315/en?latest=now&map=15.00/55.62410/12.38347)",
+    "02-follow-on: follow on (http://localhost:4315/en?latest=now&map=15.00/55.62410/12.38347)",
+    "03-following-9-s-later: following 9 s later (http://localhost:4315/en?latest=now&map=15.00/55.62410/12.38347)",
+    "04-dragged-follow-off: dragged: follow off (http://localhost:4315/en?latest=now&map=15.00/55.62452/12.38229)",
+    "05-whole-line-shown: whole line shown (http://localhost:4315/en?latest=now&map=10.30/55.68736/12.34448)",
+    "06-line-cleared: line cleared (http://localhost:4315/en?latest=now&map=10.30/55.68736/12.34448)"
+  ]
+}

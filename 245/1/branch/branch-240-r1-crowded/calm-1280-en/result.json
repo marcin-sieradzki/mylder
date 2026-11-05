@@ -1,0 +1,9 @@
+{
+  "journey": "calm-1280-en",
+  "pass": true,
+  "steps": [
+    "01-calm-pill: calm pill (http://localhost:4412/en)",
+    "02-calm-panel: calm panel (http://localhost:4412/en?latest=now)",
+    "03-calm-panel-8-s-later-still-no-ring: calm panel 8 s later, still no ring (http://localhost:4412/en?latest=now)"
+  ]
+}

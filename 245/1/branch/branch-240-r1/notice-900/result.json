@@ -1,0 +1,8 @@
+{
+  "journey": "notice-900",
+  "pass": true,
+  "steps": [
+    "01-before-press: before press (http://localhost:4315/en)",
+    "02-pressed: pressed (http://localhost:4315/en?latest=now&map=15.00/55.65523/12.34345)"
+  ]
+}

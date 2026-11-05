@@ -1,0 +1,68 @@
+import type { Journey } from '../../../.claude/skills/verify-mylder/scripts/drive.ts'
+import { mapEl, box, mapParam } from './lib.ts'
+import { W, type Lang, snapshot, waitStandout, dims, startSampler, restSample } from './p.ts'
+
+/** Follow and Show whole line from the panel's head act on the top trip as in its vehicle panel. */
+export async function actions({ page, step, expect }: Journey, o: { width?: number; lang: Lang; phone?: boolean }) {
+  const w = W[o.lang]
+  await dims(page, o.width)
+  await page.goto('/' + o.lang)
+  const pill = await waitStandout(page, expect, o.lang)
+  const map0 = mapParam(page)
+  await startSampler(page)
+  await pill.click()
+  const panel = page.getByRole('dialog', { name: w.title })
+  const card = panel.getByRole('region', { name: w.card })
+  await expect(card).toBeVisible()
+  await restSample(page, map0)
+  const key = await mapEl(page).getAttribute('data-spotlight')
+  const t = (await snapshot(page)).trips.find((x: any) => x.key === key)
+  console.log('picked', key, t.line, t.headsign)
+  await step('panel open')
+  const follow = card.getByRole('button', { name: w.follow })
+  await expect(follow).toHaveAttribute('aria-pressed', 'false')
+  await follow.click()
+  await expect(follow).toHaveAttribute('aria-pressed', 'true')
+  const a = (await mapEl(page).getAttribute('data-spotlight-at'))!.split(' ').map(Number)
+  const m1 = mapParam(page)
+  await step('follow on')
+  await page.waitForTimeout(9000)
+  const b = (await mapEl(page).getAttribute('data-spotlight-at'))!.split(' ').map(Number)
+  const m2 = mapParam(page)
+  console.log('follow: ring', a, '->', b, 'map', m1, '->', m2)
+  await step('following 9 s later')
+  await expect(follow).toHaveAttribute('aria-pressed', 'true')
+  expect(new URL(page.url()).searchParams.get('latest'), 'panel stays').toBe('now')
+  // the camera keeps to the dot: the ring stays put on the screen while the map moves on (the dot moves)
+  expect(Math.hypot(a[0] - b[0], a[1] - b[1]), 'ring held in place by Follow').toBeLessThan(30)
+  // a drag ends Follow
+  const vp = page.viewportSize()!
+  const panelBox = await box(page, panel)
+  const cx = o.phone ? vp.width / 2 : (panelBox.left + 400) / 2, cy = o.phone ? 380 : vp.height / 2
+  await page.mouse.move(cx, cy)
+  await page.mouse.down()
+  await page.mouse.move(cx + 80, cy + 60, { steps: 10 })
+  await page.mouse.up()
+  await expect(follow).toHaveAttribute('aria-pressed', 'false')
+  await step('dragged: follow off')
+  await follow.click()
+  await expect(follow).toHaveAttribute('aria-pressed', 'true')
+  // Show whole line: the chip, Follow ends, the camera pulls out
+  const z0 = Number(mapParam(page)?.split('/')[0])
+  const m3 = mapParam(page)
+  await startSampler(page)
+  await card.getByRole('button', { name: w.line }).click()
+  const chip = page.getByRole('button', { name: w.showing })
+  await expect(chip).toBeVisible()
+  await expect(chip).toHaveAccessibleName(new RegExp(`${t.line}`))
+  await expect(follow).toHaveAttribute('aria-pressed', 'false')
+  const rest = await restSample(page, m3)
+  console.log('line view', JSON.stringify(rest))
+  const z1 = Number(rest.map?.split('/')[0])
+  expect(z1, 'camera pulled out to the whole line').toBeLessThan(z0)
+  await step('whole line shown')
+  console.log('chip', await chip.getAttribute('aria-label') ?? await chip.innerText())
+  await chip.click()
+  await expect(chip).toBeHidden()
+  await step('line cleared')
+}

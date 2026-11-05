@@ -1,0 +1,8 @@
+{
+  "journey": "race-1280-en",
+  "pass": false,
+  "error": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Latest right now' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Latest right now' }) with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Latest right now' })\n",
+  "steps": [
+    "01-failure: failure (http://localhost:4314/en?trip=train.910.af953e6f34.20261031.0858&map=15.00/55.80989/12.52703)"
+  ]
+}

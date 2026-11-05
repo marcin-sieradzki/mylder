@@ -1,0 +1,8 @@
+{
+  "journey": "probe-where",
+  "pass": true,
+  "steps": [
+    "01-card: card (http://localhost:4315/en?latest=now&map=15.00/55.66282/12.33676)",
+    "02-card-later: card later (http://localhost:4315/en?latest=now&map=15.00/55.66282/12.33676)"
+  ]
+}
