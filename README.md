@@ -4,14 +4,14 @@
 
 _Mylder_ is Danish for a teeming crowd, and it echoes _myldretid_, rush hour.
 
-**Live:** [mylder-liard.vercel.app](https://mylder-liard.vercel.app) runs on today's timetable. **Demo:** [marcin-sieradzki.github.io/mylder](https://marcin-sieradzki.github.io/mylder/) runs the whole app on simulated data, with the server's tracker in a Web Worker in your browser.
+**Live:** [mylder-liard.vercel.app](https://mylder-liard.vercel.app) runs on today's timetable, with delays and cancellations from SIRI-ET. **Demo:** [marcin-sieradzki.github.io/mylder](https://marcin-sieradzki.github.io/mylder/) runs the whole app on simulated data, with the server's tracker in a Web Worker in your browser.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/map-dark.png">
   <img alt="Mylder's map of Copenhagen: every bus, Metro, S-tog, train and light rail vehicle as a dot on its line, with City pulse open in the side sheet" src="docs/images/map-light.png">
 </picture>
 
-> **Status:** every screen of the first public version is built, and runs on the timetable: every vehicle is placed where its timetable says it should be, and the page says so. It is live on [Vercel](https://mylder-liard.vercel.app). Next come delays and cancellations from Rejseplanen's SIRI-ET feed, once its listener is deployed. The Rejseplanen API joins once its key arrives ([ADR 0018](docs/adr/0018-mylder-goes-public-on-the-timetable-and-siri-et-and-adds-the-api-with-the-key.md)). See the [roadmap](#roadmap).
+> **Status:** every screen of the first public version is built, and runs on the timetable: every vehicle is placed where its timetable says it should be, and the page says so. Delays and cancellations come from Rejseplanen's SIRI-ET feed, through a small listener on Fly.io, and it is live on [Vercel](https://mylder-liard.vercel.app). The Rejseplanen API joins once its key arrives ([ADR 0018](docs/adr/0018-mylder-goes-public-on-the-timetable-and-siri-et-and-adds-the-api-with-the-key.md)). See the [roadmap](#roadmap).
 
 ## Why
 
@@ -59,7 +59,7 @@ The free Rejseplanen key allows about one call a minute, so browsers never call 
 - [x] A simulated demo on GitHub Pages
 - [x] The planes over Copenhagen, live from adsb.lol with adsb.fi as its fallback
 - [x] Every vehicle on its timetable by default, with no invented realtime
-- [ ] Delays and cancellations from Rejseplanen's SIRI-ET feed, through one small always-on listener
+- [x] Delays and cancellations from Rejseplanen's SIRI-ET feed, through one small always-on listener
 - [x] Production and previews on Vercel, live at [mylder-liard.vercel.app](https://mylder-liard.vercel.app)
 - [ ] The tracker's state in a hosted Redis
 
