@@ -12,17 +12,16 @@ function sameLatest(a: Latest | undefined, b: Latest | undefined): boolean {
   if (a === b) return true
   if (!a || !b || a.kind !== b.kind) return false
   switch (a.kind) {
-    case 'standout': {
+    case 'standout':
+    case 'calm': {
       const other = b as typeof a
       return (
         a.count === other.count &&
         a.trips.length === other.trips.length &&
-        a.trips.every((each, i) => each.trip === other.trips[i].trip)
+        a.trips.every(
+          (each, i) => each.trip === other.trips[i].trip && each.state === other.trips[i].state,
+        )
       )
-    }
-    case 'calm': {
-      const other = b as typeof a
-      return a.delay === other.delay && a.count === other.count
     }
     case 'quiet':
       return a.since === (b as typeof a).since

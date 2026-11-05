@@ -1,13 +1,14 @@
 // Follow, from vehicle detail (docs/screens.md, "Vehicle detail"): the camera stays on one trip's
 // dot, moved there as Follow starts and from the animation loop each frame it draws, outside
 // React, so the page renders again only when Follow starts or ends. It ends when the trip reaches
-// its last stop or leaves the map, when the viewer pans, when the trip's panel closes, and when
-// the Latest now pill flies the map to a trip (spotlight.ts). A zoom keeps it: the camera zooms on
+// its last stop or leaves the map, when the viewer pans, when the trip's panel, or the Latest right
+// now panel it was started from, closes, and when the Latest now pill flies the map to a trip
+// (spotlight.ts). A zoom keeps it: the camera zooms on
 // the dot.
 import 'client-only'
 import type { Map as MapLibreMap, MapLibreEvent } from 'maplibre-gl'
 import { useSyncExternalStore } from 'react'
-import { mapView, type ViewStore } from './view.ts'
+import { holdsTrip, mapView, type ViewStore } from './view.ts'
 import type { Vehicles } from './vehicles.ts'
 
 /** Where a moving dot was last placed along its path, and where the path's last stop lies. */
@@ -64,7 +65,10 @@ export function endsFollow(move: { readonly originalEvent?: Event }): boolean {
 export interface FollowStore {
   /** The followed trip's key; none while nothing is followed. */
   get(): string | undefined
-  /** Follows the trip `key`, whose panel is open, until its panel closes or Follow ends. */
+  /**
+   * Follows the trip `key`, whose panel or the Latest right now panel is open, until that panel
+   * closes or Follow ends.
+   */
   start(key: string): void
   stop(): void
   /** Calls back whenever Follow starts or ends; returns the function that stops it. */
@@ -91,8 +95,7 @@ export function followStore(view: ViewStore = mapView): FollowStore {
     start(key) {
       stopWatching?.()
       stopWatching = view.subscribe(() => {
-        const { panel } = view.get()
-        if (panel?.kind !== 'trip' || panel.id !== followed) stop()
+        if (!holdsTrip(view.get().panel, followed)) stop()
       })
       set(key)
     },

@@ -1,9 +1,10 @@
-// The spotlight, from the Latest now pill (docs/screens.md, "Latest now"): a ring on the map round
-// one trip's dot, drawn by the overlay (overlay.ts, SpotlightLayer.ts) where the dot is each frame,
-// so the rider finds it among the others, and the flight that brings the camera to it. It rings
-// the trip the rider picked, whose vehicle panel is open, and stays on it while the ranking
-// changes, until its panel closes or another opens in its place. The camera flies once, as the
-// trip is picked, and is the rider's again from then on.
+// The spotlight, from the Latest now pill and the Latest right now panel (docs/screens.md, "Latest
+// now"): a ring on the map round one trip's dot, drawn by the overlay (overlay.ts,
+// SpotlightLayer.ts) where the dot is each frame, so the rider finds it among the others, and the
+// flight that brings the camera to it. It rings the trip the rider picked, whose vehicle panel or
+// the Latest right now panel is open, and stays on it while the ranking changes, until that panel
+// closes or another opens in its place. The camera flies once, as the trip is picked, and is the
+// rider's again from then on.
 import 'client-only'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import { followedVehicle, type FollowStore } from './follow.ts'
@@ -17,12 +18,15 @@ import {
 } from './highlight.ts'
 import { liveSnapshot } from './live.ts'
 import { EASE_FOR, FADE_FOR } from './motion.ts'
-import { mapView, openPanel, type ViewStore } from './view.ts'
+import { holdsTrip, LATEST_NOW, mapView, openPanel, type ViewStore } from './view.ts'
 
 export interface SpotlightStore {
   /** The ringed trip's key; none while nothing is ringed. */
   get(): string | undefined
-  /** Rings the trip `key`, whose panel is open, until its panel closes or another is rung. */
+  /**
+   * Rings the trip `key`, whose panel or the Latest right now panel is open, until that panel
+   * closes or another is rung.
+   */
   ring(key: string): void
   clear(): void
   /** Calls back whenever the ringed trip changes; returns the function that stops it. */
@@ -49,8 +53,7 @@ export function spotlightStore(view: ViewStore = mapView): SpotlightStore {
     ring(key) {
       stopWatching?.()
       stopWatching = view.subscribe(() => {
-        const { panel } = view.get()
-        if (panel?.kind !== 'trip' || panel.id !== ringed) clear()
+        if (!holdsTrip(view.get().panel, ringed)) clear()
       })
       set(key)
     },
@@ -90,11 +93,27 @@ export function flightStore(): FlightStore {
 export const vehicleFlight = flightStore()
 
 /**
- * Picks the trip `key`, as the Latest now pill does: opens its vehicle panel in the address, rings
- * its dot and flies the camera to it.
+ * Picks the trip `key`, as a row of the Latest right now panel does: opens its vehicle panel in
+ * the address, rings its dot and flies the camera to it.
  */
 export function spotlightTrip(key: string): void {
   openPanel({ kind: 'trip', id: key })
+  vehicleSpotlight.ring(key)
+  vehicleFlight.fly(key)
+}
+
+/**
+ * Opens the Latest right now panel in the address, as the Latest now pill does: on the trip `key`,
+ * the latest, whose dot it rings and the camera flies to, or with none picked, as when no trip is
+ * 3 min late, ringing nothing and ending Follow, whose trip's panel it replaces.
+ */
+export function spotlightLatest(key: string | undefined): void {
+  openPanel({ kind: 'latest', id: LATEST_NOW })
+  if (key === undefined) {
+    vehicleSpotlight.clear()
+    followedVehicle.stop()
+    return
+  }
   vehicleSpotlight.ring(key)
   vehicleFlight.fly(key)
 }
@@ -198,13 +217,15 @@ const inRoom = (at: { x: number; y: number }, area: Area, padding: Padding) =>
  * the clear room, moved by that snapshot, is aimed at again with a short ease, at the zoom the
  * camera came to, a few times at most. A dot in the room ends it: from then on the camera is the
  * rider's, and keeping it on the dot is Follow's. So does the rider taking the map, any other
- * move, Follow starting, or a new flight. Returns the function that ends it.
+ * move, Follow starting, a new flight, or the trip no longer picked, the `spotlight` off it as its
+ * panel closes or another opens. Returns the function that ends it.
  */
 export function flyToTrip(
   map: FlightCamera,
   key: string,
   { whereIs, area, floating, onLanding = snapshotLandings }: FlightDeps,
   follow: FollowStore = followedVehicle,
+  spotlight: SpotlightStore = vehicleSpotlight,
 ): () => void {
   const point = whereIs(key)
   if (!point) return () => {}
@@ -236,7 +257,7 @@ export function flyToTrip(
   /** Where the camera has come to rest: the dot in the room, or aimed at again. */
   const settled = () => {
     check = undefined
-    if (map.isMoving() || follow.get() !== undefined) return end()
+    if (map.isMoving() || follow.get() !== undefined || spotlight.get() !== key) return end()
     const at = whereIs(key)
     if (!at) return end()
     const size = area()

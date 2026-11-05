@@ -11,12 +11,21 @@ import { useSyncExternalStore } from 'react'
 import { MODES, type Mode } from '../timetable/format.ts'
 
 /**
- * What a panel shows: a stop by its id, a trip, a vehicle's detail, by its key, or an aircraft's
- * card by its hex.
+ * What a panel shows: a stop by its id, a trip, a vehicle's detail, by its key, an aircraft's
+ * card by its hex, or Latest right now, the latest trips, as `LATEST_NOW`.
  */
-export type PanelKind = 'stop' | 'trip' | 'aircraft'
+export type PanelKind = 'stop' | 'trip' | 'aircraft' | 'latest'
 
-/** An open panel, kept in the address as `?stop=<id>`, `?trip=<key>` or `?aircraft=<hex>`. */
+/**
+ * The Latest right now panel's id: the latest trips as they are now, never one trip, so a link
+ * opens it on whichever trip runs latest when it loads.
+ */
+export const LATEST_NOW = 'now'
+
+/**
+ * An open panel, kept in the address as `?stop=<id>`, `?trip=<key>`, `?aircraft=<hex>` or
+ * `?latest=now`.
+ */
 export interface Panel {
   readonly kind: PanelKind
   readonly id: string
@@ -37,7 +46,10 @@ export interface MapView {
   readonly hidden: ReadonlySet<Mode>
   /** Whether the Planes filter keeps the aircraft off the map; it shows them by default. */
   readonly aircraftHidden?: boolean
-  /** The open panel, a stop's departures, a vehicle's detail or an aircraft's card; one at a time. */
+  /**
+   * The open panel, a stop's departures, a vehicle's detail, an aircraft's card or Latest right
+   * now; one at a time.
+   */
   readonly panel?: Panel
   /** An open stop's list, when it isn't the first, Departures. */
   readonly board?: StopBoard
@@ -91,6 +103,7 @@ const PANELS: Readonly<Record<PanelKind, string>> = {
   stop: 'stop',
   trip: 'trip',
   aircraft: 'aircraft',
+  latest: 'latest',
 }
 const KINDS = Object.keys(PANELS) as PanelKind[]
 
@@ -126,7 +139,7 @@ export function viewOf(search: string): MapView {
   }
 }
 
-/** The panel a query opens: the first of `stop`, `trip` and `aircraft` it names, if any. */
+/** The panel a query opens: the first of `stop`, `trip`, `aircraft` and `latest` it names, if any. */
 function panelOf(query: URLSearchParams): Panel | undefined {
   for (const [name, value] of query) {
     const kind = KINDS.find((each) => PANELS[each] === name)
@@ -271,6 +284,13 @@ export function usePanel(store: ViewStore = mapView): Panel | undefined {
     () => undefined,
   )
 }
+
+/**
+ * Whether `panel` keeps what one trip's panel started, Follow or the spotlight, on the trip `key`:
+ * its own vehicle panel, or the Latest right now panel, which only ever holds the trip it picked.
+ */
+export const holdsTrip = (panel: Panel | undefined, key: string | undefined): boolean =>
+  panel?.kind === 'latest' || (panel?.kind === 'trip' && panel.id === key)
 
 /**
  * Opens a panel in the address, closing whichever was open, a stop on its first list, Departures;
