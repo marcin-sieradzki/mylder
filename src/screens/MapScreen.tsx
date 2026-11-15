@@ -37,6 +37,8 @@ export function MapScreen() {
   return (
     <div className={styles.screen}>
       <main className={styles.map}>
+        {/* The page's one heading, for screen readers: the map has no visible title. */}
+        <h1 className={styles.title}>Mylder</h1>
         <BaseMap label={dictionary.map.label} className={styles.canvas} top={top} foot={legend} />
       </main>
       <div ref={top} className={styles.top}>

@@ -117,9 +117,10 @@ afterEach(() => {
 describe('the Latest now pill', () => {
   it('names the trip running latest, its delay and the stop it last passed', async () => {
     await open('en')
-    const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
-    expect(pill).toHaveAccessibleName(
-      'Biggest delay right now: 950R to Hillerød, 77 min late, between Slotspavillonen St. and Hillerød St.',
+    const pill = within(banner()).getByRole('button', { name: /^Latest now [^+—]/ })
+    expect(pill).toHaveAccessibleName('Latest now 950R 77 min late at Slotspavillonen St.')
+    expect(pill).toHaveAccessibleDescription(
+      '950R to Hillerød, between Slotspavillonen St. and Hillerød St.',
     )
     expect(within(pill).getByText('Latest now')).toBeInTheDocument()
     // A regional train's badge, in the regional trains' colours.
@@ -133,9 +134,12 @@ describe('the Latest now pill', () => {
 
   it('says it in Danish', async () => {
     await open('da')
-    const pill = within(banner()).getByRole('button', { name: /^Største forsinkelse lige nu:/ })
+    const pill = within(banner()).getByRole('button', { name: /^Mest forsinket nu [^+—]/ })
     expect(pill).toHaveAccessibleName(
-      'Største forsinkelse lige nu: 950R mod Hillerød, 77 min forsinket, mellem Slotspavillonen St. og Hillerød St.',
+      'Mest forsinket nu 950R 77 min forsinket ved Slotspavillonen St.',
+    )
+    expect(pill).toHaveAccessibleDescription(
+      '950R mod Hillerød, mellem Slotspavillonen St. og Hillerød St.',
     )
     expect(within(pill).getByText('Mest forsinket nu')).toBeInTheDocument()
     expect(pill.querySelector('[data-latest-where]')).toHaveTextContent(
@@ -145,7 +149,7 @@ describe('the Latest now pill', () => {
 
   it('opens the Latest right now panel in the address, on the named trip', async () => {
     await open('en')
-    fireEvent.click(within(banner()).getByRole('button', { name: /^Biggest delay right now:/ }))
+    fireEvent.click(within(banner()).getByRole('button', { name: /^Latest now [^+—]/ }))
     expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
     expect(new URLSearchParams(window.location.search).get('trip')).toBeNull()
     const panel = await screen.findByRole('dialog', { name: 'Latest right now' })
@@ -164,9 +168,10 @@ describe('the Latest now pill', () => {
     }
     act(() => liveSnapshot.update({ snapshot: next, clockOffset: 0 }))
     // The 950R now 1 min late, the 144 leads; it stands at a stop, so it is at it, not between.
-    const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
-    expect(pill).toHaveAccessibleName(
-      'Biggest delay right now: 144 to Vallensbæk St., 22 min late, at Idræts Allé (Vejlegårdsvej)',
+    const pill = within(banner()).getByRole('button', { name: /^Latest now [^+—]/ })
+    expect(pill).toHaveAccessibleName('Latest now 144 22 min late at Idræts Allé (Vejlegårdsvej)')
+    expect(pill).toHaveAccessibleDescription(
+      '144 to Vallensbæk St., at Idræts Allé (Vejlegårdsvej)',
     )
     expect(pill.querySelector('[data-latest-where]')).toHaveTextContent(
       /^at Idræts Allé \(Vejlegårdsvej\)$/,
@@ -175,7 +180,7 @@ describe('the Latest now pill', () => {
 
   it('names no trip when none is 3 min late', async () => {
     await open('en', calm(120))
-    expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
+    expect(within(banner()).queryByRole('button', { name: /^Latest now [^+—]/ })).toBeNull()
     expect(within(banner()).getByText('Latest now +2 min at most')).toBeInTheDocument()
   })
 
@@ -200,7 +205,7 @@ describe('the Latest now pill', () => {
     // Five minutes past the last message, at 09:21:52, the feed is no longer fresh.
     const after = minute2.updates.lastMessage! + 5 * 60_000 - minute2.fetched
     await open('en', minute2, after)
-    expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
+    expect(within(banner()).queryByRole('button', { name: /^Latest now [^+—]/ })).toBeNull()
     expect(
       within(banner()).getByText('Delays from Rejseplanen not updated since 09:21'),
     ).toBeInTheDocument()
@@ -220,9 +225,7 @@ describe('the Latest now pill', () => {
     await open('en', metroOnly)
     const line = within(banner()).getByText(/^Latest now/)
     expect(line).toHaveTextContent(/^Latest now —Delay unknown · the Metro sends no delays$/)
-    expect(
-      within(banner()).queryByRole('button', { name: /^Biggest delay|^Latest now/ }),
-    ).toBeNull()
+    expect(within(banner()).queryByRole('button', { name: /^Latest now/ })).toBeNull()
   })
 
   it('shows "—" in Danish', async () => {
@@ -252,7 +255,7 @@ describe('the Latest now pill', () => {
     vi.stubGlobal('fetch', timetableRoutesOf('timetable-source'))
     await open('en', delaysOff)
     expect(within(banner()).queryByText(/Latest now|Delays from Rejseplanen/)).toBeNull()
-    expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
+    expect(within(banner()).queryByRole('button', { name: /^Latest now [^+—]/ })).toBeNull()
   })
 
   // Whether it sits in the bar or on its row wider than a phone is the bar's layout's to say,
@@ -261,7 +264,7 @@ describe('the Latest now pill', () => {
   it('takes a row of its own under the top bar on a phone', async () => {
     phone = true
     await open('en')
-    const pill = within(banner()).getByRole('button', { name: /^Biggest delay right now:/ })
+    const pill = within(banner()).getByRole('button', { name: /^Latest now [^+—]/ })
     const about = within(banner()).getByRole('button', { name: 'About Mylder' })
     const bar = about.closest('.pn-TopBar')!
     expect(bar.contains(pill)).toBe(false)
@@ -279,7 +282,7 @@ describe('a press on the pill', () => {
     return { asked, stop }
   }
   const press = () =>
-    fireEvent.click(within(banner()).getByRole('button', { name: /^Biggest delay right now:/ }))
+    fireEvent.click(within(banner()).getByRole('button', { name: /^Latest now [^+—]/ }))
 
   it('flies the map to the named trip and rings its dot', async () => {
     await open('en')
@@ -301,9 +304,7 @@ describe('a press on the pill', () => {
       ),
     }
     act(() => liveSnapshot.update({ snapshot: next, clockOffset: 0 }))
-    expect(
-      within(banner()).getByRole('button', { name: /^Biggest delay right now: 144 to/ }),
-    ).toBeInTheDocument()
+    expect(within(banner()).getByRole('button', { name: /^Latest now 144 / })).toBeInTheDocument()
     expect(vehicleSpotlight.get()).toBe(LATEST)
     expect(asked).toEqual([LATEST])
     expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
@@ -344,7 +345,7 @@ describe('a press on the pill', () => {
       const after = next()
       vi.setSystemTime(after.fetched)
       act(() => liveSnapshot.update({ snapshot: after, clockOffset: 0 }))
-      expect(within(banner()).queryByRole('button', { name: /^Biggest delay/ })).toBeNull()
+      expect(within(banner()).queryByRole('button', { name: /^Latest now [^+—]/ })).toBeNull()
       expect(vehicleSpotlight.get()).toBeUndefined()
       expect(new URLSearchParams(window.location.search).get('latest')).toBe('now')
     })

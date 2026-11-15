@@ -78,3 +78,13 @@
   min-block-size: var(--perron-size-button-sm);
   padding-block: var(--perron-space-100);
 }
+
+/* The pill's description, the headsign and where the trip is, heard but not drawn. */
+.detail {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
