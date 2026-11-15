@@ -163,8 +163,11 @@ test('the Latest now pill names the trip running latest and opens its panel', as
   await onSavedMinute(page)
   await page.goto(`${UPDATES_URL}/en`)
   const pill = page.getByRole('banner').getByRole('button', {
-    name: 'Biggest delay right now: 950R to Hillerød, 77 min late, between Slotspavillonen St. and Hillerød St.',
+    name: 'Latest now 950R 77 min late at Slotspavillonen St.',
   })
+  await expect(pill).toHaveAccessibleDescription(
+    '950R to Hillerød, between Slotspavillonen St. and Hillerød St.',
+  )
   await expect(pill).toContainText('Latest now')
   await expect(pill).toContainText('at Slotspavillonen St.')
   await pill.click()
@@ -264,7 +267,7 @@ for (const [layout, viewport] of [
     await expect(map).not.toHaveAttribute('data-spotlight')
     await page
       .getByRole('banner')
-      .getByRole('button', { name: /^Biggest delay right now: 950R to Hillerød/ })
+      .getByRole('button', { name: /^Latest now 950R / })
       .click()
     await expect(page).toHaveURL(/[?&]latest=now(&|$)/)
     const panel = page.getByRole('dialog', { name: 'Latest right now' })
@@ -296,7 +299,7 @@ for (const [layout, viewport] of [
     const map = page.locator('[data-vehicles]')
     await page
       .getByRole('banner')
-      .getByRole('button', { name: /^Biggest delay right now: 950R to Hillerød/ })
+      .getByRole('button', { name: /^Latest now 950R / })
       .click()
     const latest = page.getByRole('dialog', { name: 'Latest right now' })
     await expect(map).toHaveAttribute('data-spotlight', 'train.950R.bacca19217.20261031.0733')
@@ -378,9 +381,7 @@ test('a snapshot that moves the trip while the camera flies to it still lands it
     })
   })
   await page.goto(`${UPDATES_URL}/en`)
-  const pill = page
-    .getByRole('banner')
-    .getByRole('button', { name: /^Biggest delay right now: 950R to Hillerød/ })
+  const pill = page.getByRole('banner').getByRole('button', { name: /^Latest now 950R / })
   await expect(pill).toBeVisible()
   await held
   await pill.click()
@@ -440,12 +441,12 @@ async function expectPillWhole(pill: Locator, now: string, line: string, kept: n
 const PHONE = {
   en: {
     now: 'Latest now',
-    name: 'Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, ',
+    name: 'Latest now 250S 100 min late ',
     at: 'at',
   },
   da: {
     now: 'Mest forsinket nu',
-    name: 'Største forsinkelse lige nu: 250S mod Dragør Stationsplads, 100 min forsinket, ',
+    name: 'Mest forsinket nu 250S 100 min forsinket ',
     at: 'ved',
   },
 } as const
@@ -531,7 +532,7 @@ const WORDS = {
     overview: 'Overview',
     latest: 'Latest right now',
     now: 'Latest now',
-    pill: /^Biggest delay right now: 250S to Dragør Stationsplads, 100 min late, /,
+    pill: /^Latest now 250S 100 min late /,
     outOfDate: /^Updated \d\d:\d\d:\d\d, may be out of date$/,
     quiet: 'Delays from Rejseplanen not updated since 09:21',
   },
@@ -541,7 +542,7 @@ const WORDS = {
     overview: 'Overblik',
     latest: 'Mest forsinket lige nu',
     now: 'Mest forsinket nu',
-    pill: /^Største forsinkelse lige nu: 250S mod Dragør Stationsplads, 100 min forsinket, /,
+    pill: /^Mest forsinket nu 250S 100 min forsinket /,
     outOfDate: /^Opdateret \d\d:\d\d:\d\d, /,
     quiet: 'Forsinkelser fra Rejseplanen ikke opdateret siden 09:21',
   },

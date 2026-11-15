@@ -119,7 +119,15 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
   const flatNorthUp = () => map.getBearing() === 0 && map.getPitch() === 0
   // Whether the camera has turned or tilted since the dots' offsets were last written.
   let reproject = false
-  const overlay = new MapLibreOverlay({ interleaved: false, layers: [], ...picking.props })
+  const overlay = new MapLibreOverlay({
+    interleaved: false,
+    layers: [],
+    ...picking.props,
+    // deck.gl makes its canvas a tab stop with no name and no ring. MapLibre's canvas under it is
+    // the map's one stop, named and keyboard-driven, so deck's leaves the tab order (WCAG 2.4.3,
+    // 2.4.7).
+    onLoad: () => untab(map.getContainer()),
+  })
   map.addControl(overlay)
   let removed = false
   let drawnFrom: Snapshot | undefined
@@ -404,4 +412,11 @@ export function vehicleOverlay(map: MapLibreMap, container: HTMLElement): Vehicl
       markSpotlight(undefined)
     },
   }
+}
+
+/** Takes deck.gl's canvas, inside the map's container, out of the tab order. */
+export function untab(container: HTMLElement) {
+  container.querySelectorAll<HTMLCanvasElement>('canvas#deckgl-overlay').forEach((canvas) => {
+    canvas.tabIndex = -1
+  })
 }

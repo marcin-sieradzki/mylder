@@ -20,7 +20,7 @@
   "latest": {
     "now": "Latest now",
     "at": "at {stop}",
-    "label": "Biggest delay right now: {line} to {headsign}, {minutes} min late, {where}",
+    "detail": "{line} to {headsign}, {where}",
     "labelAt": "at {stop}",
     "labelBetween": "between {from} and {to}",
     "atMost": "{delay} at most",

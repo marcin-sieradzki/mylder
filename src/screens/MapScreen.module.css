@@ -12,6 +12,17 @@
   inset: 0;
 }
 
+/* The page's h1, heard but not drawn: clipped to nothing, as a screen reader's text is. */
+.title {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* The top bar and, under it, the page notices, over the map on the top bar's layer, above every
    panel. The column lets the map take presses between them; the header takes them only on the
    bar and the pill's row (TopBar.module.css). */

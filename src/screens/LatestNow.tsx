@@ -1,6 +1,7 @@
 'use client'
 
 import { Button, Delay, LineBadge, Surface, Text } from '@mylder/perron'
+import { useId } from 'react'
 import type { CSSProperties, ReactNode, Ref } from 'react'
 import type { ClientDictionary } from '../i18n/dictionary'
 import { useI18n } from '../i18n/useI18n'
@@ -75,32 +76,36 @@ function Standout({ ranked, snapshot, network, words, room, pillRef }: StandoutP
       : fill(words.labelAt, { stop: name(shown) })
   const colour = network.patterns.lines[pattern.line]?.colour ?? ''
   const [before, after] = words.at.split('{stop}')
+  // Named by what it shows, "Latest now 950R 77 min late at Slotspavillonen St." (WCAG 2.5.3), and
+  // described by what it can't show, the headsign and the next stop.
+  const detailId = useId()
   return (
-    <Button
-      ref={pillRef as Ref<HTMLButtonElement>}
-      variant="outline"
-      size="small"
-      className={styles.pill}
-      style={roomStyle(room)}
-      aria-label={fill(words.label, {
-        line: trip.line,
-        headsign: trip.headsign,
-        minutes: wholeMinutes(delay),
-        where: heard,
-      })}
-      onClick={() => spotlightLatest(trip.key)}
-    >
-      <span className={styles.content}>
-        <span>{words.now}</span>
-        <LineBadge line={badgeLine(colour, trip.mode)}>{trip.line}</LineBadge>
-        <Delay minutes={delay / 60} />
-        <span className={styles.where} data-latest-where="">
-          {before}
-          <span data-latest-stop="">{name(shown)}</span>
-          {after}
+    <>
+      <Button
+        ref={pillRef as Ref<HTMLButtonElement>}
+        variant="outline"
+        size="small"
+        className={styles.pill}
+        style={roomStyle(room)}
+        aria-describedby={detailId}
+        onClick={() => spotlightLatest(trip.key)}
+      >
+        {/* The spaces keep the words apart in the name; a flex row draws none of them. */}
+        <span className={styles.content}>
+          <span>{words.now}</span>{' '}
+          <LineBadge line={badgeLine(colour, trip.mode)}>{trip.line}</LineBadge>{' '}
+          <Delay minutes={delay / 60} />{' '}
+          <span className={styles.where} data-latest-where="">
+            {before}
+            <span data-latest-stop="">{name(shown)}</span>
+            {after}
+          </span>
         </span>
+      </Button>
+      <span id={detailId} className={styles.detail}>
+        {fill(words.detail, { line: trip.line, headsign: trip.headsign, where: heard })}
       </span>
-    </Button>
+    </>
   )
 }
 

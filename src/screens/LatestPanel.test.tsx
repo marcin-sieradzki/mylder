@@ -117,7 +117,7 @@ afterEach(() => {
 describe('the Latest right now panel', () => {
   it("leads with the latest trip's line, destination, delay, place, next stop, state and sending", async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     const lead = within(panel).getByRole('region', { name: 'The latest trip' })
     expect(within(lead).getByText('950R')).toHaveAttribute('data-line', 'regional')
     expect(within(lead).getByRole('heading', { name: 'to Hillerød' })).toBeInTheDocument()
@@ -141,7 +141,7 @@ describe('the Latest right now panel', () => {
 
   it('says it all in Danish', async () => {
     await open('da')
-    const panel = await press(/^Største forsinkelse lige nu:/, 'Mest forsinket lige nu')
+    const panel = await press(/^Mest forsinket nu [^+—]/, 'Mest forsinket lige nu')
     const lead = within(panel).getByRole('region', { name: 'Den mest forsinkede tur' })
     expect(within(lead).getByRole('heading', { name: 'mod Hillerød' })).toBeInTheDocument()
     expect(within(lead).getByText('Tog · DSB')).toBeInTheDocument()
@@ -171,7 +171,7 @@ describe('the Latest right now panel', () => {
 
   it('lists the next four latest, each with its line, destination, next stop and delay', async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     const list = within(panel).getByRole('region', { name: 'Next latest' })
     const rows = within(list).getAllByRole('listitem')
     expect(rows).toHaveLength(4)
@@ -194,7 +194,7 @@ describe('the Latest right now panel', () => {
 
   it('says what the ranking was drawn from, and when the delays came', async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     expect(panel.querySelector('.pn-SourceLine')).toHaveTextContent(
       'Of 406 trips with delays from Rejseplanen now. The Metro and light rail send none. Updated 09:21:52',
     )
@@ -202,7 +202,7 @@ describe('the Latest right now panel', () => {
 
   it("flies to a listed trip, rings it and opens its vehicle panel when it's tapped", async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     expect(flown).toEqual([LATEST])
     const list = within(panel).getByRole('region', { name: 'Next latest' })
     fireEvent.click(within(list).getByRole('button', { name: /^144 to Vallensbæk St\./ }))
@@ -215,7 +215,7 @@ describe('the Latest right now panel', () => {
 
   it('follows the trip it leads with, and shows its whole line, as its vehicle panel does', async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     const lead = within(panel).getByRole('region', { name: 'The latest trip' })
     const follow = within(lead).getByRole('button', { name: 'Follow' })
     await vi.waitFor(() => expect(follow).toBeEnabled())
@@ -233,7 +233,7 @@ describe('the Latest right now panel', () => {
 
   it('keeps leading with the trip it picked when the next snapshot names another latest', async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     const next: Snapshot = {
       ...minute2,
       trips: minute2.trips.map((trip): SnapshotTrip =>
@@ -303,7 +303,7 @@ describe('the Latest right now panel', () => {
 
   it('names no trip, and lists none, once the delays stop coming', async () => {
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     const quiet = { ...minute2, fetched: minute2.updates.lastMessage! + 5 * 60_000 }
     vi.setSystemTime(quiet.fetched)
     act(() => liveSnapshot.update({ snapshot: quiet, clockOffset: 0 }))
@@ -328,7 +328,7 @@ describe('the Latest right now panel', () => {
   it('opens from the bottom on a phone, as every detail panel does', async () => {
     phone = true
     await open('en')
-    const panel = await press(/^Biggest delay right now:/)
+    const panel = await press(/^Latest now [^+—]/)
     expect(panel.closest('[data-anchor]')).toHaveAttribute('data-anchor', 'bottom')
   })
 })

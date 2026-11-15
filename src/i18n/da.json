@@ -20,7 +20,7 @@
   "latest": {
     "now": "Mest forsinket nu",
     "at": "ved {stop}",
-    "label": "Største forsinkelse lige nu: {line} mod {headsign}, {minutes} min forsinket, {where}",
+    "detail": "{line} mod {headsign}, {where}",
     "labelAt": "ved {stop}",
     "labelBetween": "mellem {from} og {to}",
     "atMost": "højst {delay}",

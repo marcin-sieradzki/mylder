@@ -15,6 +15,14 @@ interface LangProps {
 /** The path the pages sit under: the repository's in the GitHub Pages demo (ADR 0013), else none. */
 const BASE_PATH = process.env.NEXT_PUBLIC_MYLDER_BASE_PATH ?? ''
 
+/**
+ * The site's origin, so the language alternates are full URLs, as hreflang asks: Vercel's
+ * production domain where Vercel builds the app, else the live one.
+ */
+const SITE = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : 'https://mylder.marcinsieradzki.com'
+
 /** Vercel Web Analytics counts visits only where Vercel serves the app, not on the Pages demo. */
 const ON_VERCEL = process.env.VERCEL === '1'
 
@@ -32,6 +40,7 @@ export async function generateMetadata({ params }: LangProps): Promise<Metadata>
   return {
     title: meta.title,
     description: meta.description,
+    metadataBase: new URL(SITE),
     alternates: {
       languages: {
         ...Object.fromEntries(langs.map((each) => [each, `${BASE_PATH}/${each}`])),
