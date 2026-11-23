@@ -10,30 +10,24 @@ import {
   type ApiHealth,
   type DataStateContext,
 } from '../domain/data-state.ts'
+import { expectedTrip, type DelayStep } from '../domain/expected-trip.ts'
 import {
-  delayAtCall,
-  delayOf,
-  delaySteps,
   ENDED_STANDS_FOR,
   pointAt,
   progressAt,
   snapToPath,
-  steppedCalls,
-  timedCalls,
   timelineFrom,
   timelineOf,
   tripPhase,
   type Position,
   type TripPhase,
   type Call,
-  type DelayStep,
-  type TimedCall,
 } from '../domain/trip-motion.ts'
 import { clockMoment } from '../timetable/time.ts'
 import type { PlannedTrip } from '../timetable/trips.ts'
 import { joinJourney, type Corrections } from './join.ts'
 import type { PositionJourney, Stop } from './rejseplanen/answers.ts'
-import type { NextCall, SnapshotTrip } from './snapshot.ts'
+import type { SnapshotTrip } from './snapshot.ts'
 import type { Timetable } from './timetable.ts'
 import type { TripUpdate } from './updates.ts'
 
@@ -111,9 +105,8 @@ function callsWithStops(
   timetable: Timetable,
   trip: PlannedTrip,
   stops: readonly Stop[] | undefined,
-  base: readonly Call[] = trip.calls,
 ): Call[] {
-  const calls: Call[] = [...base]
+  const calls: Call[] = [...trip.calls]
   const { platforms } = timetable.stops
   const { timezone } = timetable.manifest
   let from = 0
@@ -138,23 +131,6 @@ function callsWithStops(
     }
   }
   return calls
-}
-
-/** Up to three calls still ahead at a moment: their index, platform and time. */
-function nextCalls(
-  timetable: Timetable,
-  trip: PlannedTrip,
-  timed: readonly TimedCall[],
-  now: number,
-): NextCall[] {
-  const next: NextCall[] = []
-  const last = timed.length - 1
-  for (let i = 0; i <= last && next.length < NEXT_CALLS; i++) {
-    const time = i === last ? timed[i].arrival : timed[i].departure
-    if (time <= now) continue
-    next.push({ index: i, stop: timetable.stops.platforms[trip.calls[i].platform].id, time })
-  }
-  return next
 }
 
 /**
@@ -231,6 +207,7 @@ export function buildTrips({
     } else unmatched++
   }
   const ctx: DataStateContext = { ...context, now, fetched: now }
+  const { platforms } = timetable.stops
   const trips: SnapshotTrip[] = []
   const kept: Record<string, TripHistory> = {}
   for (const day of timetable.serviceDaysAt(now)) {
@@ -240,21 +217,33 @@ export function buildTrips({
       const update = updates.get(trip.key)
       if (!realtime && !before && !update && !onMap(tripPhase(trip.calls, now))) continue
       const path = timetable.pathOf(trip.pattern)
-      // A position's stops lie over SIRI-ET's expected times, where both give one: this run's
-      // update's, or else the last one's, kept while the table no longer brings it.
-      const steps = update ? delaySteps(update.calls) : before?.steps
-      const base = update?.calls ?? (steps ? steppedCalls(trip.calls, steps) : trip.calls)
+      // A position's stops lie over SIRI-ET's steps, where both give a time: this run's update's,
+      // or else the last one's, kept while the table no longer brings it, as are its cancellations.
+      const steps = update ? update.steps : before?.steps
+      const cancelled = update ? update.cancelled : before?.cancelled === true
+      const cancelledCalls = update ? update.cancelledCalls : (before?.cancelledCalls ?? [])
       const calls = realtime
-        ? callsWithStops(timetable, trip, realtime.journey.Stops?.Stop, base)
-        : base
-      const delay = (realtime || update ? delayOf(calls) : undefined) ?? before?.delay
-      const timed = timedCalls(calls, before?.delay)
+        ? callsWithStops(timetable, trip, realtime.journey.Stops?.Stop)
+        : trip.calls
+      const expected = expectedTrip(calls, {
+        steps,
+        delay: before?.delay,
+        cancelled,
+        cancelledCalls,
+      })
+      const delay = expected.latestDelay
+      const timed = expected.times
+      const carried = {
+        ...(steps?.length ? { steps } : {}),
+        ...(cancelled ? { cancelled: true as const } : {}),
+        ...(cancelledCalls.length ? { cancelledCalls } : {}),
+      }
       // A trip that has arrived on its expected times is done with, whatever an answer says; its
-      // delay is kept while it stands at its last stop.
+      // delay, steps and cancellations are kept while it stands at its last stop.
       const phase = tripPhase(timed, now)
       if (phase === 'finished') {
         const standing = now < timed[timed.length - 1].arrival + ENDED_STANDS_FOR
-        if (standing && delay !== undefined) kept[trip.key] = { ...before, delay }
+        if (standing && delay !== undefined) kept[trip.key] = { ...before, delay, ...carried }
         continue
       }
       const timeline = timelineOf(timed, path)
@@ -272,17 +261,12 @@ export function buildTrips({
       const seen = position ?? before?.seen
       const reported = reportedNow ? position : before?.reported
       const updated = update?.received ?? before?.updated
-      // The cancellations of this run's update, or else of the last one's.
-      const cancelled = update ? update.cancelled : before?.cancelled === true
-      const cancelledCalls = update ? update.cancelledCalls : (before?.cancelledCalls ?? [])
       const remembered: TripHistory = {
         ...(seen ? { seen } : {}),
         ...(reported ? { reported } : {}),
         ...(updated === undefined ? {} : { updated }),
         ...(delay === undefined ? {} : { delay }),
-        ...(steps?.length ? { steps } : {}),
-        ...(cancelled ? { cancelled: true as const } : {}),
-        ...(cancelledCalls.length ? { cancelledCalls } : {}),
+        ...carried,
         ...(journey ? { journey } : {}),
         ...(ref ? { ref } : {}),
       }
@@ -306,13 +290,13 @@ export function buildTrips({
             path.length,
           )
       const vehicleNumber = realtime?.journey.trainNumber
-      const next = nextCalls(timetable, trip, timed, now)
-      // With SIRI-ET's steps, this run's update's or the last one's that the history keeps, the
-      // delay a rider is given is at the trip's next call, timed as its panel times it, not at its
-      // last step (#215). Once the key brings journeyPos, a position's times must win over the
-      // steps here, as an update and a position combine (spec #146).
-      const delayAtNext =
-        next[0] && steps?.length ? delayAtCall(trip.calls, steps, next[0].index) : delay
+      // The calls ahead its dot moves through, and the Delay a rider is given: at its next call,
+      // the first of them it serves, timed as its panel and its stops' rows time it (#215).
+      const next = expected
+        .ahead(now)
+        .slice(0, NEXT_CALLS)
+        .map(({ index, time }) => ({ index, stop: platforms[trip.calls[index].platform].id, time }))
+      const delayAtNext = expected.delayAtNext(now)
       trips.push({
         key: trip.key,
         line: trip.line.name,

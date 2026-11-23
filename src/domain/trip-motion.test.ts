@@ -1,13 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
-  delayOf,
-  delaySteps,
-  expectedTimes,
   measurePath,
   pointAt,
   snapToPath,
   progressAt,
-  timedCalls,
   timelineFrom,
   timelineOf,
   tripAt,
@@ -15,6 +11,7 @@ import {
   type Call,
   type LatLon,
 } from './trip-motion'
+import { expectedTrip } from './expected-trip'
 
 const t0 = Date.UTC(2026, 9, 26, 7, 0)
 const minutes = (n: number) => t0 + n * 60_000
@@ -67,14 +64,14 @@ describe('measurePath (gaps)', () => {
 
 describe('tripAt', () => {
   it('places a trip halfway in time between two calls halfway along that segment’s path', () => {
-    const trip = tripAt(timedCalls(calls), path, minutes(5))
+    const trip = tripAt(calls, path, minutes(5))
     expect(trip?.phase).toBe('underway')
     expect(trip?.progress).toBeCloseTo(path.stops[1] / 2, 6)
     expectPoint(trip?.point, [55.69, 12.505])
   })
 
   it('holds a trip at a stop while it stands there', () => {
-    const trip = tripAt(timedCalls(calls), path, minutes(10.5))
+    const trip = tripAt(calls, path, minutes(10.5))
     expect(trip?.progress).toBeCloseTo(path.stops[1], 6)
     expectPoint(trip?.point, B)
   })
@@ -83,7 +80,7 @@ describe('tripAt', () => {
     [-5, 'waiting'],
     [-0.5, 'waiting'],
   ])('stands a trip %f min before its first departure at its first stop, Waiting', (at) => {
-    const trip = tripAt(timedCalls(calls), path, minutes(at))
+    const trip = tripAt(calls, path, minutes(at))
     expect(trip).toEqual({ phase: 'waiting', progress: 0, point: A })
   })
 
@@ -92,12 +89,12 @@ describe('tripAt', () => {
     ['once it has arrived at its last stop', 15],
     ['an hour after it arrived', 75],
   ])('leaves a trip off the map %s', (_, at) => {
-    expect(tripAt(timedCalls(calls), path, minutes(at))).toBeUndefined()
+    expect(tripAt(calls, path, minutes(at))).toBeUndefined()
   })
 
   it('shifts the position by the delayed times', () => {
-    const late = timedCalls(calls, 120)
-    const onTime = timedCalls(calls)
+    const late = expectedTrip(calls, { delay: 120 }).times
+    const onTime = calls
     for (const at of [1, 4, 9.5, 10.5, 12, 14]) {
       expect(tripAt(late, path, minutes(at + 2))?.progress).toBeCloseTo(
         tripAt(onTime, path, minutes(at))?.progress ?? NaN,
@@ -116,7 +113,7 @@ describe('tripPhase', () => {
     [14.99, 'underway'],
     [15, 'finished'],
   ])('at %f min is %s', (at, phase) => {
-    expect(tripPhase(timedCalls(calls), minutes(at))).toBe(phase)
+    expect(tripPhase(calls, minutes(at))).toBe(phase)
   })
 })
 
@@ -145,7 +142,7 @@ describe('progressAt', () => {
 })
 
 describe('timelineFrom', () => {
-  const timeline = timelineOf(timedCalls(calls), path)
+  const timeline = timelineOf(calls, path)
 
   it('carries a position on to the next call it hasn’t reached, there on that call’s time', () => {
     // Seen at 07:05 three quarters of the way to B, where the timetable puts it halfway.
@@ -163,115 +160,6 @@ describe('timelineFrom', () => {
     const carried = timelineFrom(timeline, seen)
     expect(carried.every((point) => point.progress >= seen.progress)).toBe(true)
     expect(progressAt(carried, minutes(10.5), path.length)).toBeGreaterThan(seen.progress)
-  })
-})
-
-describe('timedCalls', () => {
-  it('gives the calls an update leaves out the scheduled time plus the latest delay', () => {
-    const updated: Call[] = [
-      { arrival: minutes(0), departure: minutes(0), expectedDeparture: minutes(1) },
-      {
-        arrival: minutes(10),
-        departure: minutes(11),
-        expectedArrival: minutes(13),
-        expectedDeparture: minutes(14),
-      },
-      { arrival: minutes(15), departure: minutes(15) },
-    ]
-    expect(timedCalls(updated)).toEqual([
-      { arrival: minutes(1), departure: minutes(1) },
-      { arrival: minutes(13), departure: minutes(14) },
-      { arrival: minutes(18), departure: minutes(18) },
-    ])
-  })
-
-  it('runs the calls before an update’s first expected time late by its delay', () => {
-    // An opened stop ahead says the trip will leave B 3 min late.
-    const ahead: Call[] = [calls[0], { ...calls[1], expectedDeparture: minutes(14) }, calls[2]]
-    expect(timedCalls(ahead)).toEqual([
-      { arrival: minutes(3), departure: minutes(3) },
-      { arrival: minutes(13), departure: minutes(14) },
-      { arrival: minutes(18), departure: minutes(18) },
-    ])
-  })
-
-  it('never lets a time run back before the one before it', () => {
-    const early: Call[] = [
-      { arrival: minutes(0), departure: minutes(2), expectedDeparture: minutes(4) },
-      { arrival: minutes(3), departure: minutes(3), expectedArrival: minutes(3) },
-    ]
-    expect(timedCalls(early)[1].arrival).toBe(minutes(4))
-  })
-})
-
-describe('delayOf', () => {
-  it.each<[string, Call[], number | undefined]>([
-    ['with no expected time', calls, undefined],
-    [
-      'from the latest call with an expected time',
-      [
-        { arrival: minutes(0), departure: minutes(0), expectedDeparture: minutes(1) },
-        { arrival: minutes(10), departure: minutes(11), expectedDeparture: minutes(14) },
-        { arrival: minutes(15), departure: minutes(15) },
-      ],
-      180,
-    ],
-    [
-      'negative when early, from an arrival at the last stop',
-      [
-        { arrival: minutes(0), departure: minutes(0) },
-        { arrival: minutes(15), departure: minutes(15), expectedArrival: minutes(14.5) },
-      ],
-      -30,
-    ],
-  ])('a trip %s is %s s late', (_, trip, delay) => {
-    expect(delayOf(trip)).toBe(delay)
-  })
-})
-
-describe('delaySteps and expectedTimes', () => {
-  // An update's calls: 2 min late away from A, 1 min early from B, so 1 min early at C.
-  const updated: Call[] = [
-    { arrival: minutes(0), departure: minutes(0), expectedDeparture: minutes(2) },
-    { arrival: minutes(10), departure: minutes(11), expectedDeparture: minutes(10) },
-    { arrival: minutes(15), departure: minutes(15) },
-  ]
-
-  it('lists each call an update gave an expected time, with its delay in seconds', () => {
-    expect(delaySteps(updated)).toEqual([
-      [0, 120],
-      [1, -60],
-    ])
-    expect(delaySteps(calls)).toEqual([])
-  })
-
-  it('leaves out a call whose delay is the step before’s, which times the same', () => {
-    const repeated: Call[] = [
-      ...updated.slice(0, 2),
-      { ...updated[2], expectedArrival: minutes(14), expectedDeparture: minutes(14) },
-    ]
-    expect(delaySteps(repeated)).toEqual(delaySteps(updated))
-    expect(expectedTimes(calls, { steps: delaySteps(repeated) })).toEqual(timedCalls(repeated))
-  })
-
-  it('times each call by its steps, as the update’s calls are timed', () => {
-    expect(expectedTimes(calls, { delay: -60, steps: delaySteps(updated) })).toEqual(
-      timedCalls(updated),
-    )
-    // A step at the last stop gives its arrival.
-    expect(expectedTimes(calls, { steps: [[2, 300]] })?.[2]).toEqual({
-      arrival: minutes(20),
-      departure: minutes(20),
-    })
-  })
-
-  it('shifts every call by the delay without steps, and gives none with neither', () => {
-    expect(expectedTimes(calls, { delay: 60 })).toEqual([
-      { arrival: minutes(1), departure: minutes(1) },
-      { arrival: minutes(11), departure: minutes(12) },
-      { arrival: minutes(16), departure: minutes(16) },
-    ])
-    expect(expectedTimes(calls, {})).toBeUndefined()
   })
 })
 

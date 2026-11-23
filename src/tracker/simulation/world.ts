@@ -2,8 +2,8 @@
 // and which of them report. Every service the simulation answers reads this one world, so a
 // departure board, a trip's detail and a journeyPos answer in the same minute agree.
 import 'server-only'
+import { expectedTrip } from '../../domain/expected-trip.ts'
 import {
-  timedCalls,
   tripAt,
   WAITING_FROM,
   type Call,
@@ -235,7 +235,7 @@ export function simulateTrip(
   const mode = trip.line.mode
   const minute = Math.floor(now / MINUTE)
   const delayAt = delays(settings, trip, minute)
-  const calls = timedCalls(expectedCalls(trip, delayAt, now))
+  const calls = expectedTrip(expectedCalls(trip, delayAt, now)).times
   const delay = toMinutes(delayAt(minute))
   const metro = isIntervalLine(trip)
   const reports = !metro && chance(seed, trip.key, 'reports') < scenario.reporting[mode]

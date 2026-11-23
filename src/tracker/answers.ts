@@ -10,7 +10,7 @@
 import 'server-only'
 import { shownAt } from '../domain/departure.ts'
 import { intervalOf, runsToInterval, type Interval, type LineTrip } from '../domain/interval.ts'
-import { expectedTimes } from '../domain/trip-motion.ts'
+import { expectedTrip, type ExpectedTrip } from '../domain/expected-trip.ts'
 import { MODES, type IsoDate, type LineRecord, type Mode } from '../timetable/format.ts'
 import { platformId } from '../timetable/stops.ts'
 import { hourStart } from '../timetable/time.ts'
@@ -233,11 +233,11 @@ export const tripsByKey = (snapshot: SnapshotDelays) =>
   new Map(snapshot.trips.map((trip) => [trip.key, trip]))
 
 /**
- * A trip's calls at the times the snapshot's entry for it expects them, by SIRI-ET's steps where
- * it has them, else shifted by its delay; none with neither.
+ * A trip's expected calls by what the snapshot's entry for it knows: SIRI-ET's steps where it has
+ * them, else its delay, and its cancellations.
  */
-const withDelay = (trip: PlannedTrip, live: SnapshotTrip | undefined) =>
-  live && expectedTimes(trip.calls, live)
+const expectedOf = (trip: PlannedTrip, live: SnapshotTrip | undefined): ExpectedTrip =>
+  expectedTrip(trip.calls, live)
 
 /**
  * The service days whose trips may leave in the departures' window from a moment: those running
@@ -557,19 +557,23 @@ function timedRows(
   const { platforms } = timetable.stops
   const now = snapshot.fetched
   const onMap = tripsByKey(snapshot)
-  // Each trip's calls shifted once, and only for a trip that calls here.
-  const shifted = new Map<PlannedTrip, ReturnType<typeof withDelay>>()
+  // Each trip's expected calls once, and only for a trip that calls here.
+  const expectedTrips = new Map<PlannedTrip, ExpectedTrip>()
   const rows: { row: StopDeparture; trip: PlannedTrip }[] = []
   for (const { trip, index: i } of calls) {
     const live = onMap.get(trip.key)
-    if (!shifted.has(trip)) shifted.set(trip, withDelay(trip, live))
+    let expected = expectedTrips.get(trip)
+    if (!expected) expectedTrips.set(trip, (expected = expectedOf(trip, live)))
     const call = trip.calls[i]
-    const times = { scheduled: call[side], expected: shifted.get(trip)?.[i][side] }
+    const times = {
+      scheduled: call[side],
+      expected: expected.expected ? expected.times[i][side] : undefined,
+    }
     const state = live?.state ?? 'timetable-only'
     // In the window by the time its state shows: a No signal row's is the timetabled time.
     const shown = shownAt(times, state)
     if (shown < now || shown > now + DEPARTURES_AHEAD) continue
-    const cancelled = live?.cancelled || live?.cancelledCalls?.includes(i)
+    const cancelled = expected.skips(i)
     rows.push({
       row: {
         trip: trip.key,
@@ -644,7 +648,7 @@ export function tripDetailOf(
   now: number,
 ): TripDetail {
   const { platforms } = timetable.stops
-  const expected = withDelay(trip, live)
+  const expected = expectedOf(trip, live)
   // The rule its stops' interval rows follow, so the trip's panel and theirs agree.
   const toInterval = lineRunsToInterval(snapshot, [], trip.line)
   const interval = toInterval ? intervalAt(timetable, trip, now) : undefined
@@ -672,13 +676,14 @@ export function tripDetailOf(
       name: platforms[call.platform].name,
       arrival: call.arrival,
       departure: call.departure,
-      ...(expected
+      ...(expected.expected
         ? {
-            expectedArrival: expected[index].arrival,
-            expectedDeparture: expected[index].departure,
+            expectedArrival: expected.times[index].arrival,
+            expectedDeparture: expected.times[index].departure,
           }
         : {}),
-      ...(live?.cancelledCalls?.includes(index) ? { cancelled: true as const } : {}),
+      // A trip called off whole is marked on the trip, its calls left unmarked.
+      ...(!expected.cancelled && expected.skips(index) ? { cancelled: true as const } : {}),
     })),
   }
 }

@@ -31,12 +31,12 @@ import { Messages } from './Messages'
 import { useServerSecond } from './useServerSecond'
 import { VehicleActions } from './VehicleActions'
 import {
+  expectedTripOf,
   intervalWords,
   nextCallOf,
   runsToInterval,
   shownDelayOf,
   stateSentence,
-  timedCallsOf,
   timelineStops,
   whereWords,
 } from './vehicleDetail'
@@ -194,7 +194,7 @@ function Detail({ answer, trip, updates, network, noPositions, lang, words }: De
   // The snapshot's trip, where its place is along the answer's calls: not while the trip's detail
   // shows them another planned trip's, until the run files the vehicle under it.
   const along = answer.planned === undefined ? trip : undefined
-  const next = nextCallOf(answer, along, now)
+  const next = nextCallOf(answer, now)
   const sentence = stateSentence({
     detail: answer,
     trip,
@@ -221,7 +221,7 @@ function Detail({ answer, trip, updates, network, noPositions, lang, words }: De
             state,
             fetched: answer.fetched,
             path: network.pathOf(along.pattern),
-            calls: timedCallsOf(answer),
+            calls: expectedTripOf(answer).times,
             now,
           }),
           answer,

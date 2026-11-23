@@ -2,7 +2,7 @@ import { describe, expect, it } from '@effect/vitest'
 import { Effect } from 'effect'
 import { TestClock } from 'effect/testing'
 import { clockMoment, clockTime } from '../timetable/time'
-import { stopDeparturesFrom, type SnapshotDelays } from './answers'
+import { departuresAt, findStop, stopDeparturesFrom, type SnapshotDelays } from './answers'
 import { pacing } from './budget'
 import type { History } from './build'
 import * as Http from './http'
@@ -13,6 +13,7 @@ import type { SnapshotTrip } from './snapshot'
 import { readSource } from './source'
 import { simulatedClient } from './simulation/layer'
 import { Store } from './store'
+import type { PlannedTrip } from '../timetable/trips'
 import { fixtureTimetable } from './testing'
 import { loadTimetable } from './timetable'
 import { Tracker } from './tracker'
@@ -209,6 +210,13 @@ describe('the trips standing at a stop, on the crowded recording', () => {
 })
 
 describe('the trips standing at a stop, by hand', () => {
+  /** The index of a trip's call at a stop, by the stop's id. */
+  const callAt = (trip: PlannedTrip, stopId: string) =>
+    trip.calls.findIndex(
+      (call) =>
+        timetable.stops.platforms[call.platform].stop === findStop(timetable, stopId)!.index,
+    )
+
   const snapshot = (moment: number, trips: readonly Partial<SnapshotTrip>[]): SnapshotDelays => ({
     fetched: moment,
     nextDue: moment + 60_000,
@@ -230,6 +238,56 @@ describe('the trips standing at a stop, by hand', () => {
       [A_0707, at(7, 33)],
       [E_0702, at(7, 33, 30)],
     ])
+  })
+
+  it('times a trip off the map by the delay steps its history keeps, as the map moves it', () => {
+    // The E not yet drawn, its update on time to København H and 5 min late from the stop after:
+    // its Delay, the latest step's, is 5 min, but its steps keep it on time here.
+    const trip = timetable.tripsOn('2026-06-16').find((each) => each.key === E_0702)!
+    const here = callAt(trip, KOBENHAVN_H)
+    const { departure } = trip.calls[here]
+    const moment = departure - 10_000
+    const history: History = {
+      [E_0702]: {
+        delay: 300,
+        steps: [
+          [0, 0],
+          [here + 1, 300],
+        ],
+      },
+    }
+    const answer = departuresAt(
+      timetable,
+      snapshot(moment, []),
+      findStop(timetable, KOBENHAVN_H)!,
+      {
+        now: moment,
+        history,
+      },
+    )
+    expect(answer.standing.find((each) => each.trip === E_0702)).toMatchObject({
+      scheduled: departure,
+      expected: departure,
+      departs: departure,
+      state: 'estimated',
+    })
+  })
+
+  it('leaves out a trip off the map that its history keeps cancelled', () => {
+    const trip = timetable.tripsOn('2026-06-16').find((each) => each.key === E_0702)!
+    const here = callAt(trip, KOBENHAVN_H)
+    const moment = trip.calls[here].departure - 10_000
+    const history: History = { [E_0702]: { delay: 0, cancelledCalls: [here] } }
+    const answer = departuresAt(
+      timetable,
+      snapshot(moment, []),
+      findStop(timetable, KOBENHAVN_H)!,
+      {
+        now: moment,
+        history,
+      },
+    )
+    expect(answer.standing.map((each) => each.trip)).not.toContain(E_0702)
   })
 })
 

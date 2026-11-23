@@ -121,12 +121,20 @@ A position Rejseplanen works out for a trip from its timetable and realtime, rat
 _Avoid_: Calculated position, last position, estimate
 
 **Delay**:
-How far a trip runs behind its timetable: expected minus scheduled time, at its next call wherever Mylder shows one (an opened vehicle's panel, the Vehicles list, City pulse's average), which can differ from the delay it ends on. Negative when early. A trip with no delay steps carries the delay at its latest updated call.
+How far a trip runs behind its timetable: expected minus scheduled time, at its next call wherever Mylder shows one (an opened vehicle's panel, the Vehicles list, City pulse's average), which can differ from the delay it ends on. Negative when early. A trip with no next call, or off the map in the tracker's history, carries the delay at its latest updated call.
 _Avoid_: Lateness, deviation
 
 **Delay step**:
 Where a trip's delay changes along its calls: the call it changes at and the delay from there on, taken from its update. A trip carries its steps so each call's expected time follows the update, not one delay for the whole trip.
 _Avoid_: Delay profile, per-stop delay
+
+**Expected trip**:
+A trip's calls at the times Mylder expects them, worked out from its plan and what is known of it: an answer's expected times, an update's delay steps, its last Delay and its cancellations. The map, the stop panel, the trips standing at a stop and the vehicle panel all read a trip's times, its next call and its Delay from it.
+_Avoid_: Shifted trip, timed calls, delayed times
+
+**Next call**:
+The first call of a trip that it still serves and hasn't yet left on its expected times: the departure, or the arrival at its last stop. A cancelled call is passed by, and a cancelled trip has none.
+_Avoid_: Next stop (in code), upcoming call, current stop
 
 **Position**:
 Where a trip is at a moment, as a point on its pattern's path.

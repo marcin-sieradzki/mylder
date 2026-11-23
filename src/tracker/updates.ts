@@ -6,10 +6,10 @@
 import 'server-only'
 import { join } from 'node:path'
 import { Cause, Clock, Context, Effect, Layer, Option, Result, Schema } from 'effect'
-import type { Call } from '../domain/trip-motion.ts'
+import type { DelayStep } from '../domain/expected-trip.ts'
 import { siriEtReader } from '../siri-et/reader.ts'
 import { readBox, siriEtReplay } from '../siri-et/recording.ts'
-import { UpdateTable, type DelayStep } from '../siri-et/table.ts'
+import { UpdateTable, type DelayStep as TableStep } from '../siri-et/table.ts'
 import type { PlannedTrip } from '../timetable/trips.ts'
 import * as Http from './http.ts'
 import { callIndexOf, joinTableJourney } from './join.ts'
@@ -257,8 +257,8 @@ export interface TripUpdate {
   /** When its journey's latest message was received. */
   readonly received: number
   readonly cancelled: boolean
-  /** The trip's calls, with the expected times its delays give where each changes. */
-  readonly calls: readonly Call[]
+  /** Its delay steps, by call index: where its delay changes, and the delay from there on. */
+  readonly steps: readonly DelayStep[]
   /** The indexes of the calls it won't serve. */
   readonly cancelledCalls: readonly number[]
 }
@@ -310,7 +310,7 @@ export function joinTable(timetable: Timetable, table: UpdateTable): JoinedTable
     trips.set(trip.key, {
       received: journey.received,
       cancelled,
-      calls: expectedCalls(timetable, trip, journey.steps),
+      steps: stepsOf(timetable, trip, journey.steps),
       cancelledCalls: (journey.cancelledCalls ?? [])
         .map((call) => callIndexOf(timetable, trip, call))
         .filter((index) => index >= 0),
@@ -320,28 +320,22 @@ export function joinTable(timetable: Timetable, table: UpdateTable): JoinedTable
 }
 
 /**
- * A trip's calls with the expected times its delay steps give: each step's call leaves `delay`
- * seconds late (and arrives so, at its last stop), and the calls between steps take the delay of
- * the step before them as the trip moves (`timedCalls`, src/domain/trip-motion.ts).
+ * The table's delay steps as the trip's (src/domain/expected-trip.ts): each at the index of its
+ * call, in calling order. A step whose call the trip lacks is dropped, and so is one that then
+ * repeats the step before's delay, which times the same.
  */
-function expectedCalls(
+function stepsOf(
   timetable: Timetable,
   trip: PlannedTrip,
-  steps: readonly DelayStep[],
-): Call[] {
-  const calls: Call[] = trip.calls.map(({ arrival, departure }) => ({ arrival, departure }))
-  const last = calls.length - 1
+  steps: readonly TableStep[],
+): DelayStep[] {
+  const indexed: DelayStep[] = []
   let from = 0
   for (const step of steps) {
     const i = callIndexOf(timetable, trip, step, from)
     if (i < 0) continue
     from = i + 1
-    const late = step.delay * 1000
-    calls[i] = {
-      ...calls[i],
-      expectedDeparture: calls[i].departure + late,
-      ...(i === last ? { expectedArrival: calls[i].arrival + late } : {}),
-    }
+    if (step.delay !== indexed.at(-1)?.[1]) indexed.push([i, step.delay])
   }
-  return calls
+  return indexed
 }
