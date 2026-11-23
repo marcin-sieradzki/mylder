@@ -9,12 +9,8 @@
 import 'server-only'
 import type { DataState } from '../domain/data-state.ts'
 import { followsExpected, shownAt } from '../domain/departure.ts'
-import {
-  ENDED_STANDS_FOR,
-  expectedTimes,
-  WAITING_FROM,
-  type TimedCall,
-} from '../domain/trip-motion.ts'
+import { expectedTrip, type ExpectedTrip } from '../domain/expected-trip.ts'
+import { ENDED_STANDS_FOR, WAITING_FROM } from '../domain/trip-motion.ts'
 import type { Mode } from '../timetable/format.ts'
 import type { PlannedTrip } from '../timetable/trips.ts'
 import type { SnapshotDelays } from './answers.ts'
@@ -77,15 +73,11 @@ function fromBoard(trip: PlannedTrip, index: number, board: BoardCall): CallTime
   return { arrival, departure, expectedArrival, expectedDeparture: expected }
 }
 
-/** A call's times as the snapshot expects them for its trip, when it has a delay. */
-function fromSnapshot(
-  trip: PlannedTrip,
-  index: number,
-  shifted: readonly TimedCall[] | undefined,
-): CallTimes {
+/** A call's times as the trip's expected calls give them, when anything known times them. */
+function fromExpected(trip: PlannedTrip, index: number, expectedTrip: ExpectedTrip): CallTimes {
   const { arrival, departure } = trip.calls[index]
-  if (!shifted) return { arrival, departure }
-  const expected = shifted[index]
+  if (!expectedTrip.expected) return { arrival, departure }
+  const expected = expectedTrip.times[index]
   return {
     arrival,
     departure,
@@ -101,8 +93,9 @@ export interface StandingInput {
   /** The stop's departure board's word on its calls, by `callKey`, when the board is in hand. */
   readonly board?: ReadonlyMap<string, BoardCall>
   /**
-   * What the tracker remembers of each trip, which keeps the delay of one that has arrived at its
-   * last stop and left the map while it stands there.
+   * What the tracker remembers of each trip, which keeps the delay, steps and cancellations of one
+   * not yet drawn, or of one that has arrived at its last stop and left the map while it stands
+   * there.
    */
   readonly history?: History
 }
@@ -131,20 +124,19 @@ export function standingAt(
     for (const trip of timetable.tripsOn(day)) {
       if (trip.line.mode === 'metro') continue
       const last = trip.calls.length - 1
-      let shifted: readonly TimedCall[] | undefined
       const live = onMap.get(trip.key)
-      // Off the map, a trip's delay is the history's: one remembered before it is drawn, or one
-      // that has arrived at its last stop and stands there.
-      const delay = live ? live.delay : history?.[trip.key]?.delay
+      // Off the map, what is known of a trip is the history's: of one remembered before it is
+      // drawn, or of one that has arrived at its last stop and stands there.
+      let expected: ExpectedTrip | undefined
       trip.calls.forEach((call, index) => {
         if (platforms[call.platform].stop !== stopIndex) return
-        if (live?.cancelled || live?.cancelledCalls?.includes(index)) return
+        // Timed by SIRI-ET's steps where it has them, as the map moves it.
+        expected ??= expectedTrip(trip.calls, live ?? history?.[trip.key])
+        if (expected.skips(index)) return
         const word = index < last ? board?.get(callKey(trip, index)) : undefined
         if (word?.cancelled) return
-        // On the map, by SIRI-ET's steps where it has them, as the map moves it.
-        if (!word && delay !== undefined) shifted ??= expectedTimes(trip.calls, live ?? { delay })
-        const times = word ? fromBoard(trip, index, word) : fromSnapshot(trip, index, shifted)
-        const off = delay === undefined ? 'timetable-only' : 'estimated'
+        const times = word ? fromBoard(trip, index, word) : fromExpected(trip, index, expected)
+        const off = expected.expected ? 'estimated' : 'timetable-only'
         const state = word?.state ?? live?.state ?? off
         const arrives = followsExpected(state)
           ? (times.expectedArrival ?? times.arrival)

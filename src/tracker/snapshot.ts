@@ -20,7 +20,10 @@ export const PositionMode = Schema.Literals(['REPORT_ONLY', 'CALC_REPORT', 'alte
 
 export const Mode = Schema.Literals(['bus', 'metro', 's-tog', 'train', 'light-rail'])
 
-/** One of a trip's next calls: its index in the pattern, its platform and when it leaves. */
+/**
+ * One of the calls ahead of a trip, cancelled or not, which its dot moves through: its index in the
+ * pattern, its platform and when it leaves. Its next call is the first it still serves.
+ */
 export const NextCall = Schema.Struct({
   index: Schema.Number,
   stop: Schema.String,
@@ -57,7 +60,7 @@ export const SnapshotTrip = Schema.Struct({
    * SIRI-ET's delays for the trip, from its latest update (spec #146), kept once the table no
    * longer brings it, as for a No signal trip on a quiet feed; as steps: a call index and the delay
    * in seconds there, listed where the delay changes, the calls between taking the step before
-   * them (`expectedTimes`, src/domain/trip-motion.ts). Opened trips and stops time each call by
+   * them (`expectedTrip`, src/domain/expected-trip.ts). Opened trips and stops time each call by
    * them, as the map moves the trip.
    */
   steps: optional(Schema.Array(Schema.Tuple([Schema.Number, Schema.Number]))),

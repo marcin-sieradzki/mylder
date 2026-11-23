@@ -3,7 +3,7 @@
 // from the trip route's answer, the snapshot's trip and the clock. Words only: the panel lays them
 // out. Times read on the clock of the timetable's zone.
 import { noSignalSince, type DataState, type DataStateContext } from '../domain/data-state.ts'
-import { tripPhase, type TimedCall } from '../domain/trip-motion.ts'
+import { expectedTrip, type ExpectedTrip } from '../domain/expected-trip.ts'
 import type { ClientDictionary } from '../i18n/dictionary.ts'
 import type { Where } from '../map/where.ts'
 import { clockTime } from '../timetable/time.ts'
@@ -21,36 +21,24 @@ const EXPECTED_FROM = 60_000
  */
 export const runsToInterval = (detail: TripDetail): boolean => detail.runsToInterval === true
 
-/** The times the trip keeps at each call: the expected ones where it has them, else the plan's. */
-export const timedCallsOf = (detail: TripDetail): TimedCall[] =>
-  detail.calls.map((call) => ({
-    arrival: call.expectedArrival ?? call.arrival,
-    departure: call.expectedDeparture ?? call.departure,
-  }))
+/** The trip's expected calls, from the answer's times and cancellations. */
+export const expectedTripOf = (detail: TripDetail): ExpectedTrip =>
+  expectedTrip(detail.calls, {
+    cancelled: detail.cancelled === true,
+    cancelledCalls: detail.calls.flatMap((call) => (call.cancelled ? [call.index] : [])),
+  })
 
 /**
  * The trip's delay in seconds, as its panel gives it: Rejseplanen's own at the next call, from the
- * trip's detail; else expected minus timetabled at its `next` call, where the answer expects it, as
- * SIRI-ET's delays time each call; else the answer's snapshot's, else the snapshot's now, which may
- * be newer.
+ * trip's detail; else at its `next` call by the answer's expected calls, as SIRI-ET's delays time
+ * each call; else the answer's snapshot's, else the snapshot's now, which may be newer.
  */
 export const shownDelayOf = (
   detail: TripDetail,
   trip: SnapshotTrip | undefined,
   next?: number,
 ): number | undefined =>
-  detail.nextCallDelay ?? delayAtCall(detail, next) ?? detail.delay ?? trip?.delay
-
-/** Seconds late at a call the answer has an expected time for: its departure, its last's arrival. */
-function delayAtCall(detail: TripDetail, index: number | undefined): number | undefined {
-  const call = index === undefined ? undefined : detail.calls[index]
-  if (!call) return undefined
-  const last = index === detail.calls.length - 1
-  const [planned, expected] = last
-    ? [call.arrival, call.expectedArrival]
-    : [call.departure, call.expectedDeparture]
-  return expected === undefined ? undefined : (expected - planned) / 1000
-}
+  detail.nextCallDelay ?? expectedTripOf(detail).delayAt(next) ?? detail.delay ?? trip?.delay
 
 /** A delay in seconds as whole minutes with their sign, "+3 min", "−1 min" or "0 min". */
 function signedMinutes(delay: number, words: Words): string {
@@ -111,29 +99,11 @@ export function stateSentence(input: StateInput) {
 }
 
 /**
- * The index of the trip's next call: the snapshot's while it is on the map, else where its times
- * put it at `now`; past the last once it has arrived, and none for a cancelled trip.
+ * The index of the trip's next call at `now` by the answer's expected calls: the first it still
+ * serves that it hasn't left; none once it has arrived, and none for a cancelled trip.
  */
-export function nextCallOf(
-  detail: TripDetail,
-  trip: SnapshotTrip | undefined,
-  now: number,
-): number | undefined {
-  if (detail.cancelled) return undefined
-  if (trip) return trip.waiting ? 0 : (trip.next[0]?.index ?? detail.calls.length)
-  const calls = timedCallsOf(detail)
-  switch (tripPhase(calls, now)) {
-    case 'upcoming':
-    case 'waiting':
-      return 0
-    case 'finished':
-      return calls.length
-    case 'underway': {
-      const next = calls.findIndex((call) => call.departure > now)
-      return next < 0 ? calls.length - 1 : next
-    }
-  }
-}
+export const nextCallOf = (detail: TripDetail, now: number): number | undefined =>
+  expectedTripOf(detail).nextCall(now)
 
 /** Where the trip is, in words, naming its stops as its calls do. */
 export function whereWords(where: Where, detail: TripDetail, timezone: string, words: Words) {

@@ -9,6 +9,7 @@
 // from the timetable plus the snapshot's delay, as before.
 import 'server-only'
 import { Clock, Effect } from 'effect'
+import { expectedTrip } from '../domain/expected-trip.ts'
 import type { IsoDate } from '../timetable/format.ts'
 import { clockMoment } from '../timetable/time.ts'
 import type { PlannedTrip } from '../timetable/trips.ts'
@@ -231,19 +232,13 @@ export function tripFromDetail(
     const stop = stopAt.get(call.index)
     return stop ? callFromStop(timezone, call, stop, last, tripCancelled) : call
   })
-  // The next call it will make, by the time it is expected there or else timetabled: the
-  // departure, or the arrival at the last stop.
-  const side = (call: TripCall) =>
-    call.index === last
-      ? { planned: call.arrival, expected: call.expectedArrival }
-      : { planned: call.departure, expected: call.expectedDeparture }
-  const next = calls.find((call) => {
-    const { planned, expected } = side(call)
-    return !call.cancelled && (expected ?? planned) > now
+  // Rejseplanen's own Delay at its next call, where the detail gives that call.
+  const expected = expectedTrip(calls, {
+    cancelled: tripCancelled,
+    cancelledCalls: calls.flatMap((call) => (call.cancelled ? [call.index] : [])),
   })
-  const nextSide = next && stopAt.has(next.index) ? side(next) : undefined
-  const expectedNext =
-    nextSide?.expected === undefined ? undefined : nextSide.expected - nextSide.planned
+  const next = expected.nextCall(now)
+  const expectedNext = next !== undefined && stopAt.has(next) ? expected.delayAt(next) : undefined
   const seen = new Set<string>()
   const messages: TripMessage[] = []
   for (const message of detail.Messages?.Message ?? []) {
@@ -263,7 +258,7 @@ export function tripFromDetail(
     ...(realtime ? timed : base),
     key: guess.key,
     ...(trip.key === guess.key ? {} : { planned: trip.key }),
-    ...(expectedNext === undefined ? {} : { nextCallDelay: Math.round(expectedNext / 1000) }),
+    ...(expectedNext === undefined ? {} : { nextCallDelay: Math.round(expectedNext) }),
     ...(tripCancelled ? { cancelled: true as const } : {}),
     // Due again when the snapshot is, or sooner when the detail's minute runs out first.
     nextDue: Math.min(snapshot.nextDue, called.at + 60_000),
